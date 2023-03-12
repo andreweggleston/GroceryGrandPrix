@@ -1,7 +1,7 @@
 import java.awt.geom.Point2D;
 
 public class Node {
-    Point2D.Double coord;
+    Point2D.Double coord = new Point2D.Double();
     double angle;
     double distance;
     Node next;
@@ -9,14 +9,14 @@ public class Node {
     public Node(int x, int y){
         this.coord.x = x;
         this.coord.y = y;
-        next = this;
+        setNext(this);
     }
     public Node(int x, int y, Node n){
         this.coord.x = x;
         this.coord.y = y;
-        next = n;
+        setNext(n);
     }
-    public Node Next(){
+    public Node next(){
         return next;
     }
     public void setNext(Node n){
@@ -27,10 +27,11 @@ public class Node {
     public double getAngle(){
         return angle;
     }
-    public double getDistance(){
+    public double distanceToNext(){
         return distance;
     }
     public Point2D.Double getCoord(){
         return coord;
     }
+
 }
