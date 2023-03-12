@@ -2,6 +2,7 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 
 public class GroceryGrandPrix implements ActionListener {
     private boolean hurried;
@@ -56,6 +57,17 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     private void generateNodes(int number) {
+        Random rand = new Random();
+        double x = rand.nextDouble(800) + 50;
+        double y = rand.nextDouble(400) + 50;
+        Node head = new Node(x, y);
+        Node temp = head;
+        for (int i = 0; i < number-1; i++) {
+            x = rand.nextDouble(800) + 50;
+            y = rand.nextDouble(400) + 50;
+            temp.setNext(new Node(x, y, head));
+            temp = temp.next();
+        }
 
     }
 
