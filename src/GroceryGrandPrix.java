@@ -1,5 +1,6 @@
 // Phoenix Ganz-Ratzat
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
@@ -8,22 +9,22 @@ public class GroceryGrandPrix implements ActionListener {
     private boolean hurried;
     private int budget;
     private int round;
+    private int finished;
     private int tickRate;
     private double timeElapsed;
-    //private Car[] cars;
+    private Car[] cars;
     private JButton[] buttons;
-    //private GUI gui;
-    //private Node head;
+    private GUI gui;
+    private Node head;
     public GroceryGrandPrix() {
         hurried = false;
         budget = 5;
         round = 1;
         tickRate = 33;
         timeElapsed = 0;
-        //head = new Node();
-        //gui = new GUI();
-        //head = new Node();
+        generateCars();
         createButtons();
+        gui = new GUI(Color.CYAN);
     }
 
     public void startGame() {
@@ -33,17 +34,49 @@ public class GroceryGrandPrix implements ActionListener {
     private void openMenu() {
         /*
            gui.showPlayerMenu();
-         */
+        */
     }
 
     private void showTrack() {
         /* generateNodes(round*4);
            gui.drawTrack(head);
-         */
+        */
     }
 
-    private void simulateRace() {}
+    private void simulateRace() {
+        finished = 0;
+        Car winner = null;
 
+        double lastTime = (double) System.currentTimeMillis();
+        double accumulator = 0.0;
+        double newTime;
+        double frameTime;
+
+        while (finished < 5 - round) {
+            newTime = (double) System.currentTimeMillis();
+            frameTime = newTime - lastTime;
+
+            lastTime = newTime;
+            accumulator += frameTime;
+
+            while (accumulator >= tickRate * .001) {
+                for (Car car : cars) {
+                    finished += (car.drive(tickRate)) ? 1 : 0;
+                    if (finished == 1 && winner == null) {
+                        winner = car;
+                    }
+                }
+            }
+            gui.drawTrack();
+        }
+
+        if (winner.isPlayer()) {
+            gui.showWin();
+        }
+        else {
+            gui.showLose();
+        }
+    }
     private void restart() {
         // reset the game to round 1
     }
