@@ -51,6 +51,7 @@ public class Car {
         return false;
     }
 
+    public boolean isPlayer() {return true;}
 
 }
 
@@ -127,4 +128,5 @@ class CarStats {
             return Stat.values()[i];
         }
     }
+
 }
