@@ -24,7 +24,7 @@ public class GroceryGrandPrix implements ActionListener {
         timeElapsed = 0;
         generateCars();
         createButtons();
-        gui = new GUI(Color.CYAN);
+        gui = new GUI(Color.CYAN, buttons);
     }
 
     public void startGame() {
@@ -32,34 +32,31 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     private void openMenu() {
-        /*
-           gui.showPlayerMenu();
-        */
+        gui.playerMenu(round, budget);
     }
 
     private void showTrack() {
-        /* generateNodes(round*4);
-           gui.drawTrack(head);
-        */
+        generateNodes(round*4);
+        gui.buildSegments();
     }
 
     private void simulateRace() {
         finished = 0;
         Car winner = null;
 
-        double lastTime = (double) System.currentTimeMillis();
-        double accumulator = 0.0;
+        double lastTime = System.currentTimeMillis();
+        double accumulator = 0;
         double newTime;
         double frameTime;
 
         while (finished < 5 - round) {
-            newTime = (double) System.currentTimeMillis();
+            newTime = System.currentTimeMillis();
             frameTime = newTime - lastTime;
 
             lastTime = newTime;
             accumulator += frameTime;
 
-            while (accumulator >= tickRate * .001) {
+            while (accumulator >= tickRate) {
                 for (Car car : cars) {
                     finished += (car.drive(tickRate)) ? 1 : 0;
                     if (finished == 1 && winner == null) {
@@ -77,6 +74,7 @@ public class GroceryGrandPrix implements ActionListener {
             gui.showLose();
         }
     }
+
     private void restart() {
         // reset the game to round 1
     }
@@ -85,7 +83,7 @@ public class GroceryGrandPrix implements ActionListener {
         // create array of cars
     }
 
-    private void endGame(/*Car winner*/) {
+    private void endGame(Car winner) {
         // call either gui.showLose() or gui.showWin();
     }
 
