@@ -22,7 +22,7 @@ public class Car {
 
     public boolean drive(int ms) {
         boolean aboutToFinish = lastNode.next().equals(goalNode);
-        momentum += Math.min(topSpeed*2.5, acceleration);
+        momentum += Math.min(stats.topSpeed(), stats.acceleration());
         distanceFromLast += momentum*(ms/10.0);
 
         //if the car has passed a turn
@@ -63,7 +63,7 @@ class CarStats {
     static double MIN_HANDLING_FACTOR = 0.02;
 
     public CarStats(int topSpeed, int acceleration, int handling){
-        assert (topSpeed > 0 && topSpeed < 10) && (acceleration > 0 && acceleration < 10) && (handling > 0 && handling < 10)
+        assert (topSpeed > 0 && topSpeed < 10) && (acceleration > 0 && acceleration < 10) && (handling > 0 && handling < 10);
         this.topSpeed = Stat.fromInt(topSpeed);
         this.acceleration = Stat.fromInt(acceleration);
         this.handling = Stat.fromInt(handling);
