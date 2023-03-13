@@ -90,7 +90,7 @@ public class GroceryGrandPrix implements ActionListener {
         Random rand = new Random();
         double x = rand.nextDouble()*800 + 50;
         double y = rand.nextDouble()*400 + 50;
-        Node head = new Node(x, y);
+        head = new Node(x, y);
         Node temp = head;
         for (int i = 0; i < number-1; i++) {
             x = rand.nextDouble()*800 + 50;
@@ -98,11 +98,11 @@ public class GroceryGrandPrix implements ActionListener {
             temp.setNext(new Node(x, y, head));
             temp = temp.next();
         }
-        Node tNode = head;
+        temp = head;
         do{
-            System.out.println(tNode);
-            tNode = tNode.next();
-        }while (tNode != head);
+            System.out.println(temp);
+            temp = temp.next();
+        }while (temp != head);
     }
 
     private void updateCarStats() {
