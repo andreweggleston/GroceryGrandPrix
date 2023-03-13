@@ -17,6 +17,7 @@ public class GroceryGrandPrix implements ActionListener {
     private GUI gui;
     private Node head;
     public GroceryGrandPrix() {
+        generateNodes(5);
         hurried = false;
         budget = 5;
         round = 1;
@@ -97,7 +98,11 @@ public class GroceryGrandPrix implements ActionListener {
             temp.setNext(new Node(x, y, head));
             temp = temp.next();
         }
-
+        Node tNode = head;
+        do{
+            System.out.println(tNode);
+            tNode = tNode.next();
+        }while (tNode != head);
     }
 
     private void updateCarStats() {

@@ -23,6 +23,7 @@ public class Node {
         next = n;
         distance = coord.distance(n.getCoord());
         angle = Math.atan2(n.getCoord().getY() - this.getCoord().getY(), n.getCoord().getX() - this.getCoord().getX());
+
     }
     public double getAngle(){
         return angle;
@@ -34,4 +35,7 @@ public class Node {
         return coord;
     }
 
+    public String toString(){
+        return "X: " + this.coord.getX() + " Y: " + this.coord.getY() + " Distance: " + distance + " Angle: " + angle;
+    }
 }
