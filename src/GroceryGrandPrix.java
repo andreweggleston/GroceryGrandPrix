@@ -8,6 +8,7 @@ import java.util.Random;
 
 public class GroceryGrandPrix implements ActionListener {
     private boolean hurried;
+    private boolean paused;
     private int budget;
     private int round;
     private int tickRate;
@@ -19,6 +20,7 @@ public class GroceryGrandPrix implements ActionListener {
     public GroceryGrandPrix() {
         generateNodes(5);
         hurried = false;
+        paused = false;
         budget = 5;
         round = 1;
         tickRate = 33;
@@ -26,15 +28,18 @@ public class GroceryGrandPrix implements ActionListener {
         generateCars();
         createButtons();
         gui = new GUI(Color.WHITE, buttons);
+        showTrack();
     }
 
     public void startGame() {
         gui.playerMenu(round, budget);
     }
 
+
+
     private void showTrack() {
         generateNodes(round*4);
-        gui.buildSegments();
+        gui.buildSegments(head);
     }
 
     private void simulateRace() {
@@ -54,7 +59,7 @@ public class GroceryGrandPrix implements ActionListener {
             lastTime = newTime;
             accumulator += frameTime;
             // simulate a number of ticks based on the amount of time that has passed since the last simulation
-            while (accumulator >= tickRate) {
+            while (accumulator >= tickRate && !paused) {
                 for (Car car : cars) {
                     if (car == null) {
                         // drive a car and increment finished if it finishes the race
@@ -113,9 +118,29 @@ public class GroceryGrandPrix implements ActionListener {
         JButton action = (JButton) event.getSource();
         switch (action.getActionCommand()){
             case "Start Race" :
-                for(int car = 1; car < cars.size() ; car++){
-                    gui.createPreview(car);
-                }
+                break;
+            case "hurry" :
+                tickRate = (hurried) ? 33 : 16;
+                hurried = !hurried;
+                break;
+            case "pause" :
+                paused = !paused;
+                break;
+            case "restart" :
+                restart();
+                break;
+            case "plus1" :
+                break;
+            case "plus2" :
+                break;
+            case "plus3" :
+                break;
+            case "minus1" :
+                break;
+            case "minus2" :
+                break;
+            case "minus3" :
+                break;
         }
 
     }
@@ -123,24 +148,34 @@ public class GroceryGrandPrix implements ActionListener {
     private void createButtons() {
         JButton plus1 = new JButton();
         plus1.addActionListener(this);
+        plus1.setActionCommand("plus1");
         JButton plus2 = new JButton();
         plus2.addActionListener(this);
+        plus2.setActionCommand("plus2");
         JButton plus3 = new JButton();
         plus3.addActionListener(this);
+        plus3.setActionCommand("plus3");
         JButton minus1 = new JButton();
         minus1.addActionListener(this);
+        minus1.setActionCommand("minus1");
         JButton minus2 = new JButton();
         minus2.addActionListener(this);
+        minus2.setActionCommand("minus2");
         JButton minus3 = new JButton();
         minus3.addActionListener(this);
+        minus3.setActionCommand("minus3");
         JButton startRace = new JButton();
         startRace.addActionListener(this);
+        startRace.setActionCommand("Start Race");
         JButton hurry = new JButton();
         hurry.addActionListener(this);
+        hurry.setActionCommand("hurry");
         JButton pause = new JButton();
         pause.addActionListener(this);
+        pause.setActionCommand("pause");
         JButton restart = new JButton();
         restart.addActionListener(this);
+        restart.setActionCommand("restart");
         buttons = new JButton[] {plus1, plus2, plus3, minus1, minus2, minus3, startRace, hurry, pause, restart};
     }
 
