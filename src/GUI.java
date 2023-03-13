@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.time.Instant;
 
 public class GUI extends JFrame implements MouseListener{
     private Color backgroundColor;
@@ -42,10 +41,10 @@ public class GUI extends JFrame implements MouseListener{
 
     public void playerMenu(int round, int budget /* , Car playerCar*/) {
         JPanel menu = new JPanel();
-        previewBar.add(createPreview(0));
+        createPreview(0);
         center.add(menu);
     }
-    private JPanel createPreview(int car){
+    public JPanel createPreview(int car){
         JPanel preview = new JPanel(new BorderLayout());
         preview.setPreferredSize(new Dimension(150, 150));
         preview.setMinimumSize(new Dimension(150, 150));
@@ -58,15 +57,12 @@ public class GUI extends JFrame implements MouseListener{
         placeholderForJIcon.setMaximumSize(new Dimension(120, 80));
 
         JPanel speedBar = new JPanel();
-        //speedBar.add(new Box.Filler((new Dimension(130,6)), (new Dimension(130,6)), (new Dimension(130,6))));
         speedBar.setBackground(Color.MAGENTA);
 
         JPanel accelerationBar = new JPanel();
-        //accelerationBar.add(new Box.Filler((new Dimension(130,6)), (new Dimension(130,6)), (new Dimension(130,6))));
         accelerationBar.setBackground(Color.CYAN);
 
         JPanel handlingBar = new JPanel();
-        //handlingBar.add(new Box.Filler((new Dimension(130,6)), (new Dimension(130,6)), (new Dimension(130,6))));
         handlingBar.setBackground(Color.GREEN);
 
         JPanel statsDisplay = new JPanel();
@@ -76,9 +72,7 @@ public class GUI extends JFrame implements MouseListener{
         statsDisplay.setMinimumSize(new Dimension(120,34));
         statsDisplay.setMaximumSize(new Dimension(120,34));
         statsDisplay.add(speedBar);
-        //statsDisplay.add(new Box.Filler((new Dimension(130,1)), (new Dimension(130,1)), (new Dimension(130,1))));
         statsDisplay.add(accelerationBar);
-        //statsDisplay.add(new Box.Filler((new Dimension(130,1)), (new Dimension(130,1)), (new Dimension(130,1))));
         statsDisplay.add(handlingBar);
 
 
@@ -89,17 +83,8 @@ public class GUI extends JFrame implements MouseListener{
         previewCenter.add(new Box.Filler((new Dimension(150,15)), (new Dimension(150,15)), (new Dimension(150,15))));
         previewCenter.add(statsDisplay);
 
-
-
-
-        //JPanel previewSouth = new JPanel();
-
-        //previewSouth.setBackground(Color.lightGray);
-        //previewSouth.add(new Box.Filler((new Dimension(150,10)), (new Dimension(150,10)), (new Dimension(150,10))));
-
         preview.add(new Box.Filler((new Dimension(120,15)), (new Dimension(120,15)), (new Dimension(120,15))), BorderLayout.NORTH);
         preview.add(previewCenter, BorderLayout.CENTER);
-
         preview.add(new Box.Filler((new Dimension(15,130)), (new Dimension(15,130)), (new Dimension(15,130))), BorderLayout.WEST);
         preview.add(new Box.Filler((new Dimension(15,130)), (new Dimension(15,130)), (new Dimension(15,130))), BorderLayout.EAST);
         preview.add(new Box.Filler((new Dimension(150,15)), (new Dimension(150,15)), (new Dimension(150,15))), BorderLayout.SOUTH);
@@ -123,7 +108,16 @@ public class GUI extends JFrame implements MouseListener{
     @Override
     public void mouseReleased(MouseEvent e) {}
     @Override
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseEntered(MouseEvent e) {
+        switch (((JButton) e.getSource()).getActionCommand()){
+            case "Speed Help" :
+                break;
+            case "Acceleration Help" :
+                break;
+            case "Handling Help" :
+                break;
+        }
+    }
     @Override
     public void mouseExited(MouseEvent e) {}
 

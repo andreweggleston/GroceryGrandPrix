@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class GroceryGrandPrix implements ActionListener {
@@ -11,7 +12,7 @@ public class GroceryGrandPrix implements ActionListener {
     private int round;
     private int tickRate;
     private double timeElapsed;
-    private Car[] cars;
+    private ArrayList <Car> cars = new ArrayList<Car>();
     private JButton[] buttons;
     private GUI gui;
     private Node head;
@@ -23,7 +24,7 @@ public class GroceryGrandPrix implements ActionListener {
         timeElapsed = 0;
         generateCars();
         createButtons();
-        gui = new GUI(Color.CYAN, buttons);
+        gui = new GUI(Color.WHITE, buttons);
     }
 
     public void startGame() {
@@ -104,7 +105,14 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        // handle all buttons
+        JButton action = (JButton) event.getSource();
+        switch (action.getActionCommand()){
+            case "Start Race" :
+                for(int car = 1; car < cars.size() ; car++){
+                    gui.createPreview(car);
+                }
+        }
+
     }
 
     private void createButtons() {
