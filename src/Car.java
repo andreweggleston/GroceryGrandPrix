@@ -91,6 +91,35 @@ public class Car {
         return stats.handling.statNumeral;
     }
 
+    //following accessors added by Naomi
+    public Icon getIcon() {
+        return icon;
+    }
+    public double getMomentum() {
+        return momentum;
+    }
+    public void setMomentum(double momentum) {
+        this.momentum = momentum;
+    }
+    public double getDistanceFromLast() {
+        return distanceFromLast;
+    }
+    public void setDistanceFromLast(double distanceFromLast) {
+        this.distanceFromLast = distanceFromLast;
+    }
+    public Node getLastNode() {
+        return lastNode;
+    }
+    public void setLastNode(Node lastNode) {
+        this.lastNode = lastNode;
+    }
+    public Node getGoalNode() {
+        return goalNode;
+    }
+    public void setGoalNode(Node goalNode) {
+        this.goalNode = goalNode;
+    }
+
     //TODO explain reasoning for using a private static inner class
     private static class CarStats {
 

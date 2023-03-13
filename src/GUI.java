@@ -2,15 +2,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 public class GUI extends JFrame implements MouseListener{
     private Color backgroundColor;
     private Color foregroundColor;
+    private ArrayList<JPanel> previews;
     private JPanel previewBar;
     private JPanel center;
+    private JPanel track;
     private JPanel southButtons;
+    boolean firstDraw;
     public GUI(Color backgroundColor, JButton[] buttons){
         super("GroceryGrandPrix");
+        firstDraw = true;
         this.backgroundColor = backgroundColor;
         foregroundColor = Color.lightGray;
         this.setBackground(backgroundColor);
@@ -19,6 +24,7 @@ public class GUI extends JFrame implements MouseListener{
         setLayout(new BorderLayout());
         Container c = this.getContentPane();
 
+        previews = new ArrayList<JPanel>();
         previewBar = new JPanel();
         previewBar.setLayout(new BoxLayout(previewBar, BoxLayout.X_AXIS));
         previewBar.setBackground(backgroundColor);
@@ -44,12 +50,12 @@ public class GUI extends JFrame implements MouseListener{
         createPreview(0);
         center.add(menu);
     }
-    public JPanel createPreview(int car){
-        JPanel preview = new JPanel(new BorderLayout());
-        preview.setPreferredSize(new Dimension(150, 150));
-        preview.setMinimumSize(new Dimension(150, 150));
-        preview.setMaximumSize(new Dimension(150, 150));
-        preview.setBackground(foregroundColor);
+    public void createPreview(int car){
+        previews.add(car, new JPanel(new BorderLayout()));
+        previews.get(car).setPreferredSize(new Dimension(150, 150));
+        previews.get(car).setMinimumSize(new Dimension(150, 150));
+        previews.get(car).setMaximumSize(new Dimension(150, 150));
+        previews.get(car).setBackground(foregroundColor);
 
         JPanel placeholderForJIcon = new JPanel();
         placeholderForJIcon.setBackground(Color.WHITE);
@@ -83,17 +89,21 @@ public class GUI extends JFrame implements MouseListener{
         previewCenter.add(new Box.Filler((new Dimension(150,15)), (new Dimension(150,15)), (new Dimension(150,15))));
         previewCenter.add(statsDisplay);
 
-        preview.add(new Box.Filler((new Dimension(120,15)), (new Dimension(120,15)), (new Dimension(120,15))), BorderLayout.NORTH);
-        preview.add(previewCenter, BorderLayout.CENTER);
-        preview.add(new Box.Filler((new Dimension(15,130)), (new Dimension(15,130)), (new Dimension(15,130))), BorderLayout.WEST);
-        preview.add(new Box.Filler((new Dimension(15,130)), (new Dimension(15,130)), (new Dimension(15,130))), BorderLayout.EAST);
-        preview.add(new Box.Filler((new Dimension(150,15)), (new Dimension(150,15)), (new Dimension(150,15))), BorderLayout.SOUTH);
-        return preview;
+        previews.get(car).add(new Box.Filler((new Dimension(120,15)), (new Dimension(120,15)), (new Dimension(120,15))), BorderLayout.NORTH);
+        previews.get(car).add(previewCenter, BorderLayout.CENTER);
+        previews.get(car).add(new Box.Filler((new Dimension(15,130)), (new Dimension(15,130)), (new Dimension(15,130))), BorderLayout.WEST);
+        previews.get(car).add(new Box.Filler((new Dimension(15,130)), (new Dimension(15,130)), (new Dimension(15,130))), BorderLayout.EAST);
+        previews.get(car).add(new Box.Filler((new Dimension(150,15)), (new Dimension(150,15)), (new Dimension(150,15))), BorderLayout.SOUTH);
+        previewBar.add(previews.get(car), car);
     }
     public void buildSegments(){
 
     }
     public void drawTrack() {
+
+        if(firstDraw){
+
+        }
     }
 
     public void showWin() {
