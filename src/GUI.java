@@ -120,11 +120,14 @@ public class GUI extends JComponent implements MouseListener {
             System.out.println(i + ":\n" + segment.toString() + "\n" + segment.getP1() + "\n " + segment.getP2() + "\n");
         }
         track = new Track(trackSegments);
+        track.setVisible(false);
     }
 
     public void drawTrack() {
         center.add(track);
-        //track.repaint();
+        track.setVisible(true);
+
+
     }
 
     public void showWin() {

@@ -48,7 +48,7 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     private void showTrack() {
-        generateNodes(round*10);
+        generateNodes(round*100);
         gui.buildSegments(head);
         gui.drawTrack();
     }
