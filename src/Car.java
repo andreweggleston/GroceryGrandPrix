@@ -115,6 +115,13 @@ public class Car {
     }
 
     //TODO explain reasoning for using a private static inner class
+
+    /**
+     * CarStats is a private inner class of Car that encapsulates the translation from integer stats (1 through 10) to
+     * double values used by car to calculate things like momentum and handling.
+     * The purpose for it being a private inner class is to prevent git conflicts when two people are working on Car
+     * code at the same time, as well as to keep all static final "factors" as a member of CarStats, not car.
+     */
     private static class CarStats {
 
 
@@ -134,14 +141,26 @@ public class Car {
             this.handling = Stat.fromInt(handling);
         }
 
+        /**
+         * Calculates double value for top speed used by Car
+         * @return top speed double
+         */
         public double topSpeed() {
             return topSpeed.statNumeral * TOP_SPEED_SCALE_FACTOR;
         }
 
+        /**
+         * Calculates double value for acceleration used by Car
+         * @return acceleration double
+         */
         public double acceleration() {
             return acceleration.statNumeral * ACCELERATION_SCALE_FACTOR;
         }
 
+        /**
+         * Calculates double value for handling used by Car
+         * @return handling double
+         */
         public double handling() {
             return (10 - handling.statNumeral) / 10.0 * HANDLING_SCALE_FACTOR + MIN_HANDLING_FACTOR;
         }
@@ -150,9 +169,9 @@ public class Car {
          * Stat enumerates the integer values [1,10]. We use an enumerator because we want the rigorous type
          * definition provided by an enum. This guarantees that a Stat won't exist with values outside the range
          * provided by the enum.
-         * We use an enum--instead of a class, even if we want methods--because a class would not allow for this
-         * behavior without constant checking of the actual integer value of the stat. With an enum those integer values
-         * are set once when the program is compiled and then cannot be touched during runtime.
+         * We use an enum--instead of a class, even if we want methods--because a class with an integer field would not
+         * guarantee the int was between 1 and 10.  With an enum those integer values are set once when the program is
+         * compiled and then cannot be touched during runtime.
          */
         enum Stat {
             ONE(1) {
