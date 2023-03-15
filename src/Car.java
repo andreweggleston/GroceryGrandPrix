@@ -101,9 +101,6 @@ public class Car {
     public double getMomentum() {
         return momentum;
     }
-    public void setMomentum(double momentum) {
-        this.momentum = momentum;
-    }
     public double getDistanceFromLast() {
         return distanceFromLast;
     }
@@ -113,14 +110,8 @@ public class Car {
     public Node getLastNode() {
         return lastNode;
     }
-    public void setLastNode(Node lastNode) {
-        this.lastNode = lastNode;
-    }
     public Node getGoalNode() {
         return goalNode;
-    }
-    public void setGoalNode(Node goalNode) {
-        this.goalNode = goalNode;
     }
 
     //TODO explain reasoning for using a private static inner class
