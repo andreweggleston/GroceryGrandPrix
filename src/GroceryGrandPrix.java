@@ -14,6 +14,8 @@ public class GroceryGrandPrix implements ActionListener {
     private boolean paused;
     private int budget;
     private int round;
+    private int trackWidth;
+    private int trackHeight;
     private int tickRate;
     private double timeElapsed;
     private GUI gui;
@@ -31,14 +33,16 @@ public class GroceryGrandPrix implements ActionListener {
         cars = new ArrayList<Car>();
         //generateCars();
         createButtons();
-        gui = new GUI(Color.WHITE, buttons);
+        trackWidth = 1920;
+        trackHeight = 830;
+        gui = new GUI(Color.WHITE, buttons, trackWidth, trackHeight);
         showTrack();
     }
 
     public void startGame() {
         gui.playerMenu(round, budget);
         for (int i = 0; i < cars.size(); i++) {
-            gui.createPreview(i);
+            gui.createPreviewCard(i);
         }
     }
 
