@@ -30,7 +30,7 @@ public class GroceryGrandPrix implements ActionListener {
         tickRate = 33;
         timeElapsed = 0;
         cars = new ArrayList<Car>();
-        generateCars();
+        //generateCars();
         createButtons();
         gui = new GUI(Color.WHITE, buttons);
         showTrack();
