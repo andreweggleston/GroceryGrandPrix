@@ -128,7 +128,7 @@ public class GroceryGrandPrix implements ActionListener {
 
         for (int i = 0; i < 4; i++) {
             if (i == 0) {
-                car = new Car(icons[0], 5, 5, 5, temp);
+                car = new Car(icons[0], 5, 5, 5, temp, true);
             }
             // Generate 3 random stat numbers, then create a car with a random stat number passed in for each of the cars stats.
             else {
@@ -148,13 +148,13 @@ public class GroceryGrandPrix implements ActionListener {
 
                 // Randomizes the order in which each of the stats are passed to Car's constructor to offset any bias towards each stat.
                 if (statPicker > (2.0/3.0)) {
-                    car = new Car(icons[iconIndex], stat1, (statPicker >= (5.0/6.0)) ? stat2 : stat3,  (statPicker >= (5.0/6.0)) ? stat3 : stat2, temp);
+                    car = new Car(icons[iconIndex], stat1, (statPicker >= (5.0/6.0)) ? stat2 : stat3,  (statPicker >= (5.0/6.0)) ? stat3 : stat2, temp, false);
                 }
                 else if (statPicker >= (1.0/3.0)) {
-                    car = new Car(icons[iconIndex], stat2, (statPicker >= .5) ? stat1 : stat3,  (statPicker >= .5) ? stat3 : stat1, temp);
+                    car = new Car(icons[iconIndex], stat2, (statPicker >= .5) ? stat1 : stat3,  (statPicker >= .5) ? stat3 : stat1, temp, false);
                 }
                 else {
-                    car = new Car(icons[iconIndex], stat3, (statPicker > (1.0/6.0)) ? stat1 : stat2,  (statPicker > (1.0/6.0)) ? stat2 : stat1, temp);
+                    car = new Car(icons[iconIndex], stat3, (statPicker > (1.0/6.0)) ? stat1 : stat2,  (statPicker > (1.0/6.0)) ? stat2 : stat1, temp,  false);
                 }
             }
             cars.set(i, car);
