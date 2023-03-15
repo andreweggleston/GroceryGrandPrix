@@ -5,19 +5,22 @@ public class Car {
 
     private CarStats stats;
 
+    private boolean isPlayer;
+
     private double momentum;
     private double distanceFromLast;
 
     private Node lastNode;
     private Node goalNode;
 
-    public Car(Icon icon, int topSpeed, int acceleration, int handling, Node goalNode) {
+    public Car(Icon icon, int topSpeed, int acceleration, int handling, Node goalNode, boolean isPlayer) {
         this.icon = icon;
         this.stats = new CarStats(topSpeed, acceleration, handling);
         this.goalNode = goalNode;
         this.momentum = 0.0;
         this.distanceFromLast = 0.0;
         this.lastNode = goalNode;
+        this.isPlayer = isPlayer;
     }
 
     public boolean drive(int ms) {
@@ -52,7 +55,7 @@ public class Car {
     }
 
     public boolean isPlayer() {
-        return true;
+        return isPlayer;
     }
 
     public void incrementTopSpeed() {
