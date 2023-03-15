@@ -22,7 +22,6 @@ public class GroceryGrandPrix implements ActionListener {
     private JButton[] buttons;
     private ImageIcon[] icons;
     public GroceryGrandPrix() {
-        generateNodes(5);
         hurried = false;
         paused = false;
         budget = 5;
@@ -48,7 +47,7 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     private void showTrack() {
-        generateNodes(round*100);
+        generateNodes(round*5);
         gui.buildSegments(head);
         gui.drawTrack();
     }
