@@ -163,27 +163,25 @@ public class GUI extends JComponent implements MouseListener {
 
     private class Track extends JPanel {
         ArrayList<Line2D.Double> segments;
-        boolean paintedOnce;
+        BasicStroke road;
 
         public Track(ArrayList<Line2D.Double> trackSegments) {
             super(true);
-            paintedOnce = false;
             setPreferredSize(new Dimension(900, 540));
             this.segments = trackSegments;
-            setForeground(Color.darkGray);
+            setForeground(Color.lightGray);
         }
 
         @Override
         public void paintComponent(Graphics g) {
             System.out.println("not dead yet!");
             Graphics2D g2 = (Graphics2D) g;
-            RenderingHints rh = new RenderingHints(
-                    RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setRenderingHints(rh);
-
+            RenderingHints antiAliasing = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            road = new BasicStroke(12, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
+            g2.setRenderingHints(antiAliasing);
+            g2.setStroke(road);
             for (Line2D.Double segment : segments) {
-                g2.setStroke(new BasicStroke(10));
+
                 g2.draw(segment);
                 System.out.println("Line2D : " + segment.toString());
             }
