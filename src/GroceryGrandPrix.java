@@ -52,8 +52,8 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     private void showTrack() {
-        generateNodes(round*6);
-        gui.buildSegments(head);
+        generateNodes(round*5);
+        gui.buildTrack(head, cars);
         gui.drawTrack();
     }
 
@@ -76,14 +76,13 @@ public class GroceryGrandPrix implements ActionListener {
             // simulate a number of ticks based on the amount of time that has passed since the last simulation
             while (accumulator >= tickRate && !paused) {
                 for (Car car : cars) {
-                    if (car == null) {
-                        // drive a car and increment finished if it finishes the race
-                        finished += (car.drive(tickRate)) ? 1 : 0;
-                        // save the winning car if one has not been chosen, and they are first
-                        if (finished == 1 && winner == null) {
-                            winner = car;
-                        }
+                    // drive a car and increment finished if it finishes the race
+                    finished += (car.drive(tickRate)) ? 1 : 0;
+                    // save the winning car if one has not been chosen, and they are first
+                    if (finished == 1 && winner == null) {
+                        winner = car;
                     }
+                    timeElapsed += ((double) tickRate)/1000;
                 }
                 accumulator -= tickRate;
             }
@@ -99,11 +98,11 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     private void restart() {
-        // reset the game to round 1
+        // TODO: reset the game to round 1
     }
 
     private void fileReader() throws IOException {
-        File[] spriteFiles = (new File("sprites")).listFiles();
+        File[] spriteFiles = (new File("assets/sprites")).listFiles();
         carImages = new BufferedImage[spriteFiles.length];
 
         for (int i = 0; i < spriteFiles.length; i++) {
@@ -117,7 +116,6 @@ public class GroceryGrandPrix implements ActionListener {
         Car car;
         Node temp = head;
         int iconIndex;
-        double statPicker;
         int maxStat = 10;
         int statPoints = 10;
         // The number at which stat2's lower bound becomes 1 after which the upper bound will begin to decrease.
@@ -125,8 +123,8 @@ public class GroceryGrandPrix implements ActionListener {
         int stat1;
         int stat2;
         int stat3;
-
-
+        double statPicker;
+        // TODO: switch to simple implementation
         for (int i = 0; i < 4; i++) {
             if (i == 0) {
                 car = new Car(carImages[0], new CarStats(5, 5, 5), temp, true);
@@ -218,7 +216,7 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     private void updateCarStats() {
-        // allocate budget for bots and update stats for all cars as race starts
+        // TODO: allocate budget for bots and update stats for all cars as race starts
     }
 
     public void actionPerformed(ActionEvent event) {
@@ -235,6 +233,8 @@ public class GroceryGrandPrix implements ActionListener {
                 break;
             case "restart" :
                 restart();
+                break;
+            case "next car" :
                 break;
             case "plus1" :
                 break;
@@ -273,7 +273,7 @@ public class GroceryGrandPrix implements ActionListener {
         minus3.setActionCommand("minus3");
         JButton startRace = new JButton();
         startRace.addActionListener(this);
-        startRace.setActionCommand("Start Race");
+        startRace.setActionCommand("start race");
         JButton hurry = new JButton();
         hurry.addActionListener(this);
         hurry.setActionCommand("hurry");
@@ -283,7 +283,10 @@ public class GroceryGrandPrix implements ActionListener {
         JButton restart = new JButton();
         restart.addActionListener(this);
         restart.setActionCommand("restart");
-        buttons = new JButton[] {plus1, plus2, plus3, minus1, minus2, minus3, startRace, hurry, pause, restart};
+        JButton nextCar = new JButton();
+        nextCar.addActionListener(this);
+        nextCar.setActionCommand("next car");
+        buttons = new JButton[] {plus1, plus2, plus3, minus1, minus2, minus3, startRace, hurry, pause, restart, nextCar};
     }
 
     public static void main(String[] args) {
