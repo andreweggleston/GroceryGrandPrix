@@ -12,7 +12,7 @@ public class Sprite extends JLabel{
     public Sprite(Car car) {
         super();
         try {
-            BufferedImage image = ImageIO.read(new File("assets/preview_" + type + "_size_" + size + ".png"));
+            BufferedImage image = ImageIO.read(new File("assets/preview_" + "_size_" + ".png"));
             final double radians = Math.toRadians(car.getLastNode().getAngle());
             final double sine = Math.abs(Math.sin(radians));
             final double cosine = Math.abs(Math.cos(radians));
@@ -29,14 +29,13 @@ public class Sprite extends JLabel{
             this.setHorizontalAlignment(JLabel.CENTER);
             this.setVerticalAlignment(JLabel.CENTER);
             this.setIcon(new ImageIcon(rotatedImage));
-        } catch (IOException e) {
-        }
+        } catch (IOException e) {}
     }
     //constructor for preview images
     public Sprite(String type, int size) {
         super();
         try {
-            BufferedImage image = ImageIO.read(new File("assets/preview_" + type + "_size_" + size + ".png"));
+            BufferedImage image = ImageIO.read(new File("assets//previews/preview_" + type + "_size_" + size + ".png"));
             this.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
             this.setMaximumSize(new Dimension(image.getWidth(), image.getHeight()));
             System.out.println("Max: " + this.getMaximumSize() + "\nPref: " + this.getPreferredSize() + "\nW: " + image.getWidth() + "\nH: " + image.getHeight());

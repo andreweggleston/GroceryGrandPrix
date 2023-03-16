@@ -7,12 +7,18 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-public class GUI extends JComponent implements MouseListener {
+public class GUI implements MouseListener {
     private Color backgroundColor;
     private Color foregroundColor;
+    JFrame frame;
+    Container game;
+    Container menu;
+    Container winlose;
+    Container loading;
     private ArrayList<JPanel> previewCards;
     private ArrayList<JPanel> previewSprites;
     private JButton[] menuButtons;
+    private JLabel[] menuLabels;
     private JPanel previewBar;
     private JPanel center;
     private JPanel east;
@@ -25,19 +31,19 @@ public class GUI extends JComponent implements MouseListener {
     boolean draw;
 
     public GUI(Color backgroundColor, JButton[] buttons, int width, int height) {
-        super();
-        JFrame frame = new JFrame("GroceryGrandPrix");
+        frame = new JFrame("GroceryGrandPrix");
+        menu = new Container();
+        game = new Container();
         draw = true;
-        this.centerWidth = width;
-        this.centerHeight = height;
+        centerWidth = width;
+        centerHeight = height;
         this.backgroundColor = backgroundColor;
-        this.foregroundColor = Color.lightGray;
-        this.menuButtons = buttons;
-        frame.setBackground(backgroundColor);
-        frame.setForeground(foregroundColor);
-        frame.getContentPane();
-
-        setLayout(new BorderLayout());
+        foregroundColor = Color.lightGray;
+        menuButtons = buttons;
+        menuLabels = new JLabel[4];
+        game.setBackground(backgroundColor);
+        game.setForeground(foregroundColor);
+        game.setLayout(new BorderLayout());
 
         previewCards = new ArrayList<JPanel>();
         previewSprites = new ArrayList<JPanel>();
@@ -50,11 +56,12 @@ public class GUI extends JComponent implements MouseListener {
         center.setBackground(backgroundColor);
         east = new JPanel(true);
         east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
-        this.playerMenu(0, 20);
-        frame.add(this);
-        frame.add(previewBar, BorderLayout.NORTH);
-        frame.add(center, BorderLayout.CENTER);
+        playerMenu(0, 20);
+        
+        game.add(previewBar, BorderLayout.NORTH);
+        game.add(center, BorderLayout.CENTER);
 
+        frame.setContentPane(game);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -62,11 +69,20 @@ public class GUI extends JComponent implements MouseListener {
     }
 
     public void playerMenu(int round, int budget) {
-        JPanel menu = new JPanel(new GridLayout(4,1));
-
+        menu.setLayout(new GridLayout(4,1));
         JPanel typeDisplay = new JPanel();
         JPanel typeSelector = new JPanel();
-        JPanel statSelectors = new JPanel();
+        JPanel statSelectors = new JPanel(new GridLayout(3,3));
+
+        statSelectors.add(menuButtons[3]);
+        statSelectors.add(menuLabels[1] = new JLabel(""));
+        statSelectors.add(menuButtons[0]);
+        statSelectors.add(menuButtons[4]);
+        statSelectors.add(menuLabels[2] = new JLabel(""));
+        statSelectors.add(menuButtons[1]);
+        statSelectors.add(menuButtons[5]);
+        statSelectors.add(menuLabels[3] = new JLabel(""));
+        statSelectors.add(menuButtons[2]);
 
         createPreviewCard(0);
         //menu.
