@@ -12,8 +12,7 @@ public class Sprite extends JLabel{
     public Sprite(Car car) {
         super();
         try {
-            BufferedImage image = ImageIO.read(new File("assets/preview_bikenana_small.png"));
-
+            BufferedImage image = ImageIO.read(new File("assets/preview_" + type + "_size_" + size + ".png"));
             final double radians = Math.toRadians(car.getLastNode().getAngle());
             final double sine = Math.abs(Math.sin(radians));
             final double cosine = Math.abs(Math.cos(radians));
