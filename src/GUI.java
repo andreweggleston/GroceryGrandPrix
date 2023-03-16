@@ -12,8 +12,10 @@ public class GUI extends JComponent implements MouseListener {
     private Color foregroundColor;
     private ArrayList<JPanel> previewCards;
     private ArrayList<JPanel> previewSprites;
+    private JButton[] menuButtons;
     private JPanel previewBar;
     private JPanel center;
+    private JPanel east;
     private JPanel track;
     private JPanel southButtons;
     private ArrayList<Line2D.Double> trackSegments;
@@ -30,6 +32,7 @@ public class GUI extends JComponent implements MouseListener {
         this.centerHeight = height;
         this.backgroundColor = backgroundColor;
         this.foregroundColor = Color.lightGray;
+        this.menuButtons = buttons;
         frame.setBackground(backgroundColor);
         frame.setForeground(foregroundColor);
         frame.getContentPane();
@@ -43,9 +46,10 @@ public class GUI extends JComponent implements MouseListener {
         previewBar.setBackground(backgroundColor);
 
         center = new JPanel();
-        //center.setLayout(null);
         center.setPreferredSize(new Dimension(centerWidth, centerHeight));
         center.setBackground(backgroundColor);
+        east = new JPanel(true);
+        east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
         this.playerMenu(0, 20);
         frame.add(this);
         frame.add(previewBar, BorderLayout.NORTH);
@@ -58,9 +62,15 @@ public class GUI extends JComponent implements MouseListener {
     }
 
     public void playerMenu(int round, int budget /* , Car playerCar*/) {
-        JPanel menu = new JPanel();
+        JPanel menu = new JPanel(new GridLayout(4,1));
+
+        JPanel typeDisplay = new JPanel();
+        JPanel typeSelector = new JPanel();
+        JPanel statSelectors = new JPanel();
+
         createPreviewCard(0);
-        //center.add(menu);
+        //menu.
+        //east.add(menu);
     }
 
     public void createPreviewCard(int car) {
@@ -112,8 +122,7 @@ public class GUI extends JComponent implements MouseListener {
         previewBar.add(previewCards.get(car), car);
     }
 
-    public void buildSegments(Node head) {
-
+    public void buildTrack(Node head, ArrayList <Car> cars) {
         trackSegments = new ArrayList<Line2D.Double>();
         Node temp = head;
         do {
@@ -130,12 +139,9 @@ public class GUI extends JComponent implements MouseListener {
         track = new Track(trackSegments, centerWidth, centerHeight);
         track.setVisible(false);
     }
-
     public void drawTrack() {
         center.add(track);
         track.setVisible(true);
-
-
     }
 
     public void showWin() {
@@ -191,7 +197,6 @@ public class GUI extends JComponent implements MouseListener {
             g2.setRenderingHints(antiAliasing);
             g2.setStroke(road);
             for (Line2D.Double segment : segments) {
-
                 g2.draw(segment);
                 System.out.println("Line2D : " + segment.toString());
             }
