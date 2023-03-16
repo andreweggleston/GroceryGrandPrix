@@ -127,7 +127,7 @@ public class GUI extends JComponent implements MouseListener {
             i++;
             System.out.println(i + ":\n" + segment.toString() + "\n" + segment.getP1() + "\n " + segment.getP2() + "\n");
         }
-        track = new Track(trackSegments);
+        track = new Track(trackSegments, centerWidth, centerHeight);
         track.setVisible(false);
     }
 
@@ -176,13 +176,12 @@ public class GUI extends JComponent implements MouseListener {
         ArrayList<Line2D.Double> segments;
         BasicStroke road;
 
-        public Track(ArrayList<Line2D.Double> trackSegments) {
+        public Track(ArrayList<Line2D.Double> trackSegments, int width, int height) {
             super(true);
-            setPreferredSize(new Dimension(900, 540));
+            setPreferredSize(new Dimension(width, height));
             this.segments = trackSegments;
             setForeground(Color.lightGray);
         }
-
         @Override
         public void paintComponent(Graphics g) {
             System.out.println("not dead yet!");
