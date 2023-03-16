@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class GroceryGrandPrix implements ActionListener {
     private Node head;
     private ArrayList <Car> cars ;
     private JButton[] buttons;
-    private ImageIcon[] icons;
+    private BufferedImage[] carImages;
     public GroceryGrandPrix() {
         hurried = false;
         paused = false;
@@ -103,10 +104,10 @@ public class GroceryGrandPrix implements ActionListener {
 
     private void fileReader() throws IOException {
         File[] spriteFiles = (new File("sprites")).listFiles();
-        icons = new ImageIcon[spriteFiles.length];
+        carImages = new BufferedImage[spriteFiles.length];
 
         for (int i = 0; i < spriteFiles.length; i++) {
-            icons[i] = new ImageIcon(ImageIO.read(spriteFiles[i]));
+            carImages[i] = ImageIO.read(spriteFiles[i]);
         }
     }
 
@@ -128,7 +129,7 @@ public class GroceryGrandPrix implements ActionListener {
 
         for (int i = 0; i < 4; i++) {
             if (i == 0) {
-                car = new Car(icons[0], 5, 5, 5, temp, true);
+                car = new Car(carImages[0], new CarStats(5, 5, 5), temp, true);
             }
             // Generate 3 random stat numbers, then create a car with a random stat number passed in for each of the cars stats.
             else {
@@ -144,17 +145,17 @@ public class GroceryGrandPrix implements ActionListener {
                 // Assigns the remaining unallocated stat points to the last stat.
                 stat3 = (statPoints - stat1) - stat2;
 
-                iconIndex = rand.nextInt(icons.length);
+                iconIndex = rand.nextInt(carImages.length);
 
                 // Randomizes the order in which each of the stats are passed to Car's constructor to offset any bias towards each stat.
                 if (statPicker > (2.0/3.0)) {
-                    car = new Car(icons[iconIndex], stat1, (statPicker >= (5.0/6.0)) ? stat2 : stat3,  (statPicker >= (5.0/6.0)) ? stat3 : stat2, temp, false);
+                    car = new Car(carImages[iconIndex], new CarStats(stat1, (statPicker >= (5.0/6.0)) ? stat2 : stat3,  (statPicker >= (5.0/6.0)) ? stat3 : stat2), temp, false);
                 }
                 else if (statPicker >= (1.0/3.0)) {
-                    car = new Car(icons[iconIndex], stat2, (statPicker >= .5) ? stat1 : stat3,  (statPicker >= .5) ? stat3 : stat1, temp, false);
+                    car = new Car(carImages[iconIndex], new CarStats(stat2, (statPicker >= .5) ? stat1 : stat3,  (statPicker >= .5) ? stat3 : stat1), temp, false);
                 }
                 else {
-                    car = new Car(icons[iconIndex], stat3, (statPicker > (1.0/6.0)) ? stat1 : stat2,  (statPicker > (1.0/6.0)) ? stat2 : stat1, temp,  false);
+                    car = new Car(carImages[iconIndex], new CarStats(stat3, (statPicker > (1.0/6.0)) ? stat1 : stat2,  (statPicker > (1.0/6.0)) ? stat2 : stat1), temp,  false);
                 }
             }
             cars.set(i, car);

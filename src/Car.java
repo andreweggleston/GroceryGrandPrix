@@ -1,10 +1,11 @@
 import javax.swing.Icon;
+import java.awt.image.BufferedImage;
 
 /**
- * Car represents a car in the game, both on and off the track.
+ * Car represents a car on the track
  */
 public class Car {
-    private Icon icon;
+    private BufferedImage image;
 
     private CarStats stats;
 
@@ -16,9 +17,9 @@ public class Car {
     private Node lastNode;
     private Node goalNode;
 
-    public Car(Icon icon, int topSpeed, int acceleration, int handling, Node goalNode, boolean isPlayer) {
-        this.icon = icon;
-        this.stats = new CarStats(topSpeed, acceleration, handling);
+    public Car(BufferedImage image, CarStats stats, Node goalNode, boolean isPlayer) {
+        this.image = image;
+        this.stats = stats;
         this.goalNode = goalNode;
         this.momentum = 0.0;
         this.distanceFromLast = 0.0;
@@ -98,8 +99,8 @@ public class Car {
     }
 
     //following accessors added by Naomi
-    public Icon getIcon() {
-        return icon;
+    public BufferedImage getImage() {
+        return image;
     }
     public double getMomentum() {
         return momentum;
