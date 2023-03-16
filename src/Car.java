@@ -1,4 +1,3 @@
-import javax.swing.Icon;
 import java.awt.image.BufferedImage;
 
 /**
