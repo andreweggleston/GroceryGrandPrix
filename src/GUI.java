@@ -61,7 +61,7 @@ public class GUI extends JComponent implements MouseListener {
         frame.setResizable(false);
     }
 
-    public void playerMenu(int round, int budget /* , Car playerCar*/) {
+    public void playerMenu(int round, int budget) {
         JPanel menu = new JPanel(new GridLayout(4,1));
 
         JPanel typeDisplay = new JPanel();
@@ -138,10 +138,11 @@ public class GUI extends JComponent implements MouseListener {
         }
         track = new Track(trackSegments, centerWidth, centerHeight);
         track.setVisible(false);
+        center.add(track);
     }
     public void drawTrack() {
-        center.add(track);
-        track.setVisible(true);
+        if(!track.isVisible()) track.setVisible(true);
+
     }
 
     public void showWin() {
