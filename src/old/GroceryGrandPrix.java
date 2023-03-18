@@ -1,4 +1,9 @@
-// Phoenix Ganz-Ratzat
+package old;// Phoenix Ganz-Ratzat
+
+import shared.Car;
+import shared.CarStats;
+import shared.Node;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;

@@ -1,23 +1,34 @@
+package shared;
+
 /**
  * CarStats class used by Car and GroceryGrandPrix that encapsulates the translation from integer stats (1 through 10)
  * to double values used by car to calculate things like momentum and handling.
  */
 public class CarStats {
 
-    Stat topSpeed;
-    Stat acceleration;
-    Stat handling;
-
     private static final double TOP_SPEED_SCALE_FACTOR = 2.5;
     private static final double ACCELERATION_SCALE_FACTOR = 1.0;
     private static final double HANDLING_SCALE_FACTOR = 0.53;
     private static final double MIN_HANDLING_FACTOR = 0.02;
+    Stat topSpeed;
+    Stat acceleration;
+    Stat handling;
 
     public CarStats(int topSpeed, int acceleration, int handling) {
         assert (topSpeed > 0 && topSpeed < 10) && (acceleration > 0 && acceleration < 10) && (handling > 0 && handling < 10);
         this.topSpeed = Stat.fromInt(topSpeed);
         this.acceleration = Stat.fromInt(acceleration);
         this.handling = Stat.fromInt(handling);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Top Speed: %d, Acceleration %d, Handling %d",
+                topSpeed.statNumeral,
+                acceleration.statNumeral,
+                handling.statNumeral
+        );
     }
 
     public void incrementTopSpeed() {
@@ -46,6 +57,7 @@ public class CarStats {
 
     /**
      * Calculates double value for top speed used by Car
+     *
      * @return top speed double
      */
     public double topSpeed() {
@@ -54,6 +66,7 @@ public class CarStats {
 
     /**
      * Calculates double value for acceleration used by Car
+     *
      * @return acceleration double
      */
     public double acceleration() {
@@ -62,6 +75,7 @@ public class CarStats {
 
     /**
      * Calculates double value for handling used by Car
+     *
      * @return handling double
      */
     public double handling() {
@@ -82,16 +96,7 @@ public class CarStats {
             public Stat decrement() {
                 return ONE;
             }
-        },
-        TWO(2),
-        THREE(3),
-        FOUR(4),
-        FIVE(5),
-        SIX(6),
-        SEVEN(7),
-        EIGHT(8),
-        NINE(9),
-        TEN(10) {
+        }, TWO(2), THREE(3), FOUR(4), FIVE(5), SIX(6), SEVEN(7), EIGHT(8), NINE(9), TEN(10) {
             @Override
             public Stat increment() {
                 return TEN;
@@ -104,6 +109,10 @@ public class CarStats {
             statNumeral = i;
         }
 
+        public static Stat fromInt(int i) {
+            return Stat.values()[i];
+        }
+
         public int getStatNumeral() {
             return statNumeral;
         }
@@ -114,10 +123,6 @@ public class CarStats {
 
         public Stat decrement() {
             return values()[ordinal() - 1];
-        }
-
-        public static Stat fromInt(int i) {
-            return Stat.values()[i];
         }
     }
 
