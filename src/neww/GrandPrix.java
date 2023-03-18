@@ -84,7 +84,7 @@ public class GrandPrix implements ActionListener {
                     finalDone[0] = finalDone[0] || car.drive(1);
                 }
                 finalTimeElapsed[0] += 1;
-                gui.revalidate();
+                gui.revalidate(); //VERY IMPORTANT LINE
                 gui.repaint();
             } else {
                 Timer self = (Timer) e.getSource();
