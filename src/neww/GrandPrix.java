@@ -71,17 +71,16 @@ public class GrandPrix implements ActionListener {
 
     private void startSimulation() throws InterruptedException {
         gui.toTrack(trackHead, cars);
-        window.repaint();
-        gui.repaint();
-//        gui.repaintTrack();
         double timeElapsed = 0.0;
+        gui.revalidate();
+        gui.repaint();
 
         final boolean[] finalDone = {false};
         final double[] finalTimeElapsed = {timeElapsed};
         new Timer(100, e -> {
             if (!finalDone[0]) {
                 for (Car car : cars) {
-                    finalDone[0] = finalDone[0] || car.drive(1);
+                    finalDone[0] = car.drive(1) || finalDone[0];
                 }
                 finalTimeElapsed[0] += 1;
                 gui.revalidate(); //VERY IMPORTANT LINE
@@ -147,18 +146,29 @@ public class GrandPrix implements ActionListener {
         JButton nextCar = new JButton();
         nextCar.addActionListener(this);
         nextCar.setActionCommand("next");
-        buttons = new JButton[]{plus1, plus2, plus3, minus1, minus2, minus3, startRace, hurry, pause, restart, nextCar};
+        JButton step = new JButton("step");
+        step.addActionListener(this);
+        step.setActionCommand("step");
+        buttons = new JButton[]{plus1, plus2, plus3, minus1, minus2, minus3, startRace, hurry, pause, restart, nextCar, step};
     }
     @Override
     public void actionPerformed(ActionEvent e) {
         JButton action = (JButton) e.getSource();
         switch (action.getActionCommand().substring(0, 4)) {
+            case "step":
+                for (Car car : cars) {
+                    car.drive(1);
+                }
+                gui.revalidate(); //VERY IMPORTANT LINE
+                gui.repaint();
+                break;
             case "race":
                 try {
                     startSimulation();
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
+                break;
             case "adj ":
                 String command = action.getActionCommand().substring(4);
                 System.out.println(command);

@@ -53,8 +53,8 @@ public class Car {
                 momentum = 0.0;
             }
 
-            lastNode = lastNode.next();
             distanceFromLast -= lastNode.distanceToNext();
+            lastNode = lastNode.next();
         }
         return false;
     }

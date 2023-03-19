@@ -66,7 +66,7 @@ public class TrackPanel extends JPanel {
             at.translate(-image.getWidth() / 2, -image.getHeight() / 2);
             final AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
             rotateOp.filter(image, rotatedImage);
-            g2.drawImage(rotatedImage, (int) carCoord.getX(), (int) carCoord.getY(), null);
+            g2.drawImage(rotatedImage, (int) (carCoord.getX()-(width/2)), (int) (carCoord.getY()-height/2), null);
         }
 
     }
