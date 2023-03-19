@@ -35,7 +35,6 @@ public class GUI implements MouseListener {
         menu = new Container();
         game = new Container();
         results = new Container();
-        results.setPreferredSize(new Dimension(width, height));
         results.setLayout(new BoxLayout(results, BoxLayout.Y_AXIS));
         draw = true;
         centerWidth = width;
@@ -101,7 +100,7 @@ public class GUI implements MouseListener {
 
         previewSprites.add(car, new JPanel());
         previewSprites.get(car).setBackground(Color.WHITE);
-        previewSprites.get(car).add(new Sprite("bikenana", 1));
+        //previewSprites.get(car).add(new Sprite("bikenana", 1));
         //System.out.println("Max: " + previewSprites.get(car).getMaximumSize() + "\nPref: " + previewSprites.get(car).getPreferredSize()/* + "\nW: " + image.getWidth() + "\nH: " + image.getHeight()*/);
         previewSprites.get(car).setPreferredSize(new Dimension(120, 80));
         previewSprites.get(car).setMaximumSize(new Dimension(120, 80));
@@ -165,23 +164,44 @@ public class GUI implements MouseListener {
     }
 
     public void showResults(ArrayList<Car> cars) {
+        Font messageFont = new Font(Font.SANS_SERIF, Font.BOLD, 24);
         JPanel headerPanel = new JPanel();
         JPanel rankingPanel = new JPanel();
+        rankingPanel.setLayout(new BoxLayout(rankingPanel, BoxLayout.Y_AXIS));
+        JPanel placementPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 75, 0));
+        JPanel imagePanel = new JPanel();
         JPanel bottomPanel = new JPanel();
 
-
         JLabel header = new JLabel("Placeholder text");
-
+        header.setFont(messageFont);
+        JLabel bottom = new JLabel("Placeholder text");
+        bottom.setFont(messageFont);
         headerPanel.add(header);
-
         for (int i = 0; i < cars.size(); i++) {
-
+            JLabel nextRanking = new JLabel(Integer.toString(i+1));
+            Sprite nextSprite = new Sprite("bikenana", 1);
+            nextRanking.setFont(new Font(Font.SANS_SERIF, Font.BOLD, (int)(nextSprite.getPreferredSize().getWidth()*3)/4));
+            placementPanel.add(nextRanking);
+            imagePanel.add(nextSprite);
         }
+        rankingPanel.add(placementPanel);
+        rankingPanel.add(imagePanel);
+
+        bottomPanel.add(bottom);
 
         results.add(headerPanel);
-        frame.setContentPane(results);
-        frame.pack();
-        frame.revalidate();
+        results.add(rankingPanel);
+        results.add(bottomPanel);
+        //frame.setContentPane(results);
+        //frame.pack();
+        //frame.revalidate();
+
+        JDialog resultsDialog = new JDialog(frame, "Results", true);
+        resultsDialog.setResizable(false);
+        resultsDialog.setContentPane(results);
+        resultsDialog.pack();
+        resultsDialog.revalidate();
+        resultsDialog.setVisible(true);
     }
 
     @Override

@@ -38,9 +38,9 @@ public class Sprite extends JLabel{
             BufferedImage image = ImageIO.read(new File("assets//previews/preview_" + type + "_size_" + size + ".png"));
             this.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
             this.setMaximumSize(new Dimension(image.getWidth(), image.getHeight()));
-            System.out.println("Max: " + this.getMaximumSize() + "\nPref: " + this.getPreferredSize() + "\nW: " + image.getWidth() + "\nH: " + image.getHeight());
-            this.setHorizontalAlignment(JLabel.CENTER);
-            this.setVerticalAlignment(JLabel.CENTER);
+            //System.out.println("Max: " + this.getMaximumSize() + "\nPref: " + this.getPreferredSize() + "\nW: " + image.getWidth() + "\nH: " + image.getHeight());
+            //this.setHorizontalAlignment(JLabel.CENTER);
+            //this.setVerticalAlignment(JLabel.CENTER);
             this.setIcon(new ImageIcon(image));
         } catch (IOException e) {
         }
