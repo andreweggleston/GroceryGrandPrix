@@ -41,7 +41,9 @@ public class GroceryGrandPrix implements ActionListener {
         generateCars();
         createButtons();
         gui = new GUI(Color.WHITE, buttons, trackX, trackY);
-        gui.showResults(cars);
+        //cars.remove(3);
+        //cars.remove(2);
+        gui.showResults(cars, 1, 25);
     }
 
     public void startGame() {
@@ -66,16 +68,16 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     private void simulateRace() {
-        ArrayList<Car> carPlacement = new ArrayList<Car>();
+        ArrayList<Car> carPlacements = new ArrayList<Car>();
         boolean carFinished;
-        int finishedCount= 0;
+        int playerPlacement = 0;
         double lastTime = System.currentTimeMillis();
         double accumulator = 0;
         double newTime;
         double loopTime;
 
         // loop until all cars racing in the round have finishedCount
-        while (finishedCount < 5 - round) {
+        while (carPlacements.size() < 5 - round) {
             newTime = System.currentTimeMillis();
             loopTime = newTime - lastTime;
             if (!paused) accumulator += loopTime;
@@ -88,8 +90,10 @@ public class GroceryGrandPrix implements ActionListener {
                     carFinished = car.drive(tickRate);
                     if (carFinished) {
                         // save the cars in finishing order
-                        finishedCount += 1;
-                        carPlacement.add(car);
+                        carPlacements.add(car);
+                        if (car.isPlayer()) {
+                            playerPlacement = carPlacements.size();
+                        }
                         carFinished = false;
                     }
                 }
@@ -99,8 +103,8 @@ public class GroceryGrandPrix implements ActionListener {
             gui.drawTrack(/*timeElapsed*/);
         }
 
-        gui.showResults(carPlacement);
-        cars.remove(carPlacement.get(carPlacement.size() - 1));
+        gui.showResults(carPlacements, playerPlacement, (int)timeElapsed);
+        cars.remove(carPlacements.get(carPlacements.size() - 1));
     }
 
     private void restart() {
@@ -117,6 +121,7 @@ public class GroceryGrandPrix implements ActionListener {
 
         for (int i = 0; i < spriteFiles.length; i++) {
             carImages[i] = ImageIO.read(spriteFiles[i]);
+            //spriteFiles[i].getName().split("_")[1];
         }
     }
 

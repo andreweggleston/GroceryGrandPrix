@@ -36,6 +36,7 @@ public class GUI implements MouseListener {
         game = new Container();
         results = new Container();
         results.setLayout(new BoxLayout(results, BoxLayout.Y_AXIS));
+        //results.setPreferredSize(new Dimension(1920, 1000));
         draw = true;
         centerWidth = width;
         centerHeight = height;
@@ -163,7 +164,24 @@ public class GUI implements MouseListener {
 
     }
 
-    public void showResults(ArrayList<Car> cars) {
+    public boolean showResults(ArrayList<Car> cars, int playerPlacement, int raceTime) {
+        boolean userContinue;
+        String placementSuffix;
+        switch (playerPlacement) {
+            case 1 :
+                placementSuffix = "st";
+                break;
+            case 2 :
+                placementSuffix = "nd";
+                break;
+            case 3 :
+                placementSuffix = "rd";
+                break;
+            default :
+                placementSuffix = "th";
+        }
+        JPanel statsHeaderPanel = new JPanel();
+
         Font messageFont = new Font(Font.SANS_SERIF, Font.BOLD, 24);
         JPanel headerPanel = new JPanel();
         JPanel rankingPanel = new JPanel();
@@ -172,36 +190,50 @@ public class GUI implements MouseListener {
         JPanel imagePanel = new JPanel();
         JPanel bottomPanel = new JPanel();
 
-        JLabel header = new JLabel("Placeholder text");
+        JTextArea header = new JTextArea("\t You placed " + playerPlacement + placementSuffix + ".\nThe race lasted " + raceTime + " seconds.");
+        header.setTabSize(3);
+        header.setEditable(false);
         header.setFont(messageFont);
-        JLabel bottom = new JLabel("Placeholder text");
+        header.setBackground(headerPanel.getBackground());
+        JLabel bottom = new JLabel((cars.get(cars.size()-1).isPlayer()) ? "Try again?" : "Do you want to continue?");
         bottom.setFont(messageFont);
-        headerPanel.add(header);
-        for (int i = 0; i < cars.size(); i++) {
-            JLabel nextRanking = new JLabel(Integer.toString(i+1));
-            Sprite nextSprite = new Sprite("bikenana", 1);
-            nextRanking.setFont(new Font(Font.SANS_SERIF, Font.BOLD, (int)(nextSprite.getPreferredSize().getWidth()*3)/4));
-            placementPanel.add(nextRanking);
-            imagePanel.add(nextSprite);
+        if (cars.size() == 2 && playerPlacement == 1) {
+            header.setText("\t\tYou win!\nThe final race lasted " + raceTime + " seconds.");
+            Car player = cars.get(0);
+            JLabel statsHeader = new JLabel("Your winning car is:");
+            statsHeader.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
+            JLabel stats = new JLabel("Spd: " + player.getTopSpeed() + " Acc: " + player.getAcceleration() + " Han: " + player.getHandling());
+            stats.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
+            Sprite playerSprite = new Sprite("bikenana", 1);
+            placementPanel.add(stats);
+            imagePanel.add(playerSprite);
+            statsHeaderPanel.add(statsHeader);
+            bottom.setText("Would you like to try another run?");
         }
-        rankingPanel.add(placementPanel);
-        rankingPanel.add(imagePanel);
-
+        else {
+            for (int i = 0; i < cars.size(); i++) {
+                JLabel nextRanking = new JLabel(Integer.toString(i + 1));
+                Sprite nextSprite = new Sprite("bikenana", 1);
+                nextRanking.setFont(new Font(Font.SANS_SERIF, Font.BOLD, (int) (nextSprite.getPreferredSize().getWidth() * 3) / 4));
+                placementPanel.add(nextRanking);
+                imagePanel.add(nextSprite);
+            }
+        }
+        headerPanel.add(header);
         bottomPanel.add(bottom);
 
         results.add(headerPanel);
-        results.add(rankingPanel);
+        results.add(statsHeaderPanel);
+        results.add(placementPanel);
+        results.add(imagePanel);
+        //results.add(rankingPanel);
         results.add(bottomPanel);
         //frame.setContentPane(results);
         //frame.pack();
         //frame.revalidate();
+        userContinue = JOptionPane.showConfirmDialog(frame, results, "Race Results", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE) != 1;
+        return userContinue;
 
-        JDialog resultsDialog = new JDialog(frame, "Results", true);
-        resultsDialog.setResizable(false);
-        resultsDialog.setContentPane(results);
-        resultsDialog.pack();
-        resultsDialog.revalidate();
-        resultsDialog.setVisible(true);
     }
 
     @Override
