@@ -51,7 +51,7 @@ public class TrackPanel extends JPanel {
                 throw new RuntimeException(e);
             }
         }
-        roadStroke = new BasicStroke(12, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
+        roadStroke = new BasicStroke(54, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
     }
 
     private static Point2D calculateCoord(Car car) {
@@ -76,10 +76,10 @@ public class TrackPanel extends JPanel {
             Point2D carCoord = calculateCoord(car);
             BufferedImage image = carImages[i];
             final double radians = car.getLastNode().getAngle() + Math.PI/2;
-            final double sine = Math.abs(Math.sin(radians));
-            final double cosine = Math.abs(Math.cos(radians));
-            final double width = Math.floor(image.getWidth() * cosine + image.getHeight() * sine);
-            final double height = Math.floor(image.getHeight() * cosine + image.getWidth() * sine);
+            final double sine = Math.sin(radians);
+            final double cosine = Math.cos(radians);
+            final double width = Math.floor(image.getWidth() * Math.abs(cosine) + image.getHeight() * Math.abs(sine));
+            final double height = Math.floor(image.getHeight() * Math.abs(cosine) + image.getWidth() * Math.abs(sine));
             final BufferedImage rotatedImage = new BufferedImage((int) width, (int) height, image.getType());
             final AffineTransform at = new AffineTransform();
             at.translate(width / 2, height / 2);
@@ -87,7 +87,7 @@ public class TrackPanel extends JPanel {
             at.translate(-image.getWidth() / 2, -image.getHeight() / 2);
             final AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
             rotateOp.filter(image, rotatedImage);
-            g2.drawImage(rotatedImage, (int) (carCoord.getX()-(width/2)), (int) (carCoord.getY()-(height/2)), null);
+            g2.drawImage(rotatedImage, (int) ((carCoord.getX()-(width/2))+((i-2)*10*cosine)), (int) ((carCoord.getY()-(height/2))+((i-2)*10*sine)), null);
         }
 
     }

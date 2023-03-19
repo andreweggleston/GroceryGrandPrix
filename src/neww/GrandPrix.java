@@ -166,13 +166,13 @@ public class GrandPrix implements ActionListener {
     }
 
     private void setupTempCars() {
-        playerStats = new CarStats(7, 6, 6);
+        playerStats = new CarStats(2, 4, 6);
         Car player = new Car(carNames[0], playerStats, trackHead, true);
         playerCar = player;
         cars.add(player);
-        cars.add(new Car(carNames[0], new CarStats(3,3,3), trackHead.next(), false));
-        cars.add(new Car(carNames[0], new CarStats(1,1,1), trackHead.next().next(), false));
-        cars.add(new Car(carNames[0], new CarStats(2,2,2), trackHead.next().next().next(), false));
+        cars.add(new Car(carNames[0], new CarStats(3,2,7), trackHead.next(), false));
+        cars.add(new Car(carNames[0], new CarStats(2,3,4), trackHead.next().next(), false));
+        cars.add(new Car(carNames[0], new CarStats(4,2,9), trackHead.next().next().next(), false));
     }
 
     private void setupButtons() {
