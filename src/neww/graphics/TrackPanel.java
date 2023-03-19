@@ -3,6 +3,7 @@ package neww.graphics;
 import shared.Car;
 import shared.Node;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -10,14 +11,18 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TrackPanel extends JPanel {
 
     List<Line2D.Double> trackSegments;
-    List<Car> cars;
+    Car[] cars;
+    BufferedImage[] carImages;
     BasicStroke roadStroke;
+
 
     public TrackPanel(Node head, List<Car> cars) {
         trackSegments = new ArrayList<>();
@@ -30,7 +35,22 @@ public class TrackPanel extends JPanel {
             Point2D p2 = temp.getCoord();
             trackSegments.add(new Line2D.Double(p1, p2));
         } while (temp != head);
-        this.cars = cars;
+        this.cars = new Car[cars.size()];
+        this.carImages = new BufferedImage[cars.size()];
+        for (int i = 0; i < cars.size(); i++) {
+            this.cars[i] = cars.get(i);
+            try {
+                BufferedImage image = ImageIO.read(new File("assets/sprites/sprite_" + cars.get(i).getImageName() + "_size_1.png"));
+                int scaleX = (int)(image.getWidth()*.75);
+                int scaleY = (int)(image.getHeight()*.75);
+                Image img = image.getScaledInstance(scaleX, scaleY, Image.SCALE_FAST);
+                image = new BufferedImage(scaleX, scaleY, BufferedImage.TYPE_INT_ARGB);
+                image.getGraphics().drawImage(img, 0, 0, null);
+                this.carImages[i] = image;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         roadStroke = new BasicStroke(12, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
     }
 
@@ -51,9 +71,10 @@ public class TrackPanel extends JPanel {
         for (Line2D.Double segment : trackSegments) {
             g2.draw(segment);
         }
-        for (Car car : cars) {
+        for (int i = 0; i < cars.length; i++) {
+            Car car = cars[i];
             Point2D carCoord = calculateCoord(car);
-            BufferedImage image = car.getImage();
+            BufferedImage image = carImages[i];
             final double radians = car.getLastNode().getAngle() + Math.PI/2;
             final double sine = Math.abs(Math.sin(radians));
             final double cosine = Math.abs(Math.cos(radians));
@@ -66,7 +87,7 @@ public class TrackPanel extends JPanel {
             at.translate(-image.getWidth() / 2, -image.getHeight() / 2);
             final AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
             rotateOp.filter(image, rotatedImage);
-            g2.drawImage(rotatedImage, (int) (carCoord.getX()-(width/2)), (int) (carCoord.getY()-height/2), null);
+            g2.drawImage(rotatedImage, (int) (carCoord.getX()-(width/2)), (int) (carCoord.getY()-(height/2)), null);
         }
 
     }

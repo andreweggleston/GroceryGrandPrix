@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import neww.graphics.GUI;
 import shared.Car;
@@ -19,6 +20,8 @@ import javax.swing.*;
 public class GrandPrix implements ActionListener {
 
     private final BufferedImage[] carImages;
+
+    private String[] carNames;
     private ArrayList<Car> cars;
     private CarStats playerStats;
     private Car playerCar;
@@ -31,13 +34,16 @@ public class GrandPrix implements ActionListener {
 
     private JFrame window;
 
+    private int trackX;
+    private int trackY;
+
     public GrandPrix() {
         File[] spriteFiles = (new File("assets/sprites")).listFiles();
         assert spriteFiles != null;
         carImages = new BufferedImage[spriteFiles.length];
-
+        carNames = new String[spriteFiles.length];
         for (int i = 0; i < spriteFiles.length; i++) {
-            System.out.println(spriteFiles[i].toURI());
+            carNames[i] = spriteFiles[i].getName().split("_")[1];
             try {
                 carImages[i] = ImageIO.read(spriteFiles[i]);
             } catch (IOException e) {
@@ -45,6 +51,8 @@ public class GrandPrix implements ActionListener {
             }
         }
         tickRateNs = 1000;
+        trackX = 1000;
+        trackY = 800;
         setupButtons();
         initialize();
         setupWindow();
@@ -65,7 +73,8 @@ public class GrandPrix implements ActionListener {
             gui.removeAll();
         }
         gui = new GUI(buttons);
-        setupTempTrack();
+//        setupTempTrack();
+        generateNodes(5);
         setupTempCars();
     }
 
@@ -78,18 +87,18 @@ public class GrandPrix implements ActionListener {
         final boolean[] finalDone = {false};
         final double[] finalTimeElapsed = {timeElapsed};
         new Timer(100, e -> {
-            if (!finalDone[0]) {
+//            if (!finalDone[0]) {
                 for (Car car : cars) {
                     finalDone[0] = car.drive(1) || finalDone[0];
                 }
                 finalTimeElapsed[0] += 1;
                 gui.revalidate(); //VERY IMPORTANT LINE
                 gui.repaint();
-            } else {
-                Timer self = (Timer) e.getSource();
-                self.stop();
-                JOptionPane.showMessageDialog(gui, String.format("Time elapsed: %f", finalTimeElapsed[0]));
-            }
+//            } else {
+//                Timer self = (Timer) e.getSource();
+//                self.stop();
+//                JOptionPane.showMessageDialog(gui, String.format("Time elapsed: %f", finalTimeElapsed[0]));
+//            }
         }).start();
     }
 
@@ -102,14 +111,68 @@ public class GrandPrix implements ActionListener {
         d.setNext(trackHead);
     }
 
+    private void generateNodes(int number) {
+        Random rand = new Random();
+        double x = rand.nextDouble()*400 + 50;
+        double y = rand.nextDouble()*200 + 250;
+        trackHead = new Node(x, y);
+        int quad = 1; // 1 = top left, 2 = top right, 3 = bottom right, 4 = bottom left
+        Node temp = trackHead;
+        for (int i = 0; i < number-1; i++) {
+            switch (quad) {
+                case 1:
+                    x = rand.nextDouble() * (trackX - temp.getCoord().getX()-50) + (temp.getCoord().getX()); //Goes right
+                    y = rand.nextDouble() * (trackY - 50) + 50;
+                    break;
+                case 2:
+                    x = rand.nextDouble() * (trackX - 50) + 50;
+                    y = rand.nextDouble() * (temp.getCoord().getY() - 50) + 50; //Goes down
+                    break;
+                case 3:
+                    x = rand.nextDouble() * (temp.getCoord().getX() - 50) + 50; //Goes left
+                    y = rand.nextDouble() * (trackY - 50) + 50;
+                    break;
+                case 4:
+                    x = rand.nextDouble() * (trackX - 50) + 50;
+                    y = rand.nextDouble() * (trackY - temp.getCoord().getY()-50) + (temp.getCoord().getY()); //Goes down
+            }
+            //Checks new quadrant below:
+            if (temp.getCoord().getX() >= trackX / 2) {
+                if (temp.getCoord().getY() >= trackY / 2) {
+                    quad = 2;
+                }else {
+                    quad = 3;
+                }
+            } else{
+                if(temp.getCoord().getY() >= trackY / 2){
+                    quad = 1;
+                }else {
+                    quad = 4;
+                }
+            }
+            temp.setNext(new Node(x, y, trackHead));
+            temp = temp.next();
+        }
+        /*for (int i = 0; i < number-1; i++) {
+            x = rand.nextDouble()*800 + 50;
+            y = rand.nextDouble()*400 + 50;
+            temp.setNext(new Node(x, y, head));
+            temp = temp.next();
+        }*/
+        temp = trackHead;
+        do{
+            temp = temp.next();
+        }while (temp != trackHead);
+    }
+
     private void setupTempCars() {
         playerStats = new CarStats(7, 6, 6);
-        System.out.println(playerStats);
-        Car player = new Car(carImages[0], playerStats, trackHead, true);
+        Car player = new Car(carNames[0], playerStats, trackHead, true);
         playerCar = player;
-        Car ai = new Car(carImages[0], new CarStats(3,3,3), trackHead.next(), false);
         cars.add(player);
-        cars.add(ai);
+        cars.add(new Car(carNames[0], new CarStats(3,3,3), trackHead.next(), false));
+        cars.add(new Car(carNames[0], new CarStats(1,1,1), trackHead.next().next(), false));
+        cars.add(new Car(carNames[0], new CarStats(2,2,2), trackHead.next().next().next(), false));
     }
 
     private void setupButtons() {
@@ -171,7 +234,6 @@ public class GrandPrix implements ActionListener {
                 break;
             case "adj ":
                 String command = action.getActionCommand().substring(4);
-                System.out.println(command);
                 switch (command) {
                     case "+spd":
                         playerStats.incrementTopSpeed();
