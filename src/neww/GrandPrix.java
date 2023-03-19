@@ -132,7 +132,7 @@ public class GrandPrix implements ActionListener {
         JButton minus3 = new JButton();
         minus3.addActionListener(this);
         minus3.setActionCommand("adj -han");
-        JButton startRace = new JButton();
+        JButton startRace = new JButton("start race");
         startRace.addActionListener(this);
         startRace.setActionCommand("race");
         JButton hurry = new JButton();
