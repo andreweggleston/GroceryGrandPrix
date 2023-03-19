@@ -51,7 +51,6 @@ public class GroceryGrandPrix implements ActionListener {
         paused = false;
         tickRate = 33;
         timeElapsed = 0;
-
         generateNodes(round*5);
         gui.buildTrack(head, cars);
         gui.drawTrack();
@@ -261,9 +260,21 @@ public class GroceryGrandPrix implements ActionListener {
         JButton minus3 = new JButton();
         minus3.addActionListener(this);
         minus3.setActionCommand("adj -han");
+        JButton helpSpeed = new JButton();
+        helpSpeed.addActionListener(this);
+        helpSpeed.setActionCommand("spd?");
+        JButton helpAcceleration = new JButton();
+        helpAcceleration.addActionListener(this);
+        helpAcceleration.setActionCommand("acc?");
+        JButton helpHandling = new JButton();
+        helpHandling.addActionListener(this);
+        helpHandling.setActionCommand("han?");
+        JButton helpBudget = new JButton();
+        helpBudget.addActionListener(this);
+        helpBudget.setActionCommand("bud?");
         JButton startRace = new JButton();
-        startRace.addActionListener(this);
         startRace.setActionCommand("race");
+        startRace.addActionListener(this);
         JButton hurry = new JButton();
         hurry.addActionListener(this);
         hurry.setActionCommand("fast");
@@ -276,12 +287,12 @@ public class GroceryGrandPrix implements ActionListener {
         JButton nextCar = new JButton();
         nextCar.addActionListener(this);
         nextCar.setActionCommand("next");
-        buttons = new JButton[] {plus1, plus2, plus3, minus1, minus2, minus3, startRace, hurry, pause, restart, nextCar};
+        buttons = new JButton[] {plus1, plus2, plus3, minus1, minus2, minus3, helpSpeed, helpAcceleration, helpHandling, helpBudget, startRace, hurry, pause, restart, nextCar};
     }
 
     public static void main(String[] args) {
         GroceryGrandPrix test = new GroceryGrandPrix();
-        test.showTrack();
+        //test.showTrack();
     }
 
 }
