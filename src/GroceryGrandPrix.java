@@ -30,10 +30,18 @@ public class GroceryGrandPrix implements ActionListener {
         tickRate = 330;
         timeElapsed = 0;
         cars = new ArrayList<Car>();
-        //generateCars();
+        try {
+            fileReader();
+            System.out.println(carImages);
+        } catch (Exception e) {
+            System.out.println("error");
+            // TODO: Create file error dialog
+        }
+        generateNodes(4);
+        generateCars();
         createButtons();
         gui = new GUI(Color.WHITE, buttons, trackX, trackY);
-
+        gui.showResults(cars);
     }
 
     public void startGame() {
@@ -58,15 +66,16 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     private void simulateRace() {
-        int finished = 0;
-        Car loser = null;
+        ArrayList<Car> carPlacement = new ArrayList<Car>();
+        boolean carFinished;
+        int finishedCount= 0;
         double lastTime = System.currentTimeMillis();
         double accumulator = 0;
         double newTime;
         double loopTime;
 
-        // loop until all cars racing in the round have finished
-        while (finished < 5 - round) {
+        // loop until all cars racing in the round have finishedCount
+        while (finishedCount < 5 - round) {
             newTime = System.currentTimeMillis();
             loopTime = newTime - lastTime;
             if (!paused) accumulator += loopTime;
@@ -75,10 +84,14 @@ public class GroceryGrandPrix implements ActionListener {
             // simulate a number of ticks based on the amount of time that has passed since the last simulation
             while (accumulator >= tickRate) {
                 for (Car car : cars) {
-                    // drive a car and increment finished if it finishes the race
-                    finished += (car.drive(tickRate)) ? 1 : 0;
-                    // save the losing car that will be eliminated.
-                    if (finished == 5 - round) loser = car;
+                    // drive a car and increment finishedCount if it finishes the race
+                    carFinished = car.drive(tickRate);
+                    if (carFinished) {
+                        // save the cars in finishing order
+                        finishedCount += 1;
+                        carPlacement.add(car);
+                        carFinished = false;
+                    }
                 }
                 timeElapsed += ((double) tickRate)/1000;
                 accumulator -= tickRate;
@@ -86,9 +99,8 @@ public class GroceryGrandPrix implements ActionListener {
             gui.drawTrack(/*timeElapsed*/);
         }
 
-        if (loser.isPlayer()) gui.showLose();
-        else gui.showWin();
-        cars.remove(loser);
+        gui.showResults(carPlacement);
+        cars.remove(carPlacement.get(carPlacement.size() - 1));
     }
 
     private void restart() {
@@ -100,7 +112,7 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     private void fileReader() throws IOException {
-        File[] spriteFiles = (new File("assets/sprites")).listFiles();
+        File[] spriteFiles = (new File("assets\\sprites")).listFiles();
         carImages = new BufferedImage[spriteFiles.length];
 
         for (int i = 0; i < spriteFiles.length; i++) {
@@ -138,7 +150,7 @@ public class GroceryGrandPrix implements ActionListener {
                     }
                 }
             }
-            cars.set(i, new Car(carImages[imageIndex], new CarStats(stat1, stat2, stat3), temp, i==0));
+            cars.add(new Car(carImages[imageIndex], new CarStats(stat1, stat2, stat3), temp, i==0));
             temp = temp.next();
         }
     }
@@ -288,7 +300,7 @@ public class GroceryGrandPrix implements ActionListener {
 
     public static void main(String[] args) {
         GroceryGrandPrix test = new GroceryGrandPrix();
-        test.showTrack();
+        //test.showTrack();
     }
 
 }

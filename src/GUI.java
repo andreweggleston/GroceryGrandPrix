@@ -13,7 +13,7 @@ public class GUI implements MouseListener {
     JFrame frame;
     Container game;
     Container menu;
-    Container winlose;
+    Container results;
     Container loading;
     private ArrayList<JPanel> previewCards;
     private ArrayList<JPanel> previewSprites;
@@ -34,6 +34,9 @@ public class GUI implements MouseListener {
         frame = new JFrame("GroceryGrandPrix");
         menu = new Container();
         game = new Container();
+        results = new Container();
+        results.setPreferredSize(new Dimension(width, height));
+        results.setLayout(new BoxLayout(results, BoxLayout.Y_AXIS));
         draw = true;
         centerWidth = width;
         centerHeight = height;
@@ -99,7 +102,7 @@ public class GUI implements MouseListener {
         previewSprites.add(car, new JPanel());
         previewSprites.get(car).setBackground(Color.WHITE);
         previewSprites.get(car).add(new Sprite("bikenana", 1));
-        System.out.println("Max: " + previewSprites.get(car).getMaximumSize() + "\nPref: " + previewSprites.get(car).getPreferredSize()/* + "\nW: " + image.getWidth() + "\nH: " + image.getHeight()*/);
+        //System.out.println("Max: " + previewSprites.get(car).getMaximumSize() + "\nPref: " + previewSprites.get(car).getPreferredSize()/* + "\nW: " + image.getWidth() + "\nH: " + image.getHeight()*/);
         previewSprites.get(car).setPreferredSize(new Dimension(120, 80));
         previewSprites.get(car).setMaximumSize(new Dimension(120, 80));
 
@@ -161,10 +164,24 @@ public class GUI implements MouseListener {
 
     }
 
-    public void showWin() {
-    }
+    public void showResults(ArrayList<Car> cars) {
+        JPanel headerPanel = new JPanel();
+        JPanel rankingPanel = new JPanel();
+        JPanel bottomPanel = new JPanel();
 
-    public void showLose() {
+
+        JLabel header = new JLabel("Placeholder text");
+
+        headerPanel.add(header);
+
+        for (int i = 0; i < cars.size(); i++) {
+
+        }
+
+        results.add(headerPanel);
+        frame.setContentPane(results);
+        frame.pack();
+        frame.revalidate();
     }
 
     @Override
