@@ -116,7 +116,7 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     private void fileReader() throws IOException {
-        File[] spriteFiles = (new File("assets\\sprites")).listFiles();
+        File[] spriteFiles = (new File("assets" + File.separator + "sprites")).listFiles();
         carImages = new BufferedImage[spriteFiles.length];
 
         for (int i = 0; i < spriteFiles.length; i++) {
