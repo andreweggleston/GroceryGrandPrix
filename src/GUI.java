@@ -164,73 +164,89 @@ public class GUI implements MouseListener {
 
     }
 
-    public boolean showResults(ArrayList<Car> cars, int playerPlacement, int raceTime) {
+    /**
+     * Shows the results of every race after it has been concluded and prompts the user to continue the game.
+     * @param placedCars The list of Cars in order from 1st to last.
+     * @param playerPlacement The position the player placed in the race.
+     * @param raceTime How much time the race took as an int.
+     * @return A boolean indicated whether the user would like to continue the game.
+     */
+    public boolean showResults(ArrayList<Car> placedCars, int playerPlacement, int raceTime) {
         boolean userContinue;
-        String placementSuffix;
-        switch (playerPlacement) {
-            case 1 :
-                placementSuffix = "st";
-                break;
-            case 2 :
-                placementSuffix = "nd";
-                break;
-            case 3 :
-                placementSuffix = "rd";
-                break;
-            default :
-                placementSuffix = "th";
-        }
         JPanel statsHeaderPanel = new JPanel();
-
-        Font messageFont = new Font(Font.SANS_SERIF, Font.BOLD, 24);
         JPanel headerPanel = new JPanel();
-        JPanel rankingPanel = new JPanel();
-        rankingPanel.setLayout(new BoxLayout(rankingPanel, BoxLayout.Y_AXIS));
         JPanel placementPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 75, 0));
         JPanel imagePanel = new JPanel();
         JPanel bottomPanel = new JPanel();
+        JTextArea header = new JTextArea();
+        JLabel bottom = new JLabel();
+        Font messageFont = new Font(Font.SANS_SERIF, Font.BOLD, 24);
 
-        JTextArea header = new JTextArea("\t You placed " + playerPlacement + placementSuffix + ".\nThe race lasted " + raceTime + " seconds.");
         header.setTabSize(3);
         header.setEditable(false);
         header.setFont(messageFont);
         header.setBackground(headerPanel.getBackground());
-        JLabel bottom = new JLabel((cars.get(cars.size()-1).isPlayer()) ? "Try again?" : "Do you want to continue?");
         bottom.setFont(messageFont);
-        if (cars.size() == 2 && playerPlacement == 1) {
+
+        // If player beat the game show their stats and wrap up run.
+        if (placedCars.size() == 2 && playerPlacement == 1) {
+            Car player = placedCars.get(0);
+
             header.setText("\t\tYou win!\nThe final race lasted " + raceTime + " seconds.");
-            Car player = cars.get(0);
             JLabel statsHeader = new JLabel("Your winning car is:");
             statsHeader.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
             JLabel stats = new JLabel("Spd: " + player.getTopSpeed() + " Acc: " + player.getAcceleration() + " Han: " + player.getHandling());
             stats.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
             Sprite playerSprite = new Sprite("bikenana", 1);
+            bottom.setText("Would you like to try another run?");
+
+            statsHeaderPanel.add(statsHeader);
             placementPanel.add(stats);
             imagePanel.add(playerSprite);
-            statsHeaderPanel.add(statsHeader);
-            bottom.setText("Would you like to try another run?");
         }
         else {
-            for (int i = 0; i < cars.size(); i++) {
+            String placementSuffix;
+            // Find the proper suffix for player's placement.
+            switch (playerPlacement) {
+                case 1 :
+                    placementSuffix = "st";
+                    break;
+                case 2 :
+                    placementSuffix = "nd";
+                    break;
+                case 3 :
+                    placementSuffix = "rd";
+                    break;
+                default :
+                    placementSuffix = "th";
+            }
+
+            header.setText("\t You placed " + playerPlacement + placementSuffix + ".\nThe race lasted " + raceTime + " seconds.");
+            // Change the prompt shown in the bottom label depending on if the player won or lost.
+            bottom.setText((playerPlacement == placedCars.size()) ? "Try again?" : "Do you want to continue to the next round?");
+
+            // Add every car's sprite and the corresponding placement in the prior race to panels.
+            for (int i = 0; i < placedCars.size(); i++) {
                 JLabel nextRanking = new JLabel(Integer.toString(i + 1));
                 Sprite nextSprite = new Sprite("bikenana", 1);
                 nextRanking.setFont(new Font(Font.SANS_SERIF, Font.BOLD, (int) (nextSprite.getPreferredSize().getWidth() * 3) / 4));
+
                 placementPanel.add(nextRanking);
                 imagePanel.add(nextSprite);
             }
         }
+
         headerPanel.add(header);
         bottomPanel.add(bottom);
 
         results.add(headerPanel);
+        // Adds an empty panel when the player did not win the tournament.
         results.add(statsHeaderPanel);
         results.add(placementPanel);
         results.add(imagePanel);
-        //results.add(rankingPanel);
         results.add(bottomPanel);
-        //frame.setContentPane(results);
-        //frame.pack();
-        //frame.revalidate();
+
+        // Show all the components in the form of a ConfirmDialog. Save the user response as a boolean (false if no).
         userContinue = JOptionPane.showConfirmDialog(frame, results, "Race Results", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE) != 1;
         return userContinue;
 
