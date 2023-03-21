@@ -7,7 +7,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-public class GUI implements MouseListener {
+public class GUI extends JFrame implements MouseListener {
     private Color backgroundColor;
     private Color foregroundColor;
     private Font menuFontPLAIN;
@@ -15,8 +15,7 @@ public class GUI implements MouseListener {
     private int centerWidth;
     private int centerHeight;
     private final Dimension defaultRes = new Dimension(1920, 1080);
-    private JFrame frame;
-    private Container c;
+    private JPanel c;
     private JPanel game;
     private JPanel menu;
     private JPanel uiGrid;
@@ -40,12 +39,8 @@ public class GUI implements MouseListener {
     }
     private gamestate state;
 
-    public GUI(Color backgroundColor, JButton[] buttons, int width, int height) {
-        frame = new JFrame("GroceryGrandPrix");
-        c = new Container();
-        c = frame.getContentPane();
-        c.setPreferredSize(defaultRes);
-        c.setMinimumSize(defaultRes);
+    public GUI(String title, Color backgroundColor, JButton[] buttons, int width, int height) {
+        super(title);
         state = gamestate.inMenu;
         uiGrid = new JPanel();
         menu = new JPanel();
@@ -70,8 +65,10 @@ public class GUI implements MouseListener {
         previewBar.setLayout(new BoxLayout(previewBar, BoxLayout.X_AXIS));
         previewBar.setBackground(backgroundColor);
 
+        createPreviewCard(0);
+
         center = new JPanel();
-        center.setPreferredSize(new Dimension(centerWidth, centerHeight));
+        center.setPreferredSize(defaultRes);
         center.setBackground(backgroundColor);
 
 
@@ -82,11 +79,12 @@ public class GUI implements MouseListener {
 
 
 
-        frame.setContentPane(menu);
-        frame.pack();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        frame.setResizable(false);
+        this.setContentPane(menu);
+        this.pack();
+        this.revalidate();
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setVisible(true);
+        this.setResizable(false);
 
     }
 
@@ -215,11 +213,11 @@ public class GUI implements MouseListener {
         rideWindow.setBackground(Color.GREEN);
         rideWindow.setMinimumSize(new Dimension(1700 ,830));
 
-        createPreviewCard(0);
-
         menu.add(uiGrid, BorderLayout.WEST);
         menu.add(rideWindow, BorderLayout.CENTER);
-        c.add(menu);
+        this.setContentPane(menu);
+        this.pack();
+        this.revalidate();
     }
 
     public void createPreviewCard(int car) {
@@ -232,7 +230,7 @@ public class GUI implements MouseListener {
         previewSprites.add(car, new JPanel());
         previewSprites.get(car).setBackground(Color.WHITE);
         previewSprites.get(car).add(new Sprite("bikenana", 1));
-        System.out.println("Max: " + previewSprites.get(car).getMaximumSize() + "\nPref: " + previewSprites.get(car).getPreferredSize()/* + "\nW: " + image.getWidth() + "\nH: " + image.getHeight()*/);
+        //System.out.println("Max: " + previewSprites.get(car).getMaximumSize() + "\nPref: " + previewSprites.get(car).getPreferredSize()/* + "\nW: " + image.getWidth() + "\nH: " + image.getHeight()*/);
         previewSprites.get(car).setPreferredSize(new Dimension(120, 80));
         previewSprites.get(car).setMaximumSize(new Dimension(120, 80));
 
@@ -271,7 +269,7 @@ public class GUI implements MouseListener {
         previewBar.add(previewCards.get(car), car);
     }
 
-    public void buildTrack(Node head, ArrayList <Car> cars) {
+    public void buildTrack(Node head) {
         trackSegments = new ArrayList<Line2D.Double>();
         Node temp = head;
         do {
@@ -280,22 +278,24 @@ public class GUI implements MouseListener {
             Point2D p2 = temp.getCoord();
             trackSegments.add(new Line2D.Double(p1, p2));
         } while (temp != head);
-        int i = 0;
+        /*int i = 0;
         for (Line2D segment : trackSegments) {
             i++;
             System.out.println(i + ":\n" + segment.toString() + "\n" + segment.getP1() + "\n " + segment.getP2() + "\n");
-        }
+        }*/
         track = new Track(trackSegments, centerWidth, centerHeight);
-        track.setVisible(false);
+        //track.setVisible(false);
         center.add(track);
     }
     public void drawTrack() {
         if(state.equals(gamestate.inMenu)){
-            c.removeAll();
-            c.add(game);
+            this.setContentPane(game);
+            this.pack();
+            this.revalidate();
+            this.repaint();
             state = gamestate.inGame;
         }
-        if(!track.isVisible()) track.setVisible(true);
+        //if(!track.isVisible()) track.setVisible(true);
 
     }
 
@@ -345,7 +345,7 @@ public class GUI implements MouseListener {
         }
         @Override
         public void paintComponent(Graphics g) {
-            System.out.println("not dead yet!");
+            //System.out.println("not dead yet!");
             Graphics2D g2 = (Graphics2D) g;
             RenderingHints antiAliasing = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             road = new BasicStroke(12, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
@@ -353,7 +353,7 @@ public class GUI implements MouseListener {
             g2.setStroke(road);
             for (Line2D.Double segment : segments) {
                 g2.draw(segment);
-                System.out.println("Line2D : " + segment.toString());
+                //System.out.println("Line2D : " + segment.toString());
             }
         }
     }

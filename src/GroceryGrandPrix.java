@@ -32,7 +32,7 @@ public class GroceryGrandPrix implements ActionListener {
         cars = new ArrayList<Car>();
         //generateCars();
         createButtons();
-        gui = new GUI(Color.WHITE, buttons, trackX, trackY);
+        gui = new GUI("Grocery Grand Prix", Color.WHITE, buttons, trackX, trackY);
 
     }
 
@@ -52,7 +52,7 @@ public class GroceryGrandPrix implements ActionListener {
         tickRate = 330;
         timeElapsed = 0;
         generateNodes(round*5);
-        gui.buildTrack(head, cars);
+        gui.buildTrack(head);
         gui.drawTrack();
     }
 
@@ -202,7 +202,7 @@ public class GroceryGrandPrix implements ActionListener {
         switch (action.getActionCommand().substring(0,4)) {
             case "race" :
                 showTrack();
-                simulateRace();
+                //simulateRace();
                 break;
             case "fast" :
                 tickRate = (tickRate == 16) ? 33 : 16;
