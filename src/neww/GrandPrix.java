@@ -33,9 +33,6 @@ public class GrandPrix implements ActionListener {
     private Node trackHead;
 
     private int tickRateNs;
-
-    private JFrame window;
-
     private final int trackX = 1440;
     private final int trackY = 830;
 
@@ -59,12 +56,7 @@ public class GrandPrix implements ActionListener {
     }
 
     private void setupWindow() {
-        window = new JFrame("Grocery Grand Prix");
-        window.setPreferredSize(new Dimension(trackX, trackY));
-        window.setResizable(false);
-        window.add(gui);
-        window.pack();
-        window.setVisible(true);
+        gui.setupWindow(trackX, trackY);
     }
 
     private void initialize() {
@@ -220,11 +212,12 @@ public class GrandPrix implements ActionListener {
         JButton action = (JButton) e.getSource();
         switch (action.getActionCommand().substring(0, 4)) {
             case "step":
-                for (Car car : cars) {
-                    car.drive(0.33);
-                }
-                gui.revalidate(); //VERY IMPORTANT LINE
-                gui.repaint();
+                gui.setupWindow(trackX, trackY);
+//                for (Car car : cars) {
+//                    car.drive(0.33);
+//                }
+//                gui.revalidate(); //VERY IMPORTANT LINE
+//                gui.repaint();
                 break;
             case "race":
                 try {
