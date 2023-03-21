@@ -36,8 +36,8 @@ public class GrandPrix implements ActionListener {
 
     private JFrame window;
 
-    private int trackX;
-    private int trackY;
+    private final int trackX = 1440;
+    private final int trackY = 830;
 
     public GrandPrix() {
         File[] spriteFiles = (new File("assets/sprites")).listFiles();
@@ -53,8 +53,6 @@ public class GrandPrix implements ActionListener {
             }
         }
         tickRateNs = 1000;
-        trackX = 1000;
-        trackY = 800;
         setupButtons();
         initialize();
         setupWindow();
@@ -62,7 +60,7 @@ public class GrandPrix implements ActionListener {
 
     private void setupWindow() {
         window = new JFrame("Grocery Grand Prix");
-        window.setPreferredSize(new Dimension(1000, 800));
+        window.setPreferredSize(new Dimension(trackX, trackY));
         window.setResizable(false);
         window.add(gui);
         window.pack();
