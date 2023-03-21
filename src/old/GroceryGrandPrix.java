@@ -1,4 +1,9 @@
-// Phoenix Ganz-Ratzat
+package old;// Phoenix Ganz-Ratzat
+
+import shared.Car;
+import shared.CarStats;
+import shared.Node;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -137,7 +142,7 @@ public class GroceryGrandPrix implements ActionListener {
                     }
                 }
             }
-            cars.set(i, new Car(carImages[imageIndex], new CarStats(stat1, stat2, stat3), temp, i==0));
+//            cars.set(i, new Car(carImages[imageIndex], new CarStats(stat1, stat2, stat3), temp, i==0));
             temp = temp.next();
         }
     }
@@ -214,13 +219,6 @@ public class GroceryGrandPrix implements ActionListener {
                 restart();
                 break;
             case "next" :
-                for (int i = 0; i < carImages.length; i++) {
-                    if (cars.get(0).getImage().equals(carImages[i])) {
-                        //cars.get(0).setImage(carImages[i+1])
-                        //gui.updatePreview(carImages[i+1])
-                        break;
-                    }
-                }
                 break;
             case "adj " :
                 Car player = cars.get(0);

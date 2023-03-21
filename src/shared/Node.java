@@ -1,3 +1,5 @@
+package shared;
+
 import java.awt.geom.Point2D;
 
 public class Node {
@@ -37,5 +39,10 @@ public class Node {
 
     public String toString(){
         return "X: " + this.coord.getX() + " Y: " + this.coord.getY() + " Distance: " + distance + " Angle: " + angle;
+    }
+
+    @Override
+    public int hashCode() {
+        return coord.hashCode();
     }
 }

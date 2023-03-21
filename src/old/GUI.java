@@ -1,3 +1,5 @@
+package old;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -6,6 +8,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import shared.*;
 
 public class GUI extends JFrame implements MouseListener {
     private Color backgroundColor;
