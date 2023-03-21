@@ -34,14 +34,9 @@ public class GUI extends JFrame implements MouseListener {
     private ArrayList<Line2D.Double> trackSegments;
     private ArrayList<Ellipse2D.Double> trackJoints;
     boolean draw;
-    public enum gamestate {
-        inMenu, inGame, endRace;
-    }
-    private gamestate state;
 
     public GUI(String title, Color backgroundColor, JButton[] buttons, int width, int height) {
         super(title);
-        state = gamestate.inMenu;
         uiGrid = new JPanel();
         menu = new JPanel();
         menu.setLayout(new BoxLayout(menu, BoxLayout.X_AXIS));
@@ -64,8 +59,6 @@ public class GUI extends JFrame implements MouseListener {
         previewBar = new JPanel();
         previewBar.setLayout(new BoxLayout(previewBar, BoxLayout.X_AXIS));
         previewBar.setBackground(backgroundColor);
-
-        createPreviewCard(0);
 
         center = new JPanel();
         center.setPreferredSize(defaultRes);
@@ -269,7 +262,7 @@ public class GUI extends JFrame implements MouseListener {
         previewBar.add(previewCards.get(car), car);
     }
 
-    public void buildTrack(Node head) {
+    public void buildTrack(Node head, ArrayList <Car> cars) {
         trackSegments = new ArrayList<Line2D.Double>();
         Node temp = head;
         do {
@@ -284,19 +277,14 @@ public class GUI extends JFrame implements MouseListener {
             System.out.println(i + ":\n" + segment.toString() + "\n" + segment.getP1() + "\n " + segment.getP2() + "\n");
         }*/
         track = new Track(trackSegments, centerWidth, centerHeight);
-        //track.setVisible(false);
         center.add(track);
+        this.setContentPane(game);
+        this.pack();
+        this.revalidate();
+        this.repaint();
     }
     public void drawTrack() {
-        if(state.equals(gamestate.inMenu)){
-            this.setContentPane(game);
-            this.pack();
-            this.revalidate();
-            this.repaint();
-            state = gamestate.inGame;
-        }
-        //if(!track.isVisible()) track.setVisible(true);
-
+        // Render track.
     }
 
     public void showWin() {

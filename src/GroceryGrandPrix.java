@@ -52,7 +52,7 @@ public class GroceryGrandPrix implements ActionListener {
         tickRate = 330;
         timeElapsed = 0;
         generateNodes(round*5);
-        gui.buildTrack(head);
+        gui.buildTrack(head, cars);
         gui.drawTrack();
     }
 
