@@ -28,7 +28,7 @@ public class Car {
         this.isPlayer = isPlayer;
     }
 
-    public boolean drive(int ms) {
+    public boolean drive(double ms) {
         boolean aboutToFinish = lastNode.next().equals(goalNode);
         momentum += Math.min(stats.topSpeed(), stats.acceleration());
         distanceFromLast += momentum * (ms / 10.0);

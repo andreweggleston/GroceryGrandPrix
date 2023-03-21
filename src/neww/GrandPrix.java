@@ -19,6 +19,8 @@ import javax.swing.*;
 
 public class GrandPrix implements ActionListener {
 
+    private final int framerate = 30;
+
     private final BufferedImage[] carImages;
 
     private String[] carNames;
@@ -86,10 +88,11 @@ public class GrandPrix implements ActionListener {
 
         final boolean[] finalDone = {false};
         final double[] finalTimeElapsed = {timeElapsed};
-        new Timer(100, e -> {
+        final int timerDelayMs = 1000/framerate;
+        new Timer(timerDelayMs, e -> {
 //            if (!finalDone[0]) {
-                for (Car car : cars) {
-                    finalDone[0] = car.drive(1) || finalDone[0];
+                for (Car car : cars) { //TODO: hurry mode
+                    finalDone[0] = car.drive(timerDelayMs/100.0) || finalDone[0];
                 }
                 finalTimeElapsed[0] += 1;
                 gui.revalidate(); //VERY IMPORTANT LINE
@@ -220,7 +223,7 @@ public class GrandPrix implements ActionListener {
         switch (action.getActionCommand().substring(0, 4)) {
             case "step":
                 for (Car car : cars) {
-                    car.drive(1);
+                    car.drive(0.33);
                 }
                 gui.revalidate(); //VERY IMPORTANT LINE
                 gui.repaint();
