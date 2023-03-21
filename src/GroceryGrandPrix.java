@@ -29,7 +29,7 @@ public class GroceryGrandPrix implements ActionListener {
 
     private CarStats playerStats;
     private JButton[] buttons;
-    private BufferedImage[] carImages;
+
     public GroceryGrandPrix() {
         budget = 5;
         round = 1;
