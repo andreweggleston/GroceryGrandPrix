@@ -28,7 +28,7 @@ public class GUI extends JPanel {
         trackPanel.setVisible(true);
         this.removeAll();
         this.add(trackPanel, BorderLayout.CENTER);
-        this.add(buttons[11], BorderLayout.EAST);
+        this.add(buttons[11], BorderLayout.WEST);
         JOptionPane.showMessageDialog(this, "The race will start now");
     }
 }
