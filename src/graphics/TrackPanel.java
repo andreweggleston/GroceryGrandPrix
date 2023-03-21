@@ -1,4 +1,4 @@
-package neww.graphics;
+package graphics;
 
 import shared.Car;
 import shared.Node;
@@ -25,8 +25,8 @@ public class TrackPanel extends JPanel {
 
 
     public TrackPanel(Node head, List<Car> cars) {
+        super(true);
         trackSegments = new ArrayList<>();
-//        this.setPreferredSize(new Dimension(1000, 800));
         this.setVisible(true);
         Node temp = head;
         do {

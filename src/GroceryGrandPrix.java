@@ -1,44 +1,58 @@
-package old;// Phoenix Ganz-Ratzat
-
+import graphics.GUI;
 import shared.Car;
 import shared.CarStats;
 import shared.Node;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class GroceryGrandPrix implements ActionListener {
+
+    private final int framerate = 30;
     private boolean paused;
+    private boolean fast;
     private int budget;
     private int round;
-    private final int trackX = 1920;
+    private final int trackX = 1440;
     private final int trackY = 830;
-    private int tickRate;
-    private double timeElapsed;
+    private double timeElapsed = 0.0;
     private GUI gui;
-    private Node head;
-    private ArrayList <Car> cars ;
+    private Node trackHead;
+    private String[] carNames;
+    private ArrayList <Car> cars;
+
+    private CarStats playerStats;
     private JButton[] buttons;
     private BufferedImage[] carImages;
     public GroceryGrandPrix() {
-        paused = false;
         budget = 5;
         round = 1;
-        tickRate = 330;
-        timeElapsed = 0;
-        cars = new ArrayList<Car>();
-        //generateCars();
+        timeElapsed = 0.0;
+        File[] spriteFiles = (new File("assets/sprites")).listFiles();
+        assert spriteFiles != null;
+        carNames = new String[spriteFiles.length];
+        for (int i = 0; i < spriteFiles.length; i++) {
+            carNames[i] = spriteFiles[i].getName().split("_")[1];
+        }
         createButtons();
-        gui = new GUI("Grocery Grand Prix", Color.WHITE, buttons, trackX, trackY);
+        cars = new ArrayList<>();
+        playerStats = new CarStats(0,0,0);
+        initializeGUI();
+        gui.playerMenu(1, 20);
+        gui.setVisible(true);
+    }
 
+    private void initializeGUI(){
+        if (gui != null){
+            gui.dispose();
+        }
+        gui = new GUI("Grocery Grand Prix", Color.lightGray, buttons, trackX, trackY);
     }
 
     public void startGame() {
@@ -48,79 +62,51 @@ public class GroceryGrandPrix implements ActionListener {
         }
     }
 
-    private void openMenu() {
-
-    }
-
     private void showTrack() {
-        paused = false;
-        tickRate = 330;
         timeElapsed = 0;
         generateNodes(round*5);
-        gui.buildTrack(head, cars);
-        gui.drawTrack();
+        generateCars();
+        gui.toTrack(trackHead, cars);
     }
 
-    private void simulateRace() {
-        int finished = 0;
-        Car loser = null;
-        double lastTime = System.currentTimeMillis();
-        double accumulator = 0;
-        double newTime;
-        double loopTime;
+    private void startSimulation() throws InterruptedException {
+        double timeElapsed = 0.0;
+        gui.revalidate();
+        gui.repaint();
 
-        // loop until all cars racing in the round have finished
-        while (finished < 5 - round) {
-            newTime = System.currentTimeMillis();
-            loopTime = newTime - lastTime;
-            if (!paused) accumulator += loopTime;
-            lastTime = newTime;
-
-            // simulate a number of ticks based on the amount of time that has passed since the last simulation
-            while (accumulator >= tickRate) {
-                for (Car car : cars) {
-                    // drive a car and increment finished if it finishes the race
-                    finished += (car.drive(tickRate)) ? 1 : 0;
-                    // save the losing car that will be eliminated.
-                    if (finished == 5 - round) loser = car;
-                }
-                timeElapsed += ((double) tickRate)/1000;
-                accumulator -= tickRate;
+        final boolean[] finalDone = {false};
+        final double[] finalTimeElapsed = {timeElapsed};
+        final int timerDelayMs = 1000/framerate;
+        new Timer(timerDelayMs, e -> {
+            if (!finalDone[0]) {
+            for (Car car : cars) { //TODO: hurry mode
+                finalDone[0] = car.drive(timerDelayMs/100.0) || finalDone[0];
             }
-            gui.drawTrack(/*timeElapsed*/);
-        }
-
-        if (loser.isPlayer()) gui.showLose();
-        else gui.showWin();
-        cars.remove(loser);
+            finalTimeElapsed[0] += 1;
+            gui.revalidate(); //VERY IMPORTANT LINE
+            gui.repaint();
+            } else {
+                Timer self = (Timer) e.getSource();
+                self.stop();
+                JOptionPane.showMessageDialog(gui, String.format("Time elapsed: %f", finalTimeElapsed[0]));
+            }
+        }).start();
     }
 
     private void restart() {
         budget = 5;
         round = 1;
-        //generateCars();
-        //gui.restart();
         startGame();
     }
 
-    private void fileReader() throws IOException {
-        File[] spriteFiles = (new File("assets/sprites")).listFiles();
-        carImages = new BufferedImage[spriteFiles.length];
-
-        for (int i = 0; i < spriteFiles.length; i++) {
-            carImages[i] = ImageIO.read(spriteFiles[i]);
-        }
-    }
-
-
     private void generateCars() {
-        Node temp = head;
+        Node carStartNode = trackHead;
         int imageIndex = 0;
         int maxStat = 10;
         int statPoints = 10;
-        int stat1 = 5;
-        int stat2 = 5;
-        int stat3 = 5;
+        int stat1;
+        int stat2;
+        int stat3;
         double statPicker;
 
         for (int i = 0; i < 4; i++) {
@@ -141,19 +127,24 @@ public class GroceryGrandPrix implements ActionListener {
                         stat3++;
                     }
                 }
+                cars.add(i, new Car(carNames[imageIndex], new CarStats(stat1, stat2, stat3), carStartNode, false));
+            }else {
+                cars.add(0, new Car(carNames[imageIndex], playerStats, carStartNode, true));
             }
-//            cars.set(i, new Car(carImages[imageIndex], new CarStats(stat1, stat2, stat3), temp, i==0));
-            temp = temp.next();
+            carStartNode = carStartNode.next();
         }
     }
 
     private void generateNodes(int number) {
+
+        //TODO make starting positions first
+
         Random rand = new Random();
         double x = rand.nextDouble()*400 + 50;
         double y = rand.nextDouble()*200 + 250;
-        head = new Node(x, y);
+        trackHead = new Node(x, y);
         int quad = 1; // 1 = top left, 2 = top right, 3 = bottom right, 4 = bottom left
-        Node temp = head;
+        Node temp = trackHead;
         for (int i = 0; i < number-1; i++) {
             switch (quad) {
                 case 1:
@@ -186,7 +177,7 @@ public class GroceryGrandPrix implements ActionListener {
                     quad = 4;
                 }
             }
-            temp.setNext(new Node(x, y, head));
+            temp.setNext(new Node(x, y, trackHead));
             temp = temp.next();
         }
         /*for (int i = 0; i < number-1; i++) {
@@ -195,11 +186,11 @@ public class GroceryGrandPrix implements ActionListener {
             temp.setNext(new Node(x, y, head));
             temp = temp.next();
         }*/
-        temp = head;
+        temp = trackHead;
         do{
             System.out.println(temp);
             temp = temp.next();
-        }while (temp != head);
+        }while (temp != trackHead);
     }
 
     public void actionPerformed(ActionEvent event) {
@@ -207,10 +198,15 @@ public class GroceryGrandPrix implements ActionListener {
         switch (action.getActionCommand().substring(0,4)) {
             case "race" :
                 showTrack();
-                //simulateRace();
+                try {
+                    startSimulation();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             case "fast" :
-                tickRate = (tickRate == 16) ? 33 : 16;
+                fast = !fast;
+                //TODO set fast button to indicate user is in fast mode
                 break;
             case "stop" :
                 paused = !paused;
@@ -221,25 +217,24 @@ public class GroceryGrandPrix implements ActionListener {
             case "next" :
                 break;
             case "adj " :
-                Car player = cars.get(0);
                 switch (action.getActionCommand().substring(4, 8)) {
                     case "+spd":
-                        player.incrementTopSpeed();
+                        playerStats.incrementTopSpeed();
                         break;
                     case "+acc":
-                        player.incrementAcceleration();
+                        playerStats.incrementAcceleration();
                         break;
                     case "+han":
-                        player.incrementHandling();
+                        playerStats.incrementHandling();
                         break;
                     case "-spd":
-                        player.decrementTopSpeed();
+                        playerStats.decrementTopSpeed();
                         break;
                     case "-acc":
-                        player.decrementAcceleration();
+                        playerStats.decrementAcceleration();
                         break;
                     case "-han":
-                        player.decrementHandling();
+                        playerStats.decrementHandling();
                 }
                 // gui.updatePreview(player.getTopSpeed(), player.getAcceleration(), player.getHandling());
         }
@@ -296,8 +291,7 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     public static void main(String[] args) {
-        GroceryGrandPrix test = new GroceryGrandPrix();
-        //test.showTrack();
+        SwingUtilities.invokeLater(GroceryGrandPrix::new);
     }
 
 }

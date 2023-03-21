@@ -1,4 +1,4 @@
-package old;
+package graphics;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,18 +6,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
+
 import shared.*;
 
 public class GUI extends JFrame implements MouseListener {
-    private Color backgroundColor;
     private Color foregroundColor;
     private Font menuFontPLAIN;
     private Font menuFontBOLD;
-    private int centerWidth;
-    private int centerHeight;
-    private final Dimension defaultRes = new Dimension(1920, 1080);
+    private final Dimension defaultRes;
     private JPanel c;
     private JPanel game;
     private JPanel menu;
@@ -40,14 +37,11 @@ public class GUI extends JFrame implements MouseListener {
 
     public GUI(String title, Color backgroundColor, JButton[] buttons, int width, int height) {
         super(title);
-        uiGrid = new JPanel();
-        menu = new JPanel();
+        uiGrid = new JPanel(); //button cluster
+        menu = new JPanel(); //has uiGrid and ridePreviewPanel
         menu.setLayout(new BoxLayout(menu, BoxLayout.X_AXIS));
         game = new JPanel();
-        draw = true;
-        centerWidth = width;
-        centerHeight = height;
-        this.backgroundColor = backgroundColor;
+        defaultRes = new Dimension(width, height);
         foregroundColor = Color.lightGray;
         menuFontPLAIN = new Font("Courier", Font.PLAIN, 16);
         menuFontBOLD = new Font("Courier", Font.BOLD, 16);
@@ -63,24 +57,11 @@ public class GUI extends JFrame implements MouseListener {
         previewBar.setLayout(new BoxLayout(previewBar, BoxLayout.X_AXIS));
         previewBar.setBackground(backgroundColor);
 
-        center = new JPanel();
+        center = new JPanel(); //everything but previewbar in game
         center.setPreferredSize(defaultRes);
         center.setBackground(backgroundColor);
 
-
-        playerMenu(0, 17);
-        
-        game.add(previewBar, BorderLayout.NORTH);
-        game.add(center, BorderLayout.CENTER);
-
-
-
-        this.setContentPane(menu);
-        this.pack();
-        this.revalidate();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
-        this.setResizable(false);
 
     }
 
@@ -205,7 +186,7 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridwidth = 8;
         uiGrid.add(menuButtons[10], menuConstraints);
 
-        rideWindow = new JPanel();
+        rideWindow = new JPanel(); //green thing
         rideWindow.setBackground(Color.GREEN);
         rideWindow.setMinimumSize(new Dimension(1700 ,830));
 
@@ -265,29 +246,13 @@ public class GUI extends JFrame implements MouseListener {
         previewBar.add(previewCards.get(car), car);
     }
 
-    public void buildTrack(Node head, ArrayList <Car> cars) {
-        trackSegments = new ArrayList<Line2D.Double>();
-        Node temp = head;
-        do {
-            Point2D p1 = temp.getCoord();
-            temp = temp.next();
-            Point2D p2 = temp.getCoord();
-            trackSegments.add(new Line2D.Double(p1, p2));
-        } while (temp != head);
-        /*int i = 0;
-        for (Line2D segment : trackSegments) {
-            i++;
-            System.out.println(i + ":\n" + segment.toString() + "\n" + segment.getP1() + "\n " + segment.getP2() + "\n");
-        }*/
-        track = new Track(trackSegments, centerWidth, centerHeight);
-        center.add(track);
-        this.setContentPane(game);
+    public void toTrack(Node head, ArrayList <Car> cars) {
+        track = new TrackPanel(head, cars);
+        track.setPreferredSize(defaultRes);
+        this.setContentPane(track);
         this.pack();
         this.revalidate();
         this.repaint();
-    }
-    public void drawTrack() {
-        // Render track.
     }
 
     public void showWin() {
@@ -322,30 +287,5 @@ public class GUI extends JFrame implements MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {
-    }
-
-    private class Track extends JPanel {
-        ArrayList<Line2D.Double> segments;
-        BasicStroke road;
-
-        public Track(ArrayList<Line2D.Double> trackSegments, int width, int height) {
-            super(true);
-            setPreferredSize(new Dimension(width, height));
-            this.segments = trackSegments;
-            setForeground(Color.lightGray);
-        }
-        @Override
-        public void paintComponent(Graphics g) {
-            //System.out.println("not dead yet!");
-            Graphics2D g2 = (Graphics2D) g;
-            RenderingHints antiAliasing = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            road = new BasicStroke(12, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
-            g2.setRenderingHints(antiAliasing);
-            g2.setStroke(road);
-            for (Line2D.Double segment : segments) {
-                g2.draw(segment);
-                //System.out.println("Line2D : " + segment.toString());
-            }
-        }
     }
 }
