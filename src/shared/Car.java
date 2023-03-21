@@ -1,7 +1,5 @@
 package shared;
 
-import java.awt.image.BufferedImage;
-
 /**
  * Car represents a car on the track
  */
