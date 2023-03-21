@@ -20,9 +20,6 @@ import javax.swing.*;
 public class GrandPrix implements ActionListener {
 
     private final int framerate = 30;
-
-    private final BufferedImage[] carImages;
-
     private String[] carNames;
     private ArrayList<Car> cars;
     private CarStats playerStats;
@@ -32,31 +29,18 @@ public class GrandPrix implements ActionListener {
 
     private Node trackHead;
 
-    private int tickRateNs;
     private final int trackX = 1440;
     private final int trackY = 830;
 
     public GrandPrix() {
         File[] spriteFiles = (new File("assets/sprites")).listFiles();
         assert spriteFiles != null;
-        carImages = new BufferedImage[spriteFiles.length];
         carNames = new String[spriteFiles.length];
         for (int i = 0; i < spriteFiles.length; i++) {
             carNames[i] = spriteFiles[i].getName().split("_")[1];
-            try {
-                carImages[i] = ImageIO.read(spriteFiles[i]);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         }
-        tickRateNs = 1000;
         setupButtons();
         initialize();
-        setupWindow();
-    }
-
-    private void setupWindow() {
-        gui.setupWindow(trackX, trackY);
     }
 
     private void initialize() {
@@ -64,8 +48,7 @@ public class GrandPrix implements ActionListener {
         if (gui != null) {
             gui.removeAll();
         }
-        gui = new GUI(buttons);
-//        setupTempTrack();
+        gui = new GUI(buttons, trackX, trackY);
         generateNodes(5);
         setupTempCars();
     }
@@ -212,12 +195,11 @@ public class GrandPrix implements ActionListener {
         JButton action = (JButton) e.getSource();
         switch (action.getActionCommand().substring(0, 4)) {
             case "step":
-                gui.setupWindow(trackX, trackY);
-//                for (Car car : cars) {
-//                    car.drive(0.33);
-//                }
-//                gui.revalidate(); //VERY IMPORTANT LINE
-//                gui.repaint();
+                for (Car car : cars) {
+                    car.drive(0.33);
+                }
+                gui.revalidate(); //VERY IMPORTANT LINE
+                gui.repaint();
                 break;
             case "race":
                 try {
