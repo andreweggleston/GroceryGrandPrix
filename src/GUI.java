@@ -16,7 +16,9 @@ public class GUI implements MouseListener {
     private int centerHeight;
     private final Dimension defaultRes = new Dimension(1920, 1080);
     private JFrame frame;
-    private Container c;
+    private Container pane;
+    private CardLayout cards;
+    private JPanel content;
     private JPanel game;
     private JPanel menu;
     private JPanel uiGrid;
@@ -41,12 +43,15 @@ public class GUI implements MouseListener {
     private gamestate state;
 
     public GUI(Color backgroundColor, JButton[] buttons, int width, int height) {
-        frame = new JFrame("GroceryGrandPrix");
-        c = new Container();
-        c = frame.getContentPane();
-        c.setPreferredSize(defaultRes);
-        c.setMinimumSize(defaultRes);
         state = gamestate.inMenu;
+        frame = new JFrame("GroceryGrandPrix");
+        pane = new Container();
+        pane = frame.getContentPane();
+        pane.setPreferredSize(defaultRes);
+        pane.setMinimumSize(defaultRes);
+
+
+
         uiGrid = new JPanel();
         menu = new JPanel();
         menu.setLayout(new BoxLayout(menu, BoxLayout.X_AXIS));
@@ -74,6 +79,14 @@ public class GUI implements MouseListener {
         center.setPreferredSize(new Dimension(centerWidth, centerHeight));
         center.setBackground(backgroundColor);
 
+        cards = new CardLayout();
+        cards.addLayoutComponent(menu,"menu");
+        cards.addLayoutComponent(game, "game");
+        //cards.addLayoutComponenet(end, "end");
+        content = new JPanel();
+        content.setLayout(cards);
+        pane.add(content);
+
 
         playerMenu(0, 17);
         
@@ -82,7 +95,7 @@ public class GUI implements MouseListener {
 
 
 
-        frame.setContentPane(menu);
+        frame.setContentPane(pane);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -91,6 +104,7 @@ public class GUI implements MouseListener {
     }
 
     public void playerMenu(int round, int budget) {
+        state = gamestate.inMenu;
         GridBagLayout menuLayout;
         GridBagConstraints menuConstraints = new GridBagConstraints();//12x12
         //(int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty, int anchor, int fill, Insets insets, int ipadx, int ipady)
@@ -188,7 +202,6 @@ public class GUI implements MouseListener {
             menuConstraints.gridy = 5+(i*2);
             menuConstraints.gridheight = 1;
             menuButtons[3+i].setText("-");//minus button
-            //menuButtons
             menuButtons[3+i].setPreferredSize(plusminusSize);
             menuButtons[3+i].setMaximumSize(plusminusSize);
             menuButtons[3+i].setFont(minusFont);
@@ -204,10 +217,8 @@ public class GUI implements MouseListener {
         uiGrid.add(statLabels[3], menuConstraints);
 
         menuButtons[10].setText("START RACE");
-        //menuConstraints.anchor = GridBagConstraints.NORTH;
         menuConstraints.gridx = 0;
         menuConstraints.gridy = 11;
-        //menuConstraints.weighty = 1;
         menuConstraints.gridwidth = 8;
         uiGrid.add(menuButtons[10], menuConstraints);
 
@@ -219,7 +230,7 @@ public class GUI implements MouseListener {
 
         menu.add(uiGrid, BorderLayout.WEST);
         menu.add(rideWindow, BorderLayout.CENTER);
-        c.add(menu);
+        cards.show(content, "menu");
     }
 
     public void createPreviewCard(int car) {
@@ -291,8 +302,7 @@ public class GUI implements MouseListener {
     }
     public void drawTrack() {
         if(state.equals(gamestate.inMenu)){
-            c.removeAll();
-            c.add(game);
+            cards.show(content, "game");
             state = gamestate.inGame;
         }
         if(!track.isVisible()) track.setVisible(true);
