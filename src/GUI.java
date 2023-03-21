@@ -16,8 +16,9 @@ public class GUI implements MouseListener {
     private int centerHeight;
     private final Dimension defaultRes = new Dimension(1920, 1080);
     private JFrame frame;
-    private Container game;
-    private Container menu;
+    private Container c;
+    private JPanel game;
+    private JPanel menu;
     private JPanel uiGrid;
     private JPanel uiBox;
     private JPanel rideWindow;
@@ -33,18 +34,23 @@ public class GUI implements MouseListener {
     private JPanel southButtons;
     private ArrayList<Line2D.Double> trackSegments;
     private ArrayList<Ellipse2D.Double> trackJoints;
-
     boolean draw;
+    public enum gamestate {
+        inMenu, inGame, endRace;
+    }
+    private gamestate state;
 
     public GUI(Color backgroundColor, JButton[] buttons, int width, int height) {
         frame = new JFrame("GroceryGrandPrix");
-        frame.setPreferredSize(defaultRes);
-        frame.setMinimumSize(defaultRes);
-
+        c = new Container();
+        c = frame.getContentPane();
+        c.setPreferredSize(defaultRes);
+        c.setMinimumSize(defaultRes);
+        state = gamestate.inMenu;
         uiGrid = new JPanel();
-        menu = new Container();
+        menu = new JPanel();
         menu.setLayout(new BoxLayout(menu, BoxLayout.X_AXIS));
-        game = new Container();
+        game = new JPanel();
         draw = true;
         centerWidth = width;
         centerHeight = height;
@@ -76,7 +82,7 @@ public class GUI implements MouseListener {
 
 
 
-        //
+        frame.setContentPane(menu);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -213,7 +219,7 @@ public class GUI implements MouseListener {
 
         menu.add(uiGrid, BorderLayout.WEST);
         menu.add(rideWindow, BorderLayout.CENTER);
-        frame.setContentPane(menu);
+        c.add(menu);
     }
 
     public void createPreviewCard(int car) {
@@ -284,11 +290,10 @@ public class GUI implements MouseListener {
         center.add(track);
     }
     public void drawTrack() {
-        if(frame.getContentPane().equals(menu)){
-            frame.remove(menu);
-            frame.setContentPane(game);
-            frame.revalidate();
-
+        if(state.equals(gamestate.inMenu)){
+            c.removeAll();
+            c.add(game);
+            state = gamestate.inGame;
         }
         if(!track.isVisible()) track.setVisible(true);
 
