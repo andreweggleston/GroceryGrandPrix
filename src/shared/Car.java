@@ -1,10 +1,12 @@
+package shared;
+
 import java.awt.image.BufferedImage;
 
 /**
  * Car represents a car on the track
  */
 public class Car {
-    private BufferedImage image;
+    private String imageName;
 
     private CarStats stats;
 
@@ -16,8 +18,8 @@ public class Car {
     private Node lastNode;
     private Node goalNode;
 
-    public Car(BufferedImage image, CarStats stats, Node goalNode, boolean isPlayer) {
-        this.image = image;
+    public Car(String imageName, CarStats stats, Node goalNode, boolean isPlayer) {
+        this.imageName = imageName;
         this.stats = stats;
         this.goalNode = goalNode;
         this.momentum = 0.0;
@@ -26,7 +28,7 @@ public class Car {
         this.isPlayer = isPlayer;
     }
 
-    public boolean drive(int ms) {
+    public boolean drive(double ms) {
         boolean aboutToFinish = lastNode.next().equals(goalNode);
         momentum += Math.min(stats.topSpeed(), stats.acceleration());
         distanceFromLast += momentum * (ms / 10.0);
@@ -51,8 +53,8 @@ public class Car {
                 momentum = 0.0;
             }
 
-            lastNode = lastNode.next();
             distanceFromLast -= lastNode.distanceToNext();
+            lastNode = lastNode.next();
         }
         return false;
     }
@@ -98,9 +100,7 @@ public class Car {
     }
 
     //following accessors added by Naomi
-    public BufferedImage getImage() {
-        return image;
-    }
+    public String getImageName() { return imageName; }
     public double getMomentum() {
         return momentum;
     }
