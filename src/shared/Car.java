@@ -30,7 +30,7 @@ public class Car {
 
     public boolean drive(double ms) {
         boolean aboutToFinish = lastNode.next().equals(goalNode);
-        momentum += Math.min(stats.topSpeed(), stats.acceleration());
+        momentum = Math.min(stats.topSpeed(), momentum + stats.acceleration());
         distanceFromLast += momentum * (ms / 10.0);
 
         //if the car has passed a turn

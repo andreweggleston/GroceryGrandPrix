@@ -6,8 +6,8 @@ package shared;
  */
 public class CarStats {
 
-    private static final double TOP_SPEED_SCALE_FACTOR = .25;
-    private static final double ACCELERATION_SCALE_FACTOR = 2.0;
+    private static final double TOP_SPEED_SCALE_FACTOR = 45.0;
+    private static final double ACCELERATION_SCALE_FACTOR = 1.5;
     private static final double HANDLING_SCALE_FACTOR = 0.53;
     private static final double MIN_HANDLING_FACTOR = 0.02;
     Stat topSpeed;
