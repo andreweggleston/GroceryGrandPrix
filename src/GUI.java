@@ -10,37 +10,56 @@ import java.util.ArrayList;
 public class GUI implements MouseListener {
     private Color backgroundColor;
     private Color foregroundColor;
-    JFrame frame;
-    Container game;
-    Container menu;
-    Container winlose;
-    Container loading;
+    private Font menuFontPLAIN;
+    private Font menuFontBOLD;
+    private int centerWidth;
+    private int centerHeight;
+    private final Dimension defaultRes = new Dimension(1920, 1080);
+    private JFrame frame;
+    private Container c;
+    private JPanel game;
+    private JPanel menu;
+    private JPanel uiGrid;
+    private JPanel uiBox;
+    private JPanel rideWindow;
+    private Container winlose;
+    private Container loading;
     private ArrayList<JPanel> previewCards;
     private ArrayList<JPanel> previewSprites;
     private JButton[] menuButtons;
-    private JLabel[] menuLabels;
+    private JLabel[] statLabels;
     private JPanel previewBar;
     private JPanel center;
-    private JPanel east;
     private JPanel track;
     private JPanel southButtons;
     private ArrayList<Line2D.Double> trackSegments;
     private ArrayList<Ellipse2D.Double> trackJoints;
-    private int centerWidth;
-    private int centerHeight;
     boolean draw;
+    public enum gamestate {
+        inMenu, inGame, endRace;
+    }
+    private gamestate state;
 
     public GUI(Color backgroundColor, JButton[] buttons, int width, int height) {
         frame = new JFrame("GroceryGrandPrix");
-        menu = new Container();
-        game = new Container();
+        c = new Container();
+        c = frame.getContentPane();
+        c.setPreferredSize(defaultRes);
+        c.setMinimumSize(defaultRes);
+        state = gamestate.inMenu;
+        uiGrid = new JPanel();
+        menu = new JPanel();
+        menu.setLayout(new BoxLayout(menu, BoxLayout.X_AXIS));
+        game = new JPanel();
         draw = true;
         centerWidth = width;
         centerHeight = height;
         this.backgroundColor = backgroundColor;
         foregroundColor = Color.lightGray;
+        menuFontPLAIN = new Font("Courier", Font.PLAIN, 16);
+        menuFontBOLD = new Font("Courier", Font.BOLD, 16);
         menuButtons = buttons;
-        menuLabels = new JLabel[4];
+        statLabels = new JLabel[8];
         game.setBackground(backgroundColor);
         game.setForeground(foregroundColor);
         game.setLayout(new BorderLayout());
@@ -54,39 +73,153 @@ public class GUI implements MouseListener {
         center = new JPanel();
         center.setPreferredSize(new Dimension(centerWidth, centerHeight));
         center.setBackground(backgroundColor);
-        east = new JPanel(true);
-        east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
-        playerMenu(0, 20);
+
+
+        playerMenu(0, 17);
         
         game.add(previewBar, BorderLayout.NORTH);
         game.add(center, BorderLayout.CENTER);
 
-        frame.setContentPane(game);
+
+
+        frame.setContentPane(menu);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
         frame.setResizable(false);
+
     }
 
     public void playerMenu(int round, int budget) {
-        menu.setLayout(new GridLayout(4,1));
-        JPanel typeDisplay = new JPanel();
-        JPanel typeSelector = new JPanel();
-        JPanel statSelectors = new JPanel(new GridLayout(3,3));
+        GridBagLayout menuLayout;
+        GridBagConstraints menuConstraints = new GridBagConstraints();//12x12
+        //(int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty, int anchor, int fill, Insets insets, int ipadx, int ipady)
+        int labelWidth = 5;
+        int labelHeight = 2;
+        menu.setPreferredSize(defaultRes);
+        menu.setMinimumSize(defaultRes);
+        Dimension menuDimension = new Dimension(256, 700);
+        uiGrid.setPreferredSize(menuDimension);
+        //uiGrid.setMinimumSize(menuDimension);
+        uiGrid.setMaximumSize(menuDimension);
+        //menu.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        uiGrid.setLayout(menuLayout = new GridBagLayout());
+        menuConstraints.fill = GridBagConstraints.BOTH;//to make it resizable
 
-        statSelectors.add(menuButtons[3]);
-        statSelectors.add(menuLabels[1] = new JLabel(""));
-        statSelectors.add(menuButtons[0]);
-        statSelectors.add(menuButtons[4]);
-        statSelectors.add(menuLabels[2] = new JLabel(""));
-        statSelectors.add(menuButtons[1]);
-        statSelectors.add(menuButtons[5]);
-        statSelectors.add(menuLabels[3] = new JLabel(""));
-        statSelectors.add(menuButtons[2]);
+        menuLayout.setConstraints(uiGrid, menuConstraints);
+
+        menuConstraints.fill = GridBagConstraints.NONE;//most other menu items should not be resizeable
+        //menuConstraints.anchor = GridBagConstraints.BASELINE_LEADING;
+        menuConstraints.gridx = 0;
+        menuConstraints.gridy = 0;
+        menuConstraints.gridwidth = 8;
+        menuConstraints.gridheight = 2;
+        uiGrid.add(new JLabel("Choose Your Ride"), menuConstraints);
+
+        menuConstraints.gridx = 0; //redundant
+        menuConstraints.gridy = 2;
+        menuConstraints.gridwidth = 1;
+        menuConstraints.gridheight = 2; //redundant
+        uiGrid.add(new JLabel("<"), menuConstraints);
+
+        String rideChoice = "Bikenana";//placeholder
+        menuConstraints.gridx = 1;
+        menuConstraints.gridy = 2; //redundant
+        menuConstraints.gridwidth = 6;
+        menuConstraints.gridheight = 2; //redundant
+        uiGrid.add(new JLabel(rideChoice), menuConstraints);
+
+        menuConstraints.gridx = 7;
+        menuConstraints.gridy = 2; //redundant
+        menuConstraints.gridwidth = 1;
+        menuConstraints.gridheight = 2; //redundant
+        uiGrid.add(new JLabel(">"), menuConstraints);
+
+        statLabels[0] = new JLabel("Top Speed");
+        menuConstraints.gridx = 0;
+        menuConstraints.gridy = 4;
+        menuConstraints.gridwidth = 5;
+        menuConstraints.gridheight = 2; //redundant
+        uiGrid.add(statLabels[0], menuConstraints);
+
+        statLabels[1] = new JLabel("Acceleration");
+        menuConstraints.gridx = 0; //redundant
+        menuConstraints.gridy = 6;
+        menuConstraints.gridwidth = 5; //redundant
+        menuConstraints.gridheight = 2; //redundant
+        uiGrid.add(statLabels[1], menuConstraints);
+
+        statLabels[2] = new JLabel("Handling");
+        //menuConstraints.gridx = 0; //redundant
+        menuConstraints.gridy = 8;
+        //menuConstraints.gridwidth = 5; //redundant
+        //menuConstraints.gridheight = 2; //redundant
+        uiGrid.add(statLabels[2], menuConstraints);
+
+        Dimension plusminusSize = new Dimension(18,14);
+        Font plusFont = new Font("Arial Black", Font.PLAIN, 18);
+        Font minusFont = new Font("Arial", Font.BOLD, 29);
+        Font helpFont = new Font("Arial Black", Font.PLAIN, 12);
+
+        for(int i = 0; i < 3; i++){
+            //statLabels[i].setBackground(Color.lightGray);
+            //statLabels[i].setBorder(null);
+            menuConstraints.gridx = 6;
+            menuConstraints.gridy = 4+(i*2);
+            menuConstraints.gridwidth = 1;
+            menuConstraints.gridheight = 1;
+            menuButtons[0+i].setText("+");//plus button
+            //menuButtons[0+i].setBackground(Color.lightGray);
+            menuButtons[0+i].setMaximumSize(plusminusSize);
+            menuButtons[0+i].setPreferredSize(plusminusSize);
+            menuButtons[0+i].setFont(plusFont);
+            menuButtons[0+i].setMargin(new Insets(-1,0,-2,0));
+            uiGrid.add(menuButtons[0+i], menuConstraints);
+            menuButtons[6+i].setText("?");
+            menuButtons[6+i].setFont(helpFont);
+            menuButtons[6+i].setMargin(new Insets(-1,4,-1,4));
+            menuConstraints.gridx = 7;
+            menuConstraints.gridy = 2+(i*2);
+            menuConstraints.gridheight = 2;
+
+            uiGrid.add(menuButtons[6+i], menuConstraints);
+
+            menuConstraints.gridx = 6;
+            menuConstraints.gridy = 5+(i*2);
+            menuConstraints.gridheight = 1;
+            menuButtons[3+i].setText("-");//minus button
+            //menuButtons
+            menuButtons[3+i].setPreferredSize(plusminusSize);
+            menuButtons[3+i].setMaximumSize(plusminusSize);
+            menuButtons[3+i].setFont(minusFont);
+            menuButtons[3+i].setMargin(new Insets(-4,-2,-1,-1));
+
+            uiGrid.add(menuButtons[3+i], menuConstraints);
+
+        }
+        statLabels[3] = new JLabel ("Budget: ");
+        statLabels[3].setFont(menuFontPLAIN);
+        menuConstraints.gridx = 0;
+        menuConstraints.gridy = 10;
+        uiGrid.add(statLabels[3], menuConstraints);
+
+        menuButtons[10].setText("START RACE");
+        //menuConstraints.anchor = GridBagConstraints.NORTH;
+        menuConstraints.gridx = 0;
+        menuConstraints.gridy = 11;
+        //menuConstraints.weighty = 1;
+        menuConstraints.gridwidth = 8;
+        uiGrid.add(menuButtons[10], menuConstraints);
+
+        rideWindow = new JPanel();
+        rideWindow.setBackground(Color.GREEN);
+        rideWindow.setMinimumSize(new Dimension(1700 ,830));
 
         createPreviewCard(0);
-        //menu.
-        //east.add(menu);
+
+        menu.add(uiGrid, BorderLayout.WEST);
+        menu.add(rideWindow, BorderLayout.CENTER);
+        c.add(menu);
     }
 
     public void createPreviewCard(int car) {
@@ -157,6 +290,11 @@ public class GUI implements MouseListener {
         center.add(track);
     }
     public void drawTrack() {
+        if(state.equals(gamestate.inMenu)){
+            c.removeAll();
+            c.add(game);
+            state = gamestate.inGame;
+        }
         if(!track.isVisible()) track.setVisible(true);
 
     }
