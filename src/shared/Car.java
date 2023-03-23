@@ -114,5 +114,9 @@ public class Car {
     public Node getGoalNode() {
         return goalNode;
     }
+    public void setGoalNode(Node goalNode) {
+        this.goalNode = goalNode;
+        this.lastNode = goalNode;
+    }
 
 }
