@@ -21,6 +21,11 @@ public class CarStats {
         this.handling = Stat.fromInt(handling);
     }
 
+    public CarStats(int[] stats){
+        this(stats[0], stats[1], stats[2]);
+        if (stats.length != 3) throw new RuntimeException();
+    }
+
     @Override
     public String toString() {
         return String.format(
