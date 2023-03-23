@@ -265,22 +265,29 @@ public class GUI extends JFrame implements MouseListener {
     public boolean showResults(ArrayList<Car> placedCars, int raceTime) {
         boolean userContinue;
         int playerPlacement = 0;
+        Car lastCar = placedCars.get(placedCars.size()-1);
         JPanel results = new JPanel();
         results.setLayout(new BoxLayout(results, BoxLayout.Y_AXIS));
         JPanel statsHeaderPanel = new JPanel();
         JPanel headerPanel = new JPanel();
         JPanel placementPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 75, 0));
         JPanel imagePanel = new JPanel();
-        JPanel bottomPanel = new JPanel();
+        JPanel loserPanel = new JPanel();
+        JPanel promptPanel = new JPanel();
         JTextArea header = new JTextArea();
-        JLabel bottom = new JLabel();
+        JLabel loserLabel = new JLabel();
+        JLabel promptLabel = new JLabel();
         Font messageFont = new Font(Font.SANS_SERIF, Font.BOLD, 24);
 
         header.setTabSize(3);
         header.setEditable(false);
         header.setFont(messageFont);
         header.setBackground(headerPanel.getBackground());
-        bottom.setFont(messageFont);
+
+        loserLabel.setFont(messageFont);
+        promptLabel.setFont(messageFont);
+
+        // Find the position that the player finished the race.
         for (int i = 0; i < placedCars.size(); i++) {
             if (placedCars.get(i).isPlayer()) playerPlacement = i + 1;
         }
@@ -292,10 +299,10 @@ public class GUI extends JFrame implements MouseListener {
             header.setText("\t\tYou win!\nThe final race lasted " + raceTime + " seconds.");
             JLabel statsHeader = new JLabel("Your winning car is:");
             statsHeader.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
-            JLabel stats = new JLabel("Spd: " + player.getTopSpeed() + " Acc: " + player.getAcceleration() + " Han: " + player.getHandling());
+            JLabel stats = new JLabel("Spd-" + player.getTopSpeed() + " Acc-" + player.getAcceleration() + " Han-" + player.getHandling());
             stats.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
             Sprite playerSprite = new Sprite("bikenana", 1);
-            bottom.setText("Would you like to try another run?");
+            promptLabel.setText("Would you like to try another run?");
 
             statsHeaderPanel.add(statsHeader);
             placementPanel.add(stats);
@@ -319,8 +326,8 @@ public class GUI extends JFrame implements MouseListener {
             }
 
             header.setText("\t You placed " + playerPlacement + placementSuffix + ".\nThe race lasted " + raceTime + " seconds.");
-            // Change the prompt shown in the bottom label depending on if the player won or lost.
-            bottom.setText((playerPlacement == placedCars.size()) ? "Try again?" : "Do you want to continue to the next round?");
+            // Change the message shown in the prompt label to reflect if the player has lost.
+            promptLabel.setText((playerPlacement == placedCars.size()) ? "Try again?" : "Do you want to continue to the next round?");
 
             // Add every car's sprite and the corresponding placement in the prior race to panels.
             for (int i = 0; i < placedCars.size(); i++) {
@@ -332,26 +339,25 @@ public class GUI extends JFrame implements MouseListener {
                 imagePanel.add(nextSprite);
             }
         }
+        // Change the message shown in the loser label to reflect if the player has lost.
+        loserLabel.setText(((playerPlacement == placedCars.size()) ? "You lost. Your" : "Last place's") + " ending stats were: " +
+                "Spd-" + lastCar.getTopSpeed() + ", Acc-" + lastCar.getAcceleration() + ", Han-" + lastCar.getHandling());
 
         headerPanel.add(header);
-        bottomPanel.add(bottom);
+        loserPanel.add(loserLabel);
+        promptPanel.add(promptLabel);
 
         results.add(headerPanel);
         // Adds an empty panel when the player did not win the tournament.
         results.add(statsHeaderPanel);
         results.add(placementPanel);
         results.add(imagePanel);
-        results.add(bottomPanel);
+        results.add(loserPanel);
+        results.add(promptPanel);
 
         // Show all the components in the form of a ConfirmDialog. Save the user response as a boolean (false if no).
         userContinue = JOptionPane.showConfirmDialog(this, results, "Race Results", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE) != 1;
         return userContinue;
-    }
-
-    public void showWin() {
-    }
-
-    public void showLose() {
     }
 
     @Override

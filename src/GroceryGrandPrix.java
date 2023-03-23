@@ -20,31 +20,37 @@ public class GroceryGrandPrix implements ActionListener {
     private int round;
     private final int trackX = 1440;
     private final int trackY = 830;
+    private final int maxStat = 9;
     private double timeElapsed;
     private GUI gui;
     private Node trackHead;
     private String[] carNames;
     private ArrayList <Car> cars;
     private CarStats playerStats;
+
     private JButton[] buttons;
     private Timer gameLoop;
 
     public GroceryGrandPrix() {
-        budget = 5;
+        budget = 10;
         round = 1;
         timeElapsed = 0.0;
-        File[] spriteFiles = (new File("assets/sprites")).listFiles();
-        assert spriteFiles != null;
-        carNames = new String[spriteFiles.length];
-        for (int i = 0; i < spriteFiles.length; i++) {
-            carNames[i] = spriteFiles[i].getName().split("_")[1];
-        }
+        fileReader();
         createButtons();
         cars = new ArrayList<>();
         playerStats = new CarStats(4,4,4);
         initializeGUI();
-        gui.playerMenu(1, 20);
+        gui.playerMenu(round, budget);
         gui.setVisible(true);
+
+    }
+
+    private void fileReader() {
+        File[] spriteFiles = (new File("assets/sprites")).listFiles();
+        assert spriteFiles != null;
+        for (int i = 0; i < spriteFiles.length; i++) {
+            carNames[i] = spriteFiles[i].getName().split("_")[1];
+        }
     }
 
     private void initializeGUI(){
@@ -70,7 +76,7 @@ public class GroceryGrandPrix implements ActionListener {
         gui.toTrack(trackHead, cars);
     }
 
-    private void startSimulation() throws InterruptedException {
+    private void startSimulation() {
         ArrayList<Car> carPlacements = new ArrayList<Car>();
         final int timerDelayMs = 1000 / framerate;
 
@@ -110,7 +116,6 @@ public class GroceryGrandPrix implements ActionListener {
     private void generateCars() {
         Node carStartNode = trackHead;
         int imageIndex = 0;
-        int maxStat = 9;
         int statPoints = 15;
         int stat1;
         int stat2;
@@ -137,7 +142,7 @@ public class GroceryGrandPrix implements ActionListener {
                 }
                 cars.add(i, new Car(carNames[imageIndex], new CarStats(stat1, stat2, stat3), carStartNode, false));
             }else {
-                cars.add(0, new Car(carNames[imageIndex], playerStats, carStartNode, true));
+                cars.add(i, new Car(carNames[imageIndex], playerStats, carStartNode, true));
             }
             carStartNode = carStartNode.next();
         }
@@ -206,11 +211,7 @@ public class GroceryGrandPrix implements ActionListener {
         switch (pressedButton.getActionCommand().substring(0,4)) {
             case "race" :
                 showTrack();
-                try {
-                    startSimulation();
-                } catch (InterruptedException e) {
-                    // TODO: handle exception
-                }
+                startSimulation();
                 break;
             case "fast" :
                 hurry = !hurry;
@@ -235,24 +236,42 @@ public class GroceryGrandPrix implements ActionListener {
             case "adj " :
                 switch (pressedButton.getActionCommand().substring(4, 8)) {
                     case "+spd":
-                        playerStats.incrementTopSpeed();
+                        if (budget > 0 && playerStats.topSpeed() <= maxStat) {
+                            playerStats.incrementTopSpeed();
+                            budget--;
+                        }
                         break;
                     case "+acc":
-                        playerStats.incrementAcceleration();
+                        if (budget > 0 && playerStats.acceleration() <= maxStat) {
+                            playerStats.incrementAcceleration();
+                            budget--;
+                        }
                         break;
                     case "+han":
-                        playerStats.incrementHandling();
+                        if (budget > 0 && playerStats.handling() <= maxStat) {
+                            playerStats.incrementHandling();
+                            budget--;
+                        }
                         break;
                     case "-spd":
-                        playerStats.decrementTopSpeed();
+                        if (playerStats.topSpeed() > 0) {
+                            playerStats.decrementTopSpeed();
+                            budget++;
+                        }
                         break;
                     case "-acc":
-                        playerStats.decrementAcceleration();
+                        if (playerStats.acceleration() > 0) {
+                            playerStats.decrementAcceleration();
+                            budget++;
+                        }
                         break;
                     case "-han":
-                        playerStats.decrementHandling();
+                        if (playerStats.handling() > 0) {
+                            playerStats.decrementHandling();
+                            budget++;
+                        }
                 }
-                // gui.updatePreview(player.getTopSpeed(), player.getAcceleration(), player.getHandling());
+                // gui.updatePlayer(budget, playerStats.TopSpeed(), playerStats.Acceleration(), playerStats.Handling());
         }
 
     }
