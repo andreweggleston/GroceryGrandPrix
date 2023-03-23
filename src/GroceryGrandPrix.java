@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
@@ -16,19 +15,19 @@ public class GroceryGrandPrix implements ActionListener {
 
     private final int framerate = 30;
     private boolean paused;
-    private boolean fast;
+    private boolean hurry;
     private int budget;
     private int round;
     private final int trackX = 1440;
     private final int trackY = 830;
-    private double timeElapsed = 0.0;
+    private double timeElapsed;
     private GUI gui;
     private Node trackHead;
     private String[] carNames;
     private ArrayList <Car> cars;
-
     private CarStats playerStats;
     private JButton[] buttons;
+    private Timer gameLoop;
 
     public GroceryGrandPrix() {
         budget = 5;
@@ -42,7 +41,7 @@ public class GroceryGrandPrix implements ActionListener {
         }
         createButtons();
         cars = new ArrayList<>();
-        playerStats = new CarStats(0,0,0);
+        playerStats = new CarStats(4,4,4);
         initializeGUI();
         gui.playerMenu(1, 20);
         gui.setVisible(true);
@@ -55,55 +54,64 @@ public class GroceryGrandPrix implements ActionListener {
         gui = new GUI("Grocery Grand Prix", Color.lightGray, buttons, trackX, trackY);
     }
 
-    public void startGame() {
+    public void showMenu() {
         gui.playerMenu(round, budget);
-        for (int i = 0; i < cars.size(); i++) {
+
+        /* existing startGame code
+           for (int i = 0; i < cars.size(); i++) {
             gui.createPreviewCard(i);
-        }
+        }*/
     }
 
     private void showTrack() {
-        timeElapsed = 0;
-        generateNodes(round*5);
+        timeElapsed = 0.0;
+        generateNodes(round+5);
         generateCars();
         gui.toTrack(trackHead, cars);
     }
 
     private void startSimulation() throws InterruptedException {
-        double timeElapsed = 0.0;
-        gui.revalidate();
-        gui.repaint();
+        ArrayList<Car> carPlacements = new ArrayList<Car>();
+        final int timerDelayMs = 1000 / framerate;
 
-        final boolean[] finalDone = {false};
-        final double[] finalTimeElapsed = {timeElapsed};
-        final int timerDelayMs = 1000/framerate;
-        new Timer(timerDelayMs, e -> {
-            if (!finalDone[0]) {
-            for (Car car : cars) { //TODO: hurry mode
-                finalDone[0] = car.drive(timerDelayMs/100.0) || finalDone[0];
-            }
-            finalTimeElapsed[0] += 1;
-            gui.revalidate(); //VERY IMPORTANT LINE
-            gui.repaint();
+        gameLoop = new Timer(timerDelayMs, e -> {
+            double inGameTimePassed = (timerDelayMs/100.0) * ((hurry) ? 2 : 1);
+            if (carPlacements.size() < 5 - round) {
+                for (Car car : cars) {
+                    if (!carPlacements.contains(car)) {
+                        // save the cars in finishing order
+                        if (car.drive(inGameTimePassed)) carPlacements.add(car);
+                    }
+                }
+                timeElapsed += inGameTimePassed;
+                gui.revalidate(); //VERY IMPORTANT LINE
+                gui.repaint();
             } else {
-                Timer self = (Timer) e.getSource();
-                self.stop();
-                JOptionPane.showMessageDialog(gui, String.format("Time elapsed: %f", finalTimeElapsed[0]));
+                gameLoop.stop();
+                boolean continueGame = gui.showResults(carPlacements, (int) timeElapsed);
+                cars.remove(carPlacements.get(carPlacements.size() - 1));
+
+                if (continueGame) {
+                    round++;
+                    budget = 2;
+                    showMenu();
+                } else restart();
             }
-        }).start();
+        });
+        gameLoop.start();
     }
 
     private void restart() {
         budget = 5;
         round = 1;
-        startGame();
+        showMenu();
     }
 
     private void generateCars() {
         Node carStartNode = trackHead;
         int imageIndex = 0;
-        int maxStat = 10;
-        int statPoints = 10;
+        int maxStat = 9;
+        int statPoints = 15;
         int stat1;
         int stat2;
         int stat3;
@@ -194,22 +202,30 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        JButton action = (JButton) event.getSource();
-        switch (action.getActionCommand().substring(0,4)) {
+        JButton pressedButton = (JButton) event.getSource();
+        switch (pressedButton.getActionCommand().substring(0,4)) {
             case "race" :
                 showTrack();
                 try {
                     startSimulation();
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    // TODO: handle exception
                 }
                 break;
             case "fast" :
-                fast = !fast;
-                //TODO set fast button to indicate user is in fast mode
+                hurry = !hurry;
+                pressedButton.setText("Set " + ((hurry) ? 1:2) + "x Speed");
                 break;
             case "stop" :
-                paused = !paused;
+                switch (pressedButton.getText()) {
+                    case "Unpause":
+                        pressedButton.setText("Pause");
+                        gameLoop.start();
+                        break;
+                    case "Pause" :
+                        pressedButton.setText("Unpause");
+                        gameLoop.stop();
+                }
                 break;
             case "redo" :
                 restart();
@@ -217,7 +233,7 @@ public class GroceryGrandPrix implements ActionListener {
             case "next" :
                 break;
             case "adj " :
-                switch (action.getActionCommand().substring(4, 8)) {
+                switch (pressedButton.getActionCommand().substring(4, 8)) {
                     case "+spd":
                         playerStats.incrementTopSpeed();
                         break;
