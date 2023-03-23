@@ -40,10 +40,15 @@ public class TrackPanel extends JPanel {
         for (int i = 0; i < cars.size(); i++) {
             this.cars[i] = cars.get(i);
             try {
-                BufferedImage image = ImageIO.read(new File("assets/sprites/sprite_" + cars.get(i).getImageName() + "_size_1.png"));
-                int scaleX = (int)(image.getWidth()*.75);
-                int scaleY = (int)(image.getHeight()*.75);
-                Image img = image.getScaledInstance(scaleX, scaleY, Image.SCALE_FAST);
+                BufferedImage image = ImageIO.read(new File("assets/sprites/sprite_" + this.cars[i].getImageName() + "_size_0.png"));
+                System.out.println("Image " + (i+1) + ": assets/sprites/sprite_" + this.cars[i].getImageName() + "_size_0.png\n");
+                int scaleX = (int)(image.getWidth()*.10); // for use with size_0
+                int scaleY = (int)(image.getHeight()*.10); // for use with size_0
+                //int scaleX = (int)(image.getWidth()*.75); // for use with size_1
+                // int scaleY = (int)(image.getHeight()*.75); // for use with size_1
+                //int scaleX = (int)(image.getWidth()*.30); // for use with size_2
+                //int scaleY = (int)(image.getHeight()*.30); // for use with size_2
+                Image img = image.getScaledInstance(scaleX, scaleY, Image.SCALE_SMOOTH);
                 image = new BufferedImage(scaleX, scaleY, BufferedImage.TYPE_INT_ARGB);
                 image.getGraphics().drawImage(img, 0, 0, null);
                 this.carImages[i] = image;

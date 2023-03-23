@@ -51,6 +51,7 @@ public class GroceryGrandPrix implements ActionListener {
         carNames = new String[spriteFiles.length];
         for (int i = 0; i < spriteFiles.length; i++) {
             carNames[i] = spriteFiles[i].getName().split("_")[1];
+            System.out.println("Name " + (i+1) + ": " + carNames[i] + "\n");
         }
     }
 
@@ -124,6 +125,7 @@ public class GroceryGrandPrix implements ActionListener {
         double statPicker;
 
         for (int i = 0; i < 4; i++) {
+            imageIndex=i;
             if (i > 0) {
                 stat1 = 0;
                 stat2 = 0;
@@ -145,6 +147,7 @@ public class GroceryGrandPrix implements ActionListener {
             }else {
                 cars.add(i, new Car(carNames[imageIndex], playerStats, carStartNode, true));
             }
+            System.out.println("Car " + (i+1) + ": " + cars.get(i).getImageName() + "\n");
             carStartNode = carStartNode.next();
         }
     }
