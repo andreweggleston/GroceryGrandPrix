@@ -48,6 +48,7 @@ public class GroceryGrandPrix implements ActionListener {
     private void fileReader() {
         File[] spriteFiles = (new File("assets/sprites")).listFiles();
         assert spriteFiles != null;
+        carNames = new String[spriteFiles.length];
         for (int i = 0; i < spriteFiles.length; i++) {
             carNames[i] = spriteFiles[i].getName().split("_")[1];
         }
