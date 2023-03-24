@@ -55,11 +55,11 @@ public class GUI extends JFrame implements MouseListener {
     private ArrayList<Ellipse2D.Double> trackJoints;
     boolean draw;
 
-    public GUI(String title, Color foregroundColor, Color backgroundColor, JButton[] buttons, int width, int height) {
+    public GUI(String title, Color foregroundColor, Color backgroundColor, JComponent[] inputs, int width, int height) {
         super(title);
         this.foregroundColor = foregroundColor;
         this.backgroundColor = backgroundColor;
-        initializeMenuComponents(buttons);
+        initializeMenuComponents(inputs);
         menu = new JPanel(); //has uiGrid and ridePreviewPanel
         menu.setLayout(new BoxLayout(menu, BoxLayout.X_AXIS));
         menu.setBackground(backgroundColor);
@@ -84,42 +84,59 @@ public class GUI extends JFrame implements MouseListener {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     }
-    private void initializeMenuComponents(JButton[] buttons){
-        for(JButton button : buttons){
-            button.setFont(menuFont);
+    private void initializeMenuComponents(JComponent[] inputs){
+        for (JComponent input : inputs) {
+            if (input instanceof JButton) {
+                JButton button = (JButton) input;
+                button.setFont(menuFont);
+                switch (button.getActionCommand()) {
+                    case "race":
+                        startButton = button;
+                        startButton.setText("Start Race");
+                        break;
+                    case "fast":
+                        hurryButton = button;
+                        hurryButton.setText("Hurry");
+                        break;
+                    case "stop":
+                        pauseButton = button;
+                        pauseButton.setText("Pause");
+                        break;
+                    case "redo":
+                        restartButton = button;
+                        restartButton.setText("Restart?");
+                        break;
+                    case "last":
+                        previousPreviewButton = button;
+                        previousPreviewButton.setText("<");
+                        break;
+                    case "next":
+                        nextPreviewButton = button;
+                        nextPreviewButton.setText(">");
+                        break;
+                }
+            }
+            else if (input instanceof JSlider) {
+                JSlider slider = (JSlider) input;
+                switch (slider.getName()) {
+                    case "spd" :
+                        speedSlider = slider;
+                        speedSlider.setBackground(backgroundColor);
+                    break;
+                    case "acc" :
+                        accelerationSlider = slider;
+                        accelerationSlider.setBackground(backgroundColor);
+                    break;
+                    case "han":
+                        handlingSlider = slider;
+                        handlingSlider.setBackground(backgroundColor);
+                    break;
+                }
+            }
         }
         Insets helpMargin = new Insets(-1,4,-1,4);
-        speedHelpButton = buttons[0];
-        speedHelpButton.setText("?");
-        speedHelpButton.setMargin(helpMargin);
-        accelerationHelpButton = buttons[1];
-        accelerationHelpButton.setText("?");
-        accelerationHelpButton.setMargin(helpMargin);
-        handlingHelpButton = buttons[2];
-        handlingHelpButton.setText("?");
-        handlingHelpButton.setMargin(helpMargin);
-        budgetHelpButton = buttons[3];
-        budgetHelpButton.setText("?");
-        budgetHelpButton.setMargin(helpMargin);
-        startButton = buttons[4];
-        startButton.setText("Start Race");
-        hurryButton = buttons[5];
-        hurryButton.setText("Hurry");
-        pauseButton = buttons[6];
-        pauseButton.setText("Pause");
-        restartButton = buttons[7];
-        restartButton.setText("Restart?");
-        previousPreviewButton = buttons[8];
-        previousPreviewButton.setText("<");
-        nextPreviewButton = buttons[9];
-        nextPreviewButton.setText(">");
-        //JSliders
-        speedSlider = new JSlider(1, 10, 5);
-        speedSlider.setBackground(backgroundColor);
-        accelerationSlider = new JSlider(1, 10, 5);
-        accelerationSlider.setBackground(backgroundColor);
-        handlingSlider = new JSlider(1, 10, 5);
-        handlingSlider.setBackground(backgroundColor);
+
+
         //JLabels
         selectVehicle = new JLabel("SELECT VEHICLE:", JLabel.CENTER);
         selectVehicle.setFont(menuFont);
@@ -240,11 +257,11 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridwidth = 6;
         uiGrid.add(speedLabel, menuConstraints);
 
-        menuConstraints.anchor = GridBagConstraints.SOUTHEAST;
+        /*menuConstraints.anchor = GridBagConstraints.SOUTHEAST;
         menuConstraints.fill = GridBagConstraints.NONE;
         menuConstraints.gridx = 7; // (7,3)
         menuConstraints.gridwidth = 1;
-        uiGrid.add(speedHelpButton, menuConstraints);
+        uiGrid.add(speedHelpButton, menuConstraints);*/
 
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.anchor = GridBagConstraints.NORTH;
@@ -263,12 +280,12 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridwidth = 6;
         uiGrid.add(accelerationLabel, menuConstraints);
 
-        menuConstraints.anchor = GridBagConstraints.SOUTHEAST;
+        /*menuConstraints.anchor = GridBagConstraints.SOUTHEAST;
         menuConstraints.fill = GridBagConstraints.NONE;
         menuConstraints.weightx = 0;
         menuConstraints.gridx = 7;  // (7,5)
         menuConstraints.gridwidth = 1;
-        uiGrid.add(accelerationHelpButton, menuConstraints);
+        uiGrid.add(accelerationHelpButton, menuConstraints);*/
 
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.anchor = GridBagConstraints.NORTH;
@@ -288,12 +305,12 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridwidth = 6;
         uiGrid.add(handlingLabel, menuConstraints);
 
-        menuConstraints.anchor = GridBagConstraints.SOUTHEAST;
+        /*menuConstraints.anchor = GridBagConstraints.SOUTHEAST;
         menuConstraints.fill = GridBagConstraints.NONE;
         menuConstraints.weightx = 0;
         menuConstraints.gridx = 7;  // (7,7)
         menuConstraints.gridwidth = 1;
-        uiGrid.add(handlingHelpButton, menuConstraints);
+        uiGrid.add(handlingHelpButton, menuConstraints);*/
 
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.anchor = GridBagConstraints.NORTH;

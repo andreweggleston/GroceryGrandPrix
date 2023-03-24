@@ -12,7 +12,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GroceryGrandPrix implements ActionListener {
+public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private final int framerate = 30;
     private boolean hurry;
     private int budget;
@@ -26,7 +26,7 @@ public class GroceryGrandPrix implements ActionListener {
     private String[] carNames;
     private ArrayList <Car> cars;
     private CarStats playerStats;
-    private JButton[] buttons;
+    private JComponent[] userInputs;
     private Timer gameLoop;
 
     public GroceryGrandPrix() {
@@ -55,7 +55,7 @@ public class GroceryGrandPrix implements ActionListener {
         if (gui != null){
             gui.dispose();
         }
-        gui = new GUI("Grocery Grand Prix", new Color(190, 211, 231), new Color(115, 122, 148), buttons, trackX, trackY);
+        gui = new GUI("Grocery Grand Prix", new Color(190, 211, 231), new Color(115, 122, 148), userInputs, trackX, trackY);
     }
 
     public void showMenu() {
@@ -307,6 +307,32 @@ public class GroceryGrandPrix implements ActionListener {
                 }
     }
 
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        JSlider slider = (JSlider) e.getSource();
+        if (budget > 0) {
+            switch (slider.getName()) {
+                case "spd":
+                    if (playerStats.topSpeed() < slider.getValue()) {
+                        playerStats.incrementTopSpeed();
+                        budget--;
+
+                    }
+                case "acc":
+                    if (playerStats.topSpeed() < slider.getValue()) {
+                            playerStats.incrementAcceleration();
+                            budget--;
+                    }
+                case "han":
+                    playerStats.incrementHandling();
+                    budget--;
+            }
+        }
+        else {
+
+        }
+    }
+
     private void createButtons() {
         /*
         JButton plus1 = new JButton();
@@ -354,11 +380,24 @@ public class GroceryGrandPrix implements ActionListener {
         restart.setActionCommand("redo");
         JButton previousCar = new JButton();
         previousCar.addActionListener(this);
-        previousCar.setActionCommand("prev");
+        previousCar.setActionCommand("last");
         JButton nextCar = new JButton();
         nextCar.addActionListener(this);
         nextCar.setActionCommand("next");
-        buttons = new JButton[] {helpSpeed, helpAcceleration, helpHandling, helpBudget, startRace, hurry, pause, restart, previousCar, nextCar};
+
+        JSlider speed = new JSlider(1, maxStat);
+        speed.setSnapToTicks(true);
+        speed.addChangeListener(this);
+        speed.setName("spd");
+        JSlider acceleration = new JSlider(1, maxStat);
+        acceleration.setSnapToTicks(true);
+        acceleration.addChangeListener(this);
+        acceleration.setName("acc");
+        JSlider handling = new JSlider(1, maxStat);
+        handling.setSnapToTicks(true);
+        handling.addChangeListener(this);
+        handling.setName("han");
+        userInputs = new JComponent[]{helpSpeed, helpAcceleration, helpHandling, helpBudget, startRace, hurry, pause, restart, previousCar, nextCar, speed, acceleration, handling};
     }
 
     public static void main(String[] args) {
