@@ -40,7 +40,7 @@ public class GroceryGrandPrix implements ActionListener {
         cars = new ArrayList<>();
         playerStats = new CarStats(4,4,4);
         initializeGUI();
-        gui.playerMenu(round, budget);
+        gui.switchToPlayerMenu();
         gui.setVisible(true);
 
     }
@@ -63,7 +63,7 @@ public class GroceryGrandPrix implements ActionListener {
     }
 
     public void showMenu() {
-        gui.playerMenu(round, budget);
+        gui.switchToPlayerMenu();
 
         /* existing startGame code
            for (int i = 0; i < cars.size(); i++) {

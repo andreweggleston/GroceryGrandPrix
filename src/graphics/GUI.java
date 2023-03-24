@@ -63,9 +63,11 @@ public class GUI extends JFrame implements MouseListener {
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+
+        setupPlayerMenu();
     }
 
-    public void playerMenu(int round, int budget) {
+    private void setupPlayerMenu() {
         GridBagLayout menuLayout;
         GridBagConstraints menuConstraints = new GridBagConstraints();//12x12
         //(int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty, int anchor, int fill, Insets insets, int ipadx, int ipady)
@@ -192,6 +194,9 @@ public class GUI extends JFrame implements MouseListener {
 
         menu.add(uiGrid, BorderLayout.WEST);
         menu.add(rideWindow, BorderLayout.CENTER);
+    }
+
+    public void switchToPlayerMenu(){
         this.setContentPane(menu);
         this.pack();
         this.revalidate();
