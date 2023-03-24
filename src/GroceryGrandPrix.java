@@ -55,7 +55,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         if (gui != null){
             gui.dispose();
         }
-        gui = new GUI("Grocery Grand Prix", new Color(190, 211, 231), new Color(115, 122, 148), userInputs, trackX, trackY);
+        gui = new GUI("Grocery Grand Prix", new Color(222, 232, 243), new Color(115, 122, 148), userInputs, trackX, trackY);
     }
 
     public void showMenu() {

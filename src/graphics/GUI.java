@@ -16,7 +16,8 @@ public class GUI extends JFrame implements MouseListener {
     private String[] previewNames;
     private Color backgroundColor;
     private Color foregroundColor;
-    private final Font menuFont = new Font("Calibri", Font.BOLD, 16);
+    private final Font menuFontPLAIN = new Font("Calibri", Font.PLAIN, 18);
+    private final Font menuFontBOLD = new Font("Calibri", Font.BOLD, 22);
     private final Dimension defaultRes;
     private JSlider speedSlider;
     private JSlider accelerationSlider;
@@ -88,11 +89,11 @@ public class GUI extends JFrame implements MouseListener {
         for (JComponent input : inputs) {
             if (input instanceof JButton) {
                 JButton button = (JButton) input;
-                button.setFont(menuFont);
+                button.setFont(menuFontBOLD);
                 switch (button.getActionCommand()) {
                     case "race":
                         startButton = button;
-                        startButton.setText("Start Race");
+                        startButton.setText("START RACE");
                         break;
                     case "fast":
                         hurryButton = button;
@@ -134,31 +135,59 @@ public class GUI extends JFrame implements MouseListener {
                 }
             }
         }
-        Insets helpMargin = new Insets(-1,4,-1,4);
-
 
         //JLabels
         selectVehicle = new JLabel("SELECT VEHICLE:", JLabel.CENTER);
-        selectVehicle.setFont(menuFont);
+        selectVehicle.setFont(menuFontBOLD);
         selectVehicle.setForeground(foregroundColor);
         allocateStatsLabel = new JLabel("ALLOCATE STAT POINTS:", JLabel.CENTER);
-        allocateStatsLabel.setFont(menuFont);
+        allocateStatsLabel.setFont(menuFontBOLD);
         allocateStatsLabel.setForeground(foregroundColor);
         speedLabel = new JLabel("Top Speed", JLabel.CENTER);
-        speedLabel.setFont(menuFont);
+        speedLabel.setFont(menuFontBOLD);
         speedLabel.setForeground(foregroundColor);
+
         accelerationLabel = new JLabel("Acceleration", JLabel.CENTER);
-        accelerationLabel.setFont(menuFont);
+        accelerationLabel.setFont(menuFontBOLD);
         accelerationLabel.setForeground(foregroundColor);
+
         handlingLabel = new JLabel("Handling", JLabel.CENTER);
-        handlingLabel.setFont(menuFont);
+        handlingLabel.setFont(menuFontBOLD);
         handlingLabel.setForeground(foregroundColor);
-        budgetLabel = new JLabel ("STAT POINTS AVAILABLE: ", JLabel.RIGHT);
-        budgetLabel.setFont(menuFont);
+
+        budgetLabel = new JLabel ("POINTS AVAILABLE: ", JLabel.RIGHT);
+        budgetLabel.setFont(menuFontBOLD);
         budgetLabel.setForeground(foregroundColor);
+
         budgetValue = new JLabel ("00", JLabel.LEFT);
-        budgetValue.setFont(menuFont);
+        budgetValue.setFont(menuFontBOLD);
         budgetValue.setForeground(Color.GREEN);
+        //JToolTips
+        ToolTipManager.sharedInstance().setInitialDelay(0);
+        ToolTipManager.sharedInstance().setDismissDelay(8000);
+        UIManager.put("ToolTip.font", menuFontPLAIN);
+        speedLabel.setToolTipText("Sets vehicle's top speed");
+        accelerationLabel.setToolTipText("<html>"
+                                       + "Sets rate at which top speed is "
+                                       + "<br>"
+                                       + "reached from rest"
+                                       + "</html>");
+        handlingLabel.setToolTipText("<html>"
+                + "Sets vehicle's chance to perform "
+                + "<br>"
+                + "very sharp turns without losing "
+                + "<br>"
+                + "control (stopping briefly)"
+                + "</html>");
+        budgetLabel.setToolTipText("<html>"
+                                 + "Number of points to be allocated "
+                                 + "<br>"
+                                 + "to your vehicle's stats. You can't "
+                                 + "<br>"
+                                 + "start a race until there are zero "
+                                 + "<br>"
+                                 + "points available"
+                                 + "</html>");
     }
     public void playerMenu(int round){}
 
@@ -225,7 +254,7 @@ public class GUI extends JFrame implements MouseListener {
         uiGrid.add(previousPreviewButton, menuConstraints);
 
         previewLabel = new JLabel(previewNames[previewIndex], JLabel.CENTER);
-        previewLabel.setFont(menuFont);
+        previewLabel.setFont(menuFontBOLD);
         previewLabel.setForeground(foregroundColor);
         //System.out.println(previewIndex);
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -343,11 +372,11 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridy = 9;
         uiGrid.add(budgetValue, menuConstraints);
 
-        menuConstraints.anchor = GridBagConstraints.EAST;
+        /*menuConstraints.anchor = GridBagConstraints.EAST;
         menuConstraints.weightx = 0;
         menuConstraints.gridx = 7;  // (7,7)
         menuConstraints.gridwidth = 1;
-        uiGrid.add(budgetHelpButton, menuConstraints);
+        uiGrid.add(budgetHelpButton, menuConstraints);*/
 
         menuConstraints.anchor = GridBagConstraints.NORTHEAST;
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
