@@ -15,7 +15,7 @@ public class CarStats {
     Stat handling;
 
     public CarStats(int topSpeed, int acceleration, int handling) {
-        assert (topSpeed > 0 && topSpeed < 10) && (acceleration > 0 && acceleration < 10) && (handling > 0 && handling < 10);
+        assert (topSpeed > 0 && topSpeed <= 10) && (acceleration > 0 && acceleration <= 10) && (handling > 0 && handling <= 10);
         this.topSpeed = Stat.fromInt(topSpeed);
         this.acceleration = Stat.fromInt(acceleration);
         this.handling = Stat.fromInt(handling);
@@ -115,7 +115,7 @@ public class CarStats {
         }
 
         public static Stat fromInt(int i) {
-            return Stat.values()[i];
+            return Stat.values()[i - 1];
         }
 
         public int getStatNumeral() {

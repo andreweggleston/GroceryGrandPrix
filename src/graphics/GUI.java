@@ -145,6 +145,12 @@ public class GUI extends JFrame implements MouseListener {
     }
     public void playerMenu(int round){}
 
+    public void switchToPlayerMenu() {
+        setContentPane(menu);
+        this.pack();
+        this.revalidate();
+    }
+
     public void playerMenu(String[] carNames, int budget) {
         previewNames = carNames;
         previewCount = previewNames.length;
@@ -200,7 +206,7 @@ public class GUI extends JFrame implements MouseListener {
         previewLabel = new JLabel(previewNames[previewIndex], JLabel.CENTER);
         previewLabel.setFont(menuFont);
         previewLabel.setForeground(foregroundColor);
-        System.out.println(previewIndex);
+        //System.out.println(previewIndex);
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.insets = vertical5_10;
         menuConstraints.weightx = 1;
