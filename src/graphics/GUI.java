@@ -16,7 +16,7 @@ public class GUI extends JFrame implements MouseListener {
     private String[] previewNames;
     private Color backgroundColor;
     private Color foregroundColor;
-    private final Font menuFont = new Font("Courier", Font.BOLD, 16);
+    private final Font menuFont = new Font("Calibri", Font.BOLD, 16);
     private final Dimension defaultRes;
     private JSlider speedSlider;
     private JSlider accelerationSlider;
@@ -163,7 +163,7 @@ public class GUI extends JFrame implements MouseListener {
         //(int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty, int anchor, int fill, Insets insets, int ipadx, int ipady)
         menu.setPreferredSize(defaultRes);
         menu.setMinimumSize(defaultRes);
-        int menuWidth = 320;
+        int menuWidth = 400;
         int menuHeight = 1080;
         Dimension boxBounds = new Dimension(menuWidth+40, menuHeight);
         Dimension gridBounds = new Dimension(menuWidth, menuHeight);
