@@ -40,7 +40,7 @@ public class GroceryGrandPrix implements ActionListener {
         cars = new ArrayList<>();
         playerStats = new CarStats(4,4,4);
         initializeGUI();
-        gui.playerMenu(round, budget);
+        gui.playerMenu(carNames, budget);
         gui.setVisible(true);
 
     }
@@ -59,11 +59,11 @@ public class GroceryGrandPrix implements ActionListener {
         if (gui != null){
             gui.dispose();
         }
-        gui = new GUI("Grocery Grand Prix", Color.lightGray, buttons, trackX, trackY);
+        gui = new GUI("Grocery Grand Prix", new Color(190, 211, 231), new Color(115, 122, 148), buttons, trackX, trackY);
     }
 
     public void showMenu() {
-        gui.playerMenu(round, budget);
+        gui.playerMenu(round);
 
         /* existing startGame code
            for (int i = 0; i < cars.size(); i++) {
@@ -235,8 +235,17 @@ public class GroceryGrandPrix implements ActionListener {
             case "redo" :
                 restart();
                 break;
-            case "next" :
+            case "prev" :
+                if(round==1){
+                    gui.setPreviewIndex(gui.getPreviewIndex()-1);
+                }
                 break;
+            case "next" :
+                if(round==1){
+                    gui.setPreviewIndex(gui.getPreviewIndex()+1);
+                }
+                break;
+            /*
             case "adj " :
                 switch (pressedButton.getActionCommand().substring(4, 8)) {
                     case "+spd":
@@ -274,13 +283,13 @@ public class GroceryGrandPrix implements ActionListener {
                             playerStats.decrementHandling();
                             budget++;
                         }
+                        */
                 }
                 // gui.updatePlayer(budget, playerStats.TopSpeed(), playerStats.Acceleration(), playerStats.Handling());
-        }
-
     }
 
     private void createButtons() {
+        /*
         JButton plus1 = new JButton();
         plus1.addActionListener(this);
         plus1.setActionCommand("adj +spd");
@@ -299,6 +308,7 @@ public class GroceryGrandPrix implements ActionListener {
         JButton minus3 = new JButton();
         minus3.addActionListener(this);
         minus3.setActionCommand("adj -han");
+        */
         JButton helpSpeed = new JButton();
         helpSpeed.addActionListener(this);
         helpSpeed.setActionCommand("spd?");
@@ -323,10 +333,13 @@ public class GroceryGrandPrix implements ActionListener {
         JButton restart = new JButton();
         restart.addActionListener(this);
         restart.setActionCommand("redo");
+        JButton previousCar = new JButton();
+        previousCar.addActionListener(this);
+        previousCar.setActionCommand("prev");
         JButton nextCar = new JButton();
         nextCar.addActionListener(this);
         nextCar.setActionCommand("next");
-        buttons = new JButton[] {plus1, plus2, plus3, minus1, minus2, minus3, helpSpeed, helpAcceleration, helpHandling, helpBudget, startRace, hurry, pause, restart, nextCar};
+        buttons = new JButton[] {helpSpeed, helpAcceleration, helpHandling, helpBudget, startRace, hurry, pause, restart, previousCar, nextCar};
     }
 
     public static void main(String[] args) {
