@@ -10,9 +10,9 @@ public class CarStats {
     private static final double ACCELERATION_SCALE_FACTOR = 1.5;
     private static final double HANDLING_SCALE_FACTOR = 0.53;
     private static final double MIN_HANDLING_FACTOR = 0.02;
-    Stat topSpeed;
-    Stat acceleration;
-    Stat handling;
+    public Stat topSpeed;
+    public Stat acceleration;
+    public Stat handling;
 
     public CarStats(int topSpeed, int acceleration, int handling) {
         assert (topSpeed > 0 && topSpeed <= 10) && (acceleration > 0 && acceleration <= 10) && (handling > 0 && handling <= 10);
@@ -95,7 +95,7 @@ public class CarStats {
      * guarantee the int was between 1 and 10.  With an enum those integer values are set once when the program is
      * compiled and then cannot be touched during runtime.
      */
-    enum Stat {
+    public enum Stat {
         ONE(1) {
             @Override
             public Stat decrement() {

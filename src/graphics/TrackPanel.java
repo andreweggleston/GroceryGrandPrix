@@ -41,7 +41,7 @@ public class TrackPanel extends JPanel {
             this.cars[i] = cars.get(i);
             try {
                 BufferedImage image = ImageIO.read(new File("assets/sprites/sprite_" + this.cars[i].getImageName() + "_size_0.png"));
-                System.out.println("Image " + (i+1) + ": assets/sprites/sprite_" + this.cars[i].getImageName() + "_size_0.png\n");
+                //System.out.println("Image " + (i+1) + ": assets/sprites/sprite_" + this.cars[i].getImageName() + "_size_0.png\n");
                 int scaleX = (int)(image.getWidth()*.10); // for use with size_0
                 int scaleY = (int)(image.getHeight()*.10); // for use with size_0
                 //int scaleX = (int)(image.getWidth()*.75); // for use with size_1
@@ -56,7 +56,7 @@ public class TrackPanel extends JPanel {
                 throw new RuntimeException(e);
             }
         }
-        roadStroke = new BasicStroke(54, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
+        roadStroke = new BasicStroke(75, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
     }
 
     private static Point2D calculateCoord(Car car) {
@@ -78,6 +78,17 @@ public class TrackPanel extends JPanel {
         }
         for (int i = 0; i < cars.length; i++) {
             Car car = cars[i];
+            int carOffsetModifier = 0;
+            switch (cars.length) {
+                case 4:
+                    carOffsetModifier = (i >= 2) ? i - 1 : i - 2;
+                    break;
+                case 3:
+                    carOffsetModifier = i - 1;
+                    break;
+                case 2:
+                    carOffsetModifier = (i == 1) ? i + 1 : i - 2;
+            }
             Point2D carCoord = calculateCoord(car);
             BufferedImage image = carImages[i];
             final double radians = car.getLastNode().getAngle() + Math.PI/2;
@@ -92,7 +103,7 @@ public class TrackPanel extends JPanel {
             at.translate(-image.getWidth() / 2, -image.getHeight() / 2);
             final AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
             rotateOp.filter(image, rotatedImage);
-            g2.drawImage(rotatedImage, (int) ((carCoord.getX()-(width/2))+((i-2)*10*cosine)), (int) ((carCoord.getY()-(height/2))+((i-2)*10*sine)), null);
+            g2.drawImage(rotatedImage, Math.round((float)((carCoord.getX()-(width/2))+((carOffsetModifier)*7*cosine))), Math.round((float) ((carCoord.getY()-(height/2))+((carOffsetModifier)*7*sine))), null);
         }
 
     }

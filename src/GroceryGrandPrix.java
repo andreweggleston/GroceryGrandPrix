@@ -2,6 +2,7 @@ import graphics.GUI;
 import shared.Car;
 import shared.CarStats;
 import shared.Node;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -15,11 +16,13 @@ import java.util.Random;
 public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private final int framerate = 30;
     private boolean hurry;
-    private int budget;
+    private int roundBudget;
+    private int playerBudget;
     private int round;
     private final int trackX = 1440;
     private final int trackY = 830;
-    private final int maxStat = 9;
+    private final int maxStat = 10;
+    private final int statStart = 3;
     private double timeElapsed;
     private GUI gui;
     private Node trackHead;
@@ -30,14 +33,15 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private Timer gameLoop;
 
     public GroceryGrandPrix() {
-        budget = 10;
+        roundBudget = 6;
+        playerBudget = roundBudget;
         round = 1;
         fileReader();
         createButtons();
         cars = new ArrayList<>();
-        playerStats = new CarStats(5,5,5);
+        playerStats = new CarStats(statStart, statStart, statStart);
         initializeGUI();
-        gui.playerMenu(carNames, budget);
+        gui.playerMenu(carNames, playerBudget);
         gui.setVisible(true);
     }
 
@@ -77,10 +81,9 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         else {
             Node carStartNode = trackHead;
             for (Car car : cars) {
-                if (car.isPlayer()) {
-                    //car.setAllStats();
+                if (!car.isPlayer()) {
+                    car.setAllStats(distributeCarStats(car.getTopSpeed(), car.getAcceleration(), car.getHandling(), roundBudget));
                 }
-                else car.setAllStats(distributeCarStats(car.getTopSpeed(), car.getAcceleration(), car.getHandling(), budget));
                 car.setGoalNode(carStartNode);
                 carStartNode = carStartNode.next();
             }
@@ -116,7 +119,9 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                     } else {
                         cars.remove(lastCar);
                         round++;
-                        budget = 2;
+                        roundBudget = 2;
+                        playerBudget = roundBudget;
+                        gui.updateStatLabels(playerBudget);
                         showMenu();
                     }
                 } else gui.dispose();
@@ -126,9 +131,12 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     }
 
     private void restart() {
-        budget = 5;
+        roundBudget = 6;
+        playerBudget = roundBudget;
         round = 1;
-        playerStats = new CarStats(5, 5, 5);
+        playerStats = new CarStats(statStart, statStart, statStart);
+        gui.updateStatLabels(playerStats.topSpeed.getStatNumeral(), playerStats.acceleration.getStatNumeral(),
+                playerStats.handling.getStatNumeral(), playerBudget);
         showMenu();
     }
 
@@ -136,9 +144,9 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         cars.clear();
         Node carStartNode = trackHead;
         int imageNameIndex;
-        int statPoints = budget + 9;
+        int statPoints = roundBudget + (statStart * 3);
         int[] stats;
-
+        //System.out.println(statPoints);
         for (int i = 0; i < 4; i++) {
             if (i > 0) {
                 imageNameIndex = (int) (Math.random() * carNames.length);
@@ -148,15 +156,17 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
             } else {
                 cars.add(i, new Car(carNames[0], playerStats, carStartNode, true));
             }
-            //System.out.println("Car " + (i+1) + ": " + cars.get(i).getImageName() + "\n");
+            //System.out.println("shared.Car " + (i+1) + ": " + cars.get(i).getImageName() + "\n");
             carStartNode = carStartNode.next();
         }
     }
 
     private int[] distributeCarStats(int stat1, int stat2, int stat3, int statPoints) {
         double statPicker;
+
         // Distribute all stat points randomly one at a time.
         for (int s = 0; s < statPoints; s++) {
+            //System.out.println(s);
             statPicker = Math.random();
             // Add one to any stat under the maximum. Odds adjust if any stat reaches the maximum.
             if (((statPicker > (2.0/3.0) || ((stat2 == maxStat || stat3 == maxStat) && statPicker >= .5))
@@ -164,10 +174,11 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                 stat1++;
             } else if ((((statPicker > (1.0/3.0) && stat1 != maxStat) || (statPicker >= .5)) || stat3 == maxStat) && stat2 != maxStat) {
                 stat2++;
-            } else {
+            } else if (stat3 != maxStat){
                 stat3++;
             }
         }
+
         return new int[]{stat1, stat2, stat3};
     }
 
@@ -219,7 +230,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         /*for (int i = 0; i < number-1; i++) {
             x = rand.nextDouble()*800 + 50;
             y = rand.nextDouble()*400 + 50;
-            temp.setNext(new Node(x, y, head));
+            temp.setNext(new shared.Node(x, y, head));
             temp = temp.next();
         }*/
         temp = trackHead;
@@ -310,27 +321,52 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     @Override
     public void stateChanged(ChangeEvent e) {
         JSlider slider = (JSlider) e.getSource();
-        if (budget > 0) {
-            switch (slider.getName()) {
-                case "spd":
-                    if (playerStats.topSpeed() < slider.getValue()) {
+
+        switch (slider.getName()) {
+            case "spd":
+                if (playerStats.topSpeed.getStatNumeral() < slider.getValue()) {
+                    if (playerBudget > 0) {
                         playerStats.incrementTopSpeed();
-                        budget--;
-
+                        playerBudget--;
+                    } else {
+                        slider.setValue(playerStats.topSpeed.getStatNumeral());
                     }
-                case "acc":
-                    if (playerStats.topSpeed() < slider.getValue()) {
-                            playerStats.incrementAcceleration();
-                            budget--;
+                } else if (playerStats.topSpeed.getStatNumeral() != slider.getValue()) {
+                    playerStats.decrementTopSpeed();
+                    playerBudget++;
+                }
+                //System.out.println(playerStats.topSpeed.getStatNumeral() + "spd, slider" + slider.getValue());
+                break;
+            case "acc":
+                if (playerStats.acceleration.getStatNumeral() < slider.getValue()) {
+                    if (playerBudget > 0) {
+                        playerStats.incrementAcceleration();
+                        playerBudget--;
+                    } else {
+                        slider.setValue(playerStats.acceleration.getStatNumeral());
                     }
-                case "han":
-                    playerStats.incrementHandling();
-                    budget--;
-            }
+                } else if (playerStats.acceleration.getStatNumeral() != slider.getValue()){
+                    playerStats.decrementAcceleration();
+                    playerBudget++;
+                }
+                //System.out.println(playerStats.acceleration.getStatNumeral() + "acc, slider" + slider.getValue());
+                break;
+            case "han":
+                if (playerStats.handling.getStatNumeral() < slider.getValue()) {
+                    if (playerBudget > 0) {
+                        playerStats.incrementHandling();
+                        playerBudget--;
+                    } else {
+                        slider.setValue(playerStats.handling.getStatNumeral());
+                    }
+                } else if (playerStats.handling.getStatNumeral() != slider.getValue()) {
+                    playerStats.decrementHandling();
+                    playerBudget++;
+                }
+                //System.out.println(playerStats.handling.getStatNumeral() + "han, slider" + slider.getValue());
         }
-        else {
-
-        }
+        gui.updateStatLabels(playerStats.topSpeed.getStatNumeral(), playerStats.acceleration.getStatNumeral(),
+                playerStats.handling.getStatNumeral(), playerBudget);
     }
 
     private void createButtons() {
@@ -385,15 +421,15 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         nextCar.addActionListener(this);
         nextCar.setActionCommand("next");
 
-        JSlider speed = new JSlider(1, maxStat);
+        JSlider speed = new JSlider(1, maxStat, statStart);
         speed.setSnapToTicks(true);
         speed.addChangeListener(this);
         speed.setName("spd");
-        JSlider acceleration = new JSlider(1, maxStat);
+        JSlider acceleration = new JSlider(1, maxStat, statStart);
         acceleration.setSnapToTicks(true);
         acceleration.addChangeListener(this);
         acceleration.setName("acc");
-        JSlider handling = new JSlider(1, maxStat);
+        JSlider handling = new JSlider(1, maxStat, statStart);
         handling.setSnapToTicks(true);
         handling.addChangeListener(this);
         handling.setName("han");

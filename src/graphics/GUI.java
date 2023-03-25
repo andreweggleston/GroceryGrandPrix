@@ -1,5 +1,9 @@
 package graphics;
 
+import shared.Car;
+import shared.Node;
+import shared.Sprite;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -7,8 +11,6 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
-
-import shared.*;
 
 public class GUI extends JFrame implements MouseListener {
     private int previewCount;
@@ -189,7 +191,6 @@ public class GUI extends JFrame implements MouseListener {
                                  + "points available"
                                  + "</html>");
     }
-    public void playerMenu(int round){}
 
     public void switchToPlayerMenu() {
         setContentPane(menu);
@@ -398,6 +399,21 @@ public class GUI extends JFrame implements MouseListener {
         this.setContentPane(menu);
         this.pack();
         this.revalidate();
+    }
+
+    public void updateStatLabels(int topSpeed, int acceleration, int handling, int budget) {
+        speedLabel.setText("Top Speed: " + topSpeed);
+        accelerationLabel.setText("Acceleration: " + acceleration);
+        handlingLabel.setText("Handling: " + handling);
+        budgetValue.setText(String.valueOf(budget));
+
+        //this.revalidate();
+    }
+
+    public void updateStatLabels(int budget) {
+        budgetValue.setText(String.valueOf(budget));
+
+        //this.revalidate();
     }
 
     public void createPreviewCard(int car) {
