@@ -56,7 +56,7 @@ public class TrackPanel extends JPanel {
                 throw new RuntimeException(e);
             }
         }
-        roadStroke = new BasicStroke(75, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
+        roadStroke = new BasicStroke(80, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
     }
 
     private static Point2D calculateCoord(Car car) {

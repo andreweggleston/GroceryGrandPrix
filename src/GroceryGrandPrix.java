@@ -2,9 +2,9 @@ import graphics.GUI;
 import shared.Car;
 import shared.CarStats;
 import shared.Node;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
@@ -12,15 +12,14 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private final int framerate = 30;
     private boolean hurry;
     private int roundBudget;
     private int playerBudget;
+    private int playerNameIndex;
     private int round;
     private final int trackX = 1280;
     private final int trackY = 900;
@@ -35,14 +34,15 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private JComponent[] userInputs;
     private Timer gameLoop;
 
+
     public GroceryGrandPrix() {
+        playerNameIndex = 0;
         roundBudget = 6;
         playerBudget = roundBudget;
         round = 1;
-
-            createButtons();
-            cars = new ArrayList<>();
-            playerStats = new CarStats(statStart, statStart, statStart);
+        createButtons();
+        cars = new ArrayList<>();
+        playerStats = new CarStats(statStart, statStart, statStart);
         try {
             initializeGUI();
             gui.playerMenu(playerBudget);
@@ -56,6 +56,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private HashMap<String, BufferedImage> fileReader() throws IOException {
         File[] spriteFiles = (new File("assets/previews")).listFiles();
         assert spriteFiles != null;
+
         carNames = new String[spriteFiles.length];
         HashMap<String, BufferedImage> previewMap = new HashMap<String, BufferedImage>();
         for (int i = 0; i < spriteFiles.length; i++) {
@@ -67,17 +68,11 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     }
 
 
-
-    private void initializeGUI() throws IOException{
-        HashMap<String, BufferedImage> previewMap = fileReader();
+    private void initializeGUI() throws IOException {
         if (gui != null){
             gui.dispose();
         }
-        try {
-            gui = new GUI("Grocery Grand Prix", userInputs, previewMap, trackX, trackY);
-        } catch (IOException e) {
-            //TODO: Display error to user
-        }
+        gui = new GUI("Grocery Grand Prix", userInputs, fileReader(), trackX, trackY);
     }
 
     public void showMenu() {
@@ -152,6 +147,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private void restart() {
         roundBudget = 6;
         playerBudget = roundBudget;
+        playerNameIndex = 0;
         round = 1;
         playerStats = new CarStats(statStart, statStart, statStart);
         showMenu();
@@ -163,15 +159,19 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         int imageNameIndex;
         int statPoints = roundBudget + (statStart * 3);
         int[] stats;
+        List<String> availableCarNames = new ArrayList<String>(Arrays.asList(carNames));
+
         //System.out.println(statPoints);
         for (int i = 0; i < 4; i++) {
             if (i > 0) {
-                imageNameIndex = (int) (Math.random() * carNames.length);
+                imageNameIndex = (int) (Math.random() * availableCarNames.size());
                 //System.out.println(imageNameIndex);
                 stats = distributeCarStats(1, 1, 1, statPoints);
-                cars.add(i, new Car(carNames[imageNameIndex], new CarStats(stats), carStartNode, false));
+                cars.add(i, new Car(availableCarNames.get(imageNameIndex), new CarStats(stats), carStartNode, false));
+                availableCarNames.remove(imageNameIndex);
             } else {
-                cars.add(i, new Car(carNames[0], playerStats, carStartNode, true));
+                cars.add(i, new Car(availableCarNames.get(playerNameIndex), playerStats, carStartNode, true));
+                availableCarNames.remove(playerNameIndex);
             }
             //System.out.println("Car " + (i+1) + ": " + cars.get(i).getTopSpeed() + " " + cars.get(i).getAcceleration() + " " + cars.get(i).getHandling() + "\n");
             carStartNode = carStartNode.next();
@@ -257,7 +257,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         do{
             //System.out.println(temp);
             temp = temp.next();
-        }while (temp != trackHead);
+        } while (temp != trackHead);
     }
 
     @Override
@@ -284,13 +284,23 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                 }
                 break;
             case "last" :
-                if(round == 1){
-                    gui.setPreviewIndex(gui.getPreviewIndex() - 1);
+                if(round == 1) {
+                    if (playerNameIndex > 0) {
+                        playerNameIndex--;
+                    } else {
+                        playerNameIndex = carNames.length - 1;
+                    }
+                    gui.changePreviewDisplay(carNames[playerNameIndex]);
                 }
                 break;
             case "next" :
-                if(round == 1){
-                    gui.setPreviewIndex(gui.getPreviewIndex() + 1);
+                if(round == 1) {
+                    if (playerNameIndex < carNames.length - 1) {
+                        playerNameIndex++;
+                    } else {
+                        playerNameIndex = 0;
+                    }
+                    gui.changePreviewDisplay(carNames[playerNameIndex]);
                 }
         }
     }
@@ -373,8 +383,8 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         acceleration.setName("acc");
         JSlider handling = new JSlider(1, maxStat, statStart);
         handling.setSnapToTicks(true);
-        handling.setPaintTicks(true);
         handling.setMajorTickSpacing(1);
+        handling.setPaintTicks(true);
         handling.addChangeListener(this);
         handling.setName("han");
         userInputs = new JComponent[]{startRace, hurry, pause, previousCar, nextCar, speed, acceleration, handling};
