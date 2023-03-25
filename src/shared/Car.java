@@ -43,12 +43,15 @@ public class Car {
 
             //do the handling "spin out" logic
             //1 handling is 50% spin out, 10 handling is 2% spin out
-            double turnAngle = Math.abs(lastNode.next().getAngle() - lastNode.getAngle()); //TODO probably wrong
-            double angleScale = turnAngle / 120.0; //TODO MAGIC NUMBER
+            double turnAngle = Math.toDegrees(Math.abs(lastNode.next().getAngle() - lastNode.getAngle())); //probably correct
+            if (turnAngle > 180.0) turnAngle = 360.0-turnAngle;
+            double angleScale = turnAngle / 120.0;
             double spinout = stats.handling() * angleScale;
 
             if (Math.random() < spinout) {
                 momentum = 0.0;
+            } else {
+                momentum -= stats.handling() * stats.topSpeed();
             }
 
             distanceFromLast -= lastNode.distanceToNext();
@@ -82,7 +85,7 @@ public class Car {
     }
 
     public void incrementAcceleration() {
-       stats.incrementAcceleration();
+        stats.incrementAcceleration();
     }
 
     public void decrementAcceleration() {
@@ -110,22 +113,30 @@ public class Car {
     }
 
     //following accessors added by Naomi
-    public String getImageName() { return imageName; }
+    public String getImageName() {
+        return imageName;
+    }
+
     public double getMomentum() {
         return momentum;
     }
+
     public double getDistanceFromLast() {
         return distanceFromLast;
     }
+
     public void setDistanceFromLast(double distanceFromLast) {
         this.distanceFromLast = distanceFromLast;
     }
+
     public Node getLastNode() {
         return lastNode;
     }
+
     public Node getGoalNode() {
         return goalNode;
     }
+
     public void setGoalNode(Node goalNode) {
         this.goalNode = goalNode;
         this.lastNode = goalNode;

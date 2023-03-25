@@ -6,8 +6,8 @@ package shared;
  */
 public class CarStats {
 
-    private static final double TOP_SPEED_SCALE_FACTOR = 45.0;
-    private static final double ACCELERATION_SCALE_FACTOR = 1.5;
+    private static final double TOP_SPEED_SCALE_FACTOR = 4.5;
+    private static final double ACCELERATION_SCALE_FACTOR = .025;
     private static final double HANDLING_SCALE_FACTOR = 0.53;
     private static final double MIN_HANDLING_FACTOR = 0.02;
     public Stat topSpeed;
@@ -62,25 +62,26 @@ public class CarStats {
 
     /**
      * Calculates double value for top speed used by Car
-     *
+     * log_10(stat*4.5)
+     * Should be between ~.65 and 1.65
      * @return top speed double
      */
     public double topSpeed() {
-        return topSpeed.statNumeral * TOP_SPEED_SCALE_FACTOR;
+        return Math.log10(topSpeed.statNumeral * TOP_SPEED_SCALE_FACTOR);
     }
 
     /**
      * Calculates double value for acceleration used by Car
-     *
+     * Should be between .015 and .15
      * @return acceleration double
      */
     public double acceleration() {
-        return acceleration.statNumeral * ACCELERATION_SCALE_FACTOR;
+        return Math.pow(acceleration.statNumeral * ACCELERATION_SCALE_FACTOR, 2);
     }
 
     /**
      * Calculates double value for handling used by Car
-     *
+     * Should be between ~0.02 and ~0.5
      * @return handling double
      */
     public double handling() {
