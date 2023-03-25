@@ -3,12 +3,14 @@ import shared.Car;
 import shared.CarStats;
 import shared.Node;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private int roundBudget;
     private int playerBudget;
     private int round;
-    private final int trackX = 1600;
+    private final int trackX = 1280;
     private final int trackY = 900;
     private final int maxStat = 10;
     private final int statStart = 3;
@@ -56,6 +58,8 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
             //System.out.println("Name " + (i+1) + ": " + carNames[i] + "\n");
         }
     }
+
+
 
     private void initializeGUI(){
         if (gui != null){
@@ -286,50 +290,46 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     @Override
     public void stateChanged(ChangeEvent e) {
         JSlider slider = (JSlider) e.getSource();
+        final int sliderValue = slider.getValue();
+        final int playerTopSpeed = playerStats.topSpeed.getStatNumeral();
+        final int playerAcceleration = playerStats.acceleration.getStatNumeral();
+        final int playerHandling = playerStats.handling.getStatNumeral();
 
         switch (slider.getName()) {
             case "spd":
-                if (playerStats.topSpeed.getStatNumeral() < slider.getValue()) {
-                    if (playerBudget > 0) {
-                        playerStats.incrementTopSpeed();
-                        playerBudget--;
-                    } else {
-                        slider.setValue(playerStats.topSpeed.getStatNumeral());
-                    }
-                } else if (playerStats.topSpeed.getStatNumeral() != slider.getValue()) {
-                    playerStats.decrementTopSpeed();
-                    playerBudget++;
+                if (playerBudget >= (sliderValue - playerTopSpeed)) {
+                    playerStats.topSpeed = CarStats.Stat.fromInt(sliderValue);
+                    playerBudget -= sliderValue - playerTopSpeed;
+                }
+                else {
+                    playerStats.topSpeed = CarStats.Stat.fromInt(playerTopSpeed + playerBudget);
+                    playerBudget = 0;
                 }
                 //System.out.println(playerStats.topSpeed.getStatNumeral() + "spd, slider" + slider.getValue());
                 break;
             case "acc":
-                if (playerStats.acceleration.getStatNumeral() < slider.getValue()) {
-                    if (playerBudget > 0) {
-                        playerStats.incrementAcceleration();
-                        playerBudget--;
-                    } else {
-                        slider.setValue(playerStats.acceleration.getStatNumeral());
-                    }
-                } else if (playerStats.acceleration.getStatNumeral() != slider.getValue()){
-                    playerStats.decrementAcceleration();
-                    playerBudget++;
+                if (playerBudget >= (sliderValue - playerAcceleration)) {
+                    playerStats.acceleration = CarStats.Stat.fromInt(sliderValue);
+                    playerBudget -= sliderValue - playerAcceleration;
+                }
+                else {
+                    playerStats.acceleration = CarStats.Stat.fromInt(playerAcceleration + playerBudget);
+                    playerBudget = 0;
                 }
                 //System.out.println(playerStats.acceleration.getStatNumeral() + "acc, slider" + slider.getValue());
                 break;
             case "han":
-                if (playerStats.handling.getStatNumeral() < slider.getValue()) {
-                    if (playerBudget > 0) {
-                        playerStats.incrementHandling();
-                        playerBudget--;
-                    } else {
-                        slider.setValue(playerStats.handling.getStatNumeral());
-                    }
-                } else if (playerStats.handling.getStatNumeral() != slider.getValue()) {
-                    playerStats.decrementHandling();
-                    playerBudget++;
+                if (playerBudget >= (sliderValue - playerHandling)) {
+                    playerStats.handling = CarStats.Stat.fromInt(sliderValue);
+                    playerBudget -= sliderValue - playerHandling;
+                }
+                else {
+                    playerStats.handling = CarStats.Stat.fromInt(playerHandling + playerBudget);
+                    playerBudget = 0;
                 }
                 //System.out.println(playerStats.handling.getStatNumeral() + "han, slider" + slider.getValue());
         }
+        //System.out.println(sliderValue);
         gui.updateStatLabels(playerStats.topSpeed.getStatNumeral(), playerStats.acceleration.getStatNumeral(),
                 playerStats.handling.getStatNumeral(), playerBudget, !slider.getValueIsAdjusting());
     }
@@ -353,14 +353,20 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
 
         JSlider speed = new JSlider(1, maxStat, statStart);
         speed.setSnapToTicks(true);
+        speed.setPaintTicks(true);
+        speed.setMajorTickSpacing(1);
         speed.addChangeListener(this);
         speed.setName("spd");
         JSlider acceleration = new JSlider(1, maxStat, statStart);
         acceleration.setSnapToTicks(true);
+        acceleration.setPaintTicks(true);
+        acceleration.setMajorTickSpacing(1);
         acceleration.addChangeListener(this);
         acceleration.setName("acc");
         JSlider handling = new JSlider(1, maxStat, statStart);
         handling.setSnapToTicks(true);
+        handling.setPaintTicks(true);
+        handling.setMajorTickSpacing(1);
         handling.addChangeListener(this);
         handling.setName("han");
         userInputs = new JComponent[]{startRace, hurry, pause, previousCar, nextCar, speed, acceleration, handling};
