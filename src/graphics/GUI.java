@@ -28,7 +28,7 @@ public class GUI extends JFrame implements MouseListener {
     private JButton startButton, hurryButton, pauseButton, restartButton, lastPreviewButton, nextPreviewButton;
     private JLabel selectVehicle, allocateStatsLabel, speedLabel, accelerationLabel, handlingLabel, budgetLabel, budgetValue, nameLabel, previewLabel;
 
-    public GUI(String title, Color foregroundColor, Color backgroundColor, JComponent[] inputs, int width, int height) {
+    public GUI(String title, Color foregroundColor, Color backgroundColor, JComponent[] inputs, int width, int height) throws IOException {
         super(title);
         this.foregroundColor = foregroundColor;
         this.backgroundColor = backgroundColor;
@@ -75,10 +75,6 @@ public class GUI extends JFrame implements MouseListener {
                     case "stop":
                         pauseButton = button;
                         pauseButton.setText("Pause");
-                        break;
-                    case "redo":
-                        restartButton = button;
-                        restartButton.setText("Restart?");
                         break;
                     case "last":
                         lastPreviewButton = button;
@@ -334,22 +330,19 @@ public class GUI extends JFrame implements MouseListener {
         uiBox.add(uiGrid, BorderLayout.EAST);
         menu.add(uiBox, BorderLayout.WEST);
         menu.add(previewWindow, BorderLayout.CENTER);
-        this.setContentPane(menu);
-        this.pack();
-        this.revalidate();
     }
 
-    public void updateStatLabels(int topSpeed, int acceleration, int handling, int budget) {
+    public void updateStatLabels(int topSpeed, int acceleration, int handling, int budget, boolean updateSliders) {
         speedLabel.setText("Top Speed: " + topSpeed);
         accelerationLabel.setText("Acceleration: " + acceleration);
         handlingLabel.setText("Handling: " + handling);
         budgetValue.setText(String.valueOf(budget));
 
-        //this.revalidate();
-    }
-
-    public void updateStatLabels(int budget) {
-        budgetValue.setText(String.valueOf(budget));
+        if (updateSliders) {
+            speedSlider.setValue(topSpeed);
+            accelerationSlider.setValue(acceleration);
+            handlingSlider.setValue(handling);
+        }
 
         //this.revalidate();
     }
@@ -419,25 +412,21 @@ public class GUI extends JFrame implements MouseListener {
         uiGrid.revalidate();
     }
 
-    private void importPreviews() {
+    private void importPreviews() throws IOException{
         File[] previewFiles = (new File("assets/previews")).listFiles();
         previewNames = new String[previewFiles.length];
         previewImages = new BufferedImage[previewFiles.length];
         previewCount = previewFiles.length;
         previewIndex = (int)(Math.random() * (previewCount) + 0);
         for (int i = 0; i < previewFiles.length; i++)  {
-            try {
-                previewNames[i]=previewFiles[i].getName().split("_")[1];
-                BufferedImage source = ImageIO.read(previewFiles[i]);
-                int scaleX = (int)(source.getWidth()*.50);
-                int scaleY = (int)(source.getHeight()*.50);
-                Image scaled = source.getScaledInstance(scaleX, scaleY, Image.SCALE_SMOOTH);
-                source = new BufferedImage(scaleX, scaleY, BufferedImage.TYPE_INT_ARGB);
-                source.getGraphics().drawImage(scaled, 0, 0, null);
-                previewImages[i] = source;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            previewNames[i] = previewFiles[i].getName().split("_")[1];
+            BufferedImage source = ImageIO.read(previewFiles[i]);
+            int scaleX = (int)(source.getWidth() * .50);
+            int scaleY = (int)(source.getHeight() * .50);
+            Image scaled = source.getScaledInstance(scaleX, scaleY, Image.SCALE_SMOOTH);
+            source = new BufferedImage(scaleX, scaleY, BufferedImage.TYPE_INT_ARGB);
+            source.getGraphics().drawImage(scaled, 0, 0, null);
+            previewImages[i] = source;
         }
     }
 

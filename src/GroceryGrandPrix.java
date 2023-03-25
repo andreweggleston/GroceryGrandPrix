@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -42,6 +43,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         playerStats = new CarStats(statStart, statStart, statStart);
         initializeGUI();
         gui.playerMenu(playerBudget);
+        showMenu();
         gui.setVisible(true);
     }
 
@@ -59,10 +61,16 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         if (gui != null){
             gui.dispose();
         }
-        gui = new GUI("Grocery Grand Prix", new Color(222, 232, 243), new Color(115, 122, 148), userInputs, trackX, trackY);
+        try {
+            gui = new GUI("Grocery Grand Prix", new Color(222, 232, 243), new Color(115, 122, 148), userInputs, trackX, trackY);
+        } catch (IOException e) {
+            //TODO: Display error to user
+        }
     }
 
     public void showMenu() {
+        gui.updateStatLabels(playerStats.topSpeed.getStatNumeral(), playerStats.acceleration.getStatNumeral(),
+                playerStats.handling.getStatNumeral(), playerBudget, true);
         gui.switchToPlayerMenu();
 
         /* existing startGame code
@@ -121,7 +129,6 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                         round++;
                         roundBudget = 2;
                         playerBudget = roundBudget;
-                        gui.updateStatLabels(playerBudget);
                         showMenu();
                     }
                 } else gui.dispose();
@@ -135,8 +142,6 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         playerBudget = roundBudget;
         round = 1;
         playerStats = new CarStats(statStart, statStart, statStart);
-        gui.updateStatLabels(playerStats.topSpeed.getStatNumeral(), playerStats.acceleration.getStatNumeral(),
-                playerStats.handling.getStatNumeral(), playerBudget);
         showMenu();
     }
 
@@ -151,31 +156,34 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
             if (i > 0) {
                 imageNameIndex = (int) (Math.random() * carNames.length);
                 //System.out.println(imageNameIndex);
-                stats = distributeCarStats(0, 0, 0, statPoints);
+                stats = distributeCarStats(1, 1, 1, statPoints);
                 cars.add(i, new Car(carNames[imageNameIndex], new CarStats(stats), carStartNode, false));
             } else {
                 cars.add(i, new Car(carNames[0], playerStats, carStartNode, true));
             }
-            //System.out.println("shared.Car " + (i+1) + ": " + cars.get(i).getImageName() + "\n");
+            //System.out.println("Car " + (i+1) + ": " + cars.get(i).getTopSpeed() + " " + cars.get(i).getAcceleration() + " " + cars.get(i).getHandling() + "\n");
             carStartNode = carStartNode.next();
         }
     }
 
     private int[] distributeCarStats(int stat1, int stat2, int stat3, int statPoints) {
         double statPicker;
-
+        int underMaxStatsCount = ((stat1 != maxStat) ?  1 : 0) + ((stat2 != maxStat) ?  1 : 0) + ((stat3 != maxStat) ?  1 : 0);
         // Distribute all stat points randomly one at a time.
         for (int s = 0; s < statPoints; s++) {
+            //System.out.println(underMaxStatsCount);
             //System.out.println(s);
             statPicker = Math.random();
             // Add one to any stat under the maximum. Odds adjust if any stat reaches the maximum.
-            if (((statPicker > (2.0/3.0) || ((stat2 == maxStat || stat3 == maxStat) && statPicker >= .5))
-                    || (stat2 == maxStat && stat3 == maxStat)) && stat1 != maxStat) {
+            if (statPicker < (1.0/underMaxStatsCount) && stat1 != maxStat) {
                 stat1++;
-            } else if ((((statPicker > (1.0/3.0) && stat1 != maxStat) || (statPicker >= .5)) || stat3 == maxStat) && stat2 != maxStat) {
+                underMaxStatsCount -= (stat1 == maxStat) ? 1 : 0;
+            } else if (((statPicker < (2.0/underMaxStatsCount) && stat1 != maxStat) || (statPicker < 1.0/underMaxStatsCount)) && stat2 != maxStat) {
                 stat2++;
+                underMaxStatsCount -= (stat2 == maxStat) ? 1 : 0;
             } else if (stat3 != maxStat){
                 stat3++;
+                underMaxStatsCount -= (stat3 == maxStat) ? 1 : 0;
             }
         }
 
@@ -263,59 +271,16 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                         gameLoop.stop();
                 }
                 break;
-            case "redo" :
-                restart();
-                break;
             case "last" :
-                if(round==1){
-                    gui.setPreviewIndex(gui.getPreviewIndex()-1);
+                if(round == 1){
+                    gui.setPreviewIndex(gui.getPreviewIndex() - 1);
                 }
                 break;
             case "next" :
-                if(round==1){
-                    gui.setPreviewIndex(gui.getPreviewIndex()+1);
+                if(round == 1){
+                    gui.setPreviewIndex(gui.getPreviewIndex() + 1);
                 }
-                break;
-            /*
-            case "adj " :
-                switch (pressedButton.getActionCommand().substring(4, 8)) {
-                    case "+spd":
-                        if (budget > 0 && playerStats.topSpeed() <= maxStat) {
-                            playerStats.incrementTopSpeed();
-                            budget--;
-                        }
-                        break;
-                    case "+acc":
-                        if (budget > 0 && playerStats.acceleration() <= maxStat) {
-                            playerStats.incrementAcceleration();
-                            budget--;
-                        }
-                        break;
-                    case "+han":
-                        if (budget > 0 && playerStats.handling() <= maxStat) {
-                            playerStats.incrementHandling();
-                            budget--;
-                        }
-                        break;
-                    case "-spd":
-                        if (playerStats.topSpeed() > 0) {
-                            playerStats.decrementTopSpeed();
-                            budget++;
-                        }
-                        break;
-                    case "-acc":
-                        if (playerStats.acceleration() > 0) {
-                            playerStats.decrementAcceleration();
-                            budget++;
-                        }
-                        break;
-                    case "-han":
-                        if (playerStats.handling() > 0) {
-                            playerStats.decrementHandling();
-                            budget++;
-                        }
-                        */
-                }
+        }
     }
 
     @Override
@@ -366,42 +331,10 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                 //System.out.println(playerStats.handling.getStatNumeral() + "han, slider" + slider.getValue());
         }
         gui.updateStatLabels(playerStats.topSpeed.getStatNumeral(), playerStats.acceleration.getStatNumeral(),
-                playerStats.handling.getStatNumeral(), playerBudget);
+                playerStats.handling.getStatNumeral(), playerBudget, !slider.getValueIsAdjusting());
     }
 
     private void createButtons() {
-        /*
-        JButton plus1 = new JButton();
-        plus1.addActionListener(this);
-        plus1.setActionCommand("adj +spd");
-        JButton plus2 = new JButton();
-        plus2.addActionListener(this);
-        plus2.setActionCommand("adj +acc");
-        JButton plus3 = new JButton();
-        plus3.addActionListener(this);
-        plus3.setActionCommand("adj +han");
-        JButton minus1 = new JButton();
-        minus1.addActionListener(this);
-        minus1.setActionCommand("adj -spd");
-        JButton minus2 = new JButton();
-        minus2.addActionListener(this);
-        minus2.setActionCommand("adj -acc");
-        JButton minus3 = new JButton();
-        minus3.addActionListener(this);
-        minus3.setActionCommand("adj -han");
-        */
-        JButton helpSpeed = new JButton();
-        helpSpeed.addActionListener(this);
-        helpSpeed.setActionCommand("spd?");
-        JButton helpAcceleration = new JButton();
-        helpAcceleration.addActionListener(this);
-        helpAcceleration.setActionCommand("acc?");
-        JButton helpHandling = new JButton();
-        helpHandling.addActionListener(this);
-        helpHandling.setActionCommand("han?");
-        JButton helpBudget = new JButton();
-        helpBudget.addActionListener(this);
-        helpBudget.setActionCommand("bud?");
         JButton startRace = new JButton();
         startRace.setActionCommand("race");
         startRace.addActionListener(this);
@@ -411,9 +344,6 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         JButton pause = new JButton();
         pause.addActionListener(this);
         pause.setActionCommand("stop");
-        JButton restart = new JButton();
-        restart.addActionListener(this);
-        restart.setActionCommand("redo");
         JButton previousCar = new JButton();
         previousCar.addActionListener(this);
         previousCar.setActionCommand("last");
@@ -433,7 +363,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         handling.setSnapToTicks(true);
         handling.addChangeListener(this);
         handling.setName("han");
-        userInputs = new JComponent[]{helpSpeed, helpAcceleration, helpHandling, helpBudget, startRace, hurry, pause, restart, previousCar, nextCar, speed, acceleration, handling};
+        userInputs = new JComponent[]{startRace, hurry, pause, previousCar, nextCar, speed, acceleration, handling};
     }
 
     public static void main(String[] args) {
