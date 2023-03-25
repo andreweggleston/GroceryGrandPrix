@@ -2,6 +2,8 @@ import graphics.GUI;
 import shared.Car;
 import shared.CarStats;
 import shared.Node;
+import shared.Stat;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -316,33 +318,33 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         switch (slider.getName()) {
             case "spd":
                 if (playerBudget >= (sliderValue - playerTopSpeed)) {
-                    playerStats.topSpeed = CarStats.Stat.fromInt(sliderValue);
+                    playerStats.topSpeed = Stat.fromInt(sliderValue);
                     playerBudget -= sliderValue - playerTopSpeed;
                 }
                 else {
-                    playerStats.topSpeed = CarStats.Stat.fromInt(playerTopSpeed + playerBudget);
+                    playerStats.topSpeed = Stat.fromInt(playerTopSpeed + playerBudget);
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.topSpeed.getStatNumeral() + "spd, slider" + slider.getValue());
                 break;
             case "acc":
                 if (playerBudget >= (sliderValue - playerAcceleration)) {
-                    playerStats.acceleration = CarStats.Stat.fromInt(sliderValue);
+                    playerStats.acceleration = Stat.fromInt(sliderValue);
                     playerBudget -= sliderValue - playerAcceleration;
                 }
                 else {
-                    playerStats.acceleration = CarStats.Stat.fromInt(playerAcceleration + playerBudget);
+                    playerStats.acceleration = Stat.fromInt(playerAcceleration + playerBudget);
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.acceleration.getStatNumeral() + "acc, slider" + slider.getValue());
                 break;
             case "han":
                 if (playerBudget >= (sliderValue - playerHandling)) {
-                    playerStats.handling = CarStats.Stat.fromInt(sliderValue);
+                    playerStats.handling = Stat.fromInt(sliderValue);
                     playerBudget -= sliderValue - playerHandling;
                 }
                 else {
-                    playerStats.handling = CarStats.Stat.fromInt(playerHandling + playerBudget);
+                    playerStats.handling = Stat.fromInt(playerHandling + playerBudget);
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.handling.getStatNumeral() + "han, slider" + slider.getValue());

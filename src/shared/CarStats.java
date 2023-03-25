@@ -30,9 +30,9 @@ public class CarStats {
     public String toString() {
         return String.format(
                 "Top Speed: %d, Acceleration %d, Handling %d",
-                topSpeed.statNumeral,
-                acceleration.statNumeral,
-                handling.statNumeral
+                topSpeed.getStatNumeral(),
+                acceleration.getStatNumeral(),
+                handling.getStatNumeral()
         );
     }
 
@@ -67,7 +67,7 @@ public class CarStats {
      * @return top speed double
      */
     public double topSpeed() {
-        return Math.log10(topSpeed.statNumeral * TOP_SPEED_SCALE_FACTOR);
+        return Math.log10(topSpeed.getStatNumeral() * TOP_SPEED_SCALE_FACTOR);
     }
 
     /**
@@ -76,7 +76,7 @@ public class CarStats {
      * @return acceleration double
      */
     public double acceleration() {
-        return Math.pow(acceleration.statNumeral * ACCELERATION_SCALE_FACTOR, 2);
+        return Math.pow(acceleration.getStatNumeral() * ACCELERATION_SCALE_FACTOR, 2);
     }
 
     /**
@@ -85,7 +85,7 @@ public class CarStats {
      * @return handling double
      */
     public double handling() {
-        return (10 - handling.statNumeral) / 10.0 * HANDLING_SCALE_FACTOR + MIN_HANDLING_FACTOR;
+        return (10 - handling.getStatNumeral()) / 10.0 * HANDLING_SCALE_FACTOR + MIN_HANDLING_FACTOR;
     }
 
     /**
@@ -96,40 +96,6 @@ public class CarStats {
      * guarantee the int was between 1 and 10.  With an enum those integer values are set once when the program is
      * compiled and then cannot be touched during runtime.
      */
-    public enum Stat {
-        ONE(1) {
-            @Override
-            public Stat decrement() {
-                return ONE;
-            }
-        }, TWO(2), THREE(3), FOUR(4), FIVE(5), SIX(6), SEVEN(7), EIGHT(8), NINE(9), TEN(10) {
-            @Override
-            public Stat increment() {
-                return TEN;
-            }
-        };
 
-        private final int statNumeral;
-
-        Stat(int i) {
-            statNumeral = i;
-        }
-
-        public static Stat fromInt(int i) {
-            return Stat.values()[i - 1];
-        }
-
-        public int getStatNumeral() {
-            return statNumeral;
-        }
-
-        public Stat increment() {
-            return values()[ordinal() + 1];
-        }
-
-        public Stat decrement() {
-            return values()[ordinal() - 1];
-        }
-    }
 
 }

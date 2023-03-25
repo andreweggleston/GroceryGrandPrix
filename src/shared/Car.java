@@ -65,15 +65,15 @@ public class Car {
     }
 
     public void setAllStats(int[] statsArray) {
-        stats.topSpeed = CarStats.Stat.fromInt(statsArray[0]);
-        stats.acceleration = CarStats.Stat.fromInt(statsArray[1]);
-        stats.handling = CarStats.Stat.fromInt(statsArray[2]);
+        stats.topSpeed = Stat.fromInt(statsArray[0]);
+        stats.acceleration = Stat.fromInt(statsArray[1]);
+        stats.handling = Stat.fromInt(statsArray[2]);
     }
 
     public void setAllStats(int topSpeed, int acceleration, int handling) {
-        stats.topSpeed = CarStats.Stat.fromInt(topSpeed);
-        stats.acceleration = CarStats.Stat.fromInt(acceleration);
-        stats.handling = CarStats.Stat.fromInt(handling);
+        stats.topSpeed = Stat.fromInt(topSpeed);
+        stats.acceleration = Stat.fromInt(acceleration);
+        stats.handling = Stat.fromInt(handling);
     }
 
     public void incrementTopSpeed() {
