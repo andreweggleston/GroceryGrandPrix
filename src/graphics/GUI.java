@@ -505,10 +505,10 @@ public class GUI extends JFrame implements MouseListener {
     /**
      * Shows the results of every race after it has been concluded and prompts the user to continue the game.
      * @param placedCars The list of Cars in order from 1st to last.
-     * @param raceTime How much time the race took as an int.
+     * @param raceTime How much time the race took in seconds as a double.
      * @return A boolean indicated whether the user would like to continue the game.
      */
-    public boolean showResults(ArrayList<Car> placedCars, int raceTime) {
+    public boolean showResults(ArrayList<Car> placedCars, double raceTime) {
         boolean userContinue;
         int playerPlacement = 0;
         Car lastCar = placedCars.get(placedCars.size()-1);
