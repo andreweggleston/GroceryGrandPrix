@@ -17,15 +17,16 @@ import java.util.HashMap;
 
 public class GUI extends JFrame implements MouseListener {
     private int gameWidth, gameHeight, windowWidth, windowHeight, cardWidth, cardHeight, previewCount, previewIndex;
+    float previewScale;
     private final Dimension gameBounds;
     private final Dimension windowBounds;
-    private String[] previewNames;
+    private String previewName;
     private Color backgroundColor, foregroundColor;
     private final Font menuFontPLAIN = new Font("Calibri", Font.PLAIN, 18);
     private final Font menuFontBOLD = new Font("Calibri", Font.BOLD, 22);
 
     private HashMap<String, BufferedImage> images;
-    private BufferedImage[] previewImages;
+    private BufferedImage previewImage;
     private BufferedImage[] thumbImages;
     private JLabel[] thumbLabels;
     private ArrayList<JPanel> cards, thumbnails;
@@ -38,9 +39,8 @@ public class GUI extends JFrame implements MouseListener {
         super(title);
 
         this.images = images;
-        previewNames = new String[images.size()];
+        previewName = "";
         previewIndex = (int)(Math.random() * (previewCount) + 0);
-        previewImages = new BufferedImage[images.size()];
         thumbImages = new BufferedImage[images.size()];
 
         this.foregroundColor = new Color(222, 232, 243);
@@ -72,11 +72,11 @@ public class GUI extends JFrame implements MouseListener {
 
         initializeMenuComponents(inputs);
 
-
-        center = new JPanel(); //everything but previewbar in game
+        center = new JPanel(); //everything but previewCards in game
         center.setPreferredSize(gameBounds);
         center.setBackground(backgroundColor);
 
+        //this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     }
@@ -126,7 +126,16 @@ public class GUI extends JFrame implements MouseListener {
                 }
             }
         }
-
+        //define preview scaling
+        int maxWidth = 0;
+        previewScale = 1.0f;
+        for (BufferedImage img : images.values()) {
+            if (img.getWidth() > maxWidth) {
+                maxWidth = img.getWidth();
+                previewScale = ((float) (gameWidth - 400)) / ((float) (maxWidth));
+            }
+        }
+        previewLabel = new JLabel(new ImageIcon(), JLabel.LEFT);
         //JLabels
         selectVehicle = new JLabel("SELECT VEHICLE:", JLabel.CENTER);
         selectVehicle.setFont(menuFontBOLD);
@@ -153,35 +162,7 @@ public class GUI extends JFrame implements MouseListener {
         budgetValue = new JLabel ("00", JLabel.LEFT);
         budgetValue.setFont(menuFontBOLD);
         budgetValue.setForeground(Color.GREEN);
-        //Scale preview images
-        int maxWidth = 0;
-        float previewScale = 1.0f;
-        for (int i = 0; i < images.size(); i++) {
-            if (i == 0) {
-                for (BufferedImage img : images.values()) {
 
-                    if (img.getWidth() > maxWidth) {
-                        maxWidth = img.getWidth();
-                        previewScale = ((float) (gameWidth - 400)) / ((float) (maxWidth));
-                    }
-                }
-                int j = 0;
-                for (String key : images.keySet()) {
-                    System.out.println("Key " + (j + 1) + ": " + key);
-                    previewNames[j] = key;
-                    j++;
-                }
-            }
-            int previewX = (int) (images.get(previewNames[i]).getWidth() * previewScale);
-            int previewY = (int) (images.get(previewNames[i]).getHeight() * previewScale);
-
-            Image scaledPreviewImage = images.get(previewNames[i]).getScaledInstance(previewX, previewY, Image.SCALE_SMOOTH);
-
-            previewImages[i] = new BufferedImage(previewX, previewY, BufferedImage.TYPE_INT_ARGB);
-
-            previewImages[i].getGraphics().drawImage(scaledPreviewImage, 0, 0, null);
-        }
-        previewLabel = new JLabel(new ImageIcon(previewImages[previewIndex]), JLabel.LEFT);
         //JToolTips
         ToolTipManager.sharedInstance().setInitialDelay(0);
         ToolTipManager.sharedInstance().setDismissDelay(8000);
@@ -369,6 +350,8 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridwidth = 6;
         uiGrid.add(startButton, menuConstraints);
 
+        changePreviewDisplay("Avocardo");
+
         previewWindow = new JPanel(new GridBagLayout());
         GridBagConstraints previewConstraints = new GridBagConstraints();
         previewConstraints.fill = GridBagConstraints.BOTH;
@@ -412,9 +395,9 @@ public class GUI extends JFrame implements MouseListener {
             String img = car.getImageName();
             cards.add(cars.indexOf(car), new JPanel(new BorderLayout()));
 
-            cards.get(cars.indexOf(car)).setPreferredSize(new Dimension(150, 150));
-            cards.get(cars.indexOf(car)).setMinimumSize(new Dimension(150, 150));
-            cards.get(cars.indexOf(car)).setMaximumSize(new Dimension(150, 150));
+            cards.get(cars.indexOf(car)).setPreferredSize(new Dimension(cardWidth, cardHeight));
+            cards.get(cars.indexOf(car)).setMinimumSize(new Dimension(cardWidth, cardHeight));
+            cards.get(cars.indexOf(car)).setMaximumSize(new Dimension(cardWidth, cardHeight));
             cards.get(cars.indexOf(car)).setBackground(foregroundColor);
 
             //Process thumbnail from image
@@ -447,9 +430,9 @@ public class GUI extends JFrame implements MouseListener {
             JPanel statsDisplay = new JPanel();
             statsDisplay.setLayout(new GridLayout(3, 1, 10, 10));
             statsDisplay.setBackground(Color.lightGray);
-            statsDisplay.setPreferredSize(new Dimension(120, 34));
-            statsDisplay.setMinimumSize(new Dimension(120, 34));
-            statsDisplay.setMaximumSize(new Dimension(120, 34));
+            //statsDisplay.setPreferredSize(new Dimension(120, 34));
+            //statsDisplay.setMinimumSize(new Dimension(120, 34));
+            //statsDisplay.setMaximumSize(new Dimension(120, 34));
             statsDisplay.add(speedBar);
             statsDisplay.add(accelerationBar);
             statsDisplay.add(handlingBar);
@@ -483,42 +466,32 @@ public class GUI extends JFrame implements MouseListener {
         }else{
             this.previewIndex = newIndex;
         }
-        nameLabel.setText(previewNames[previewIndex]);
-        previewLabel.setIcon((new ImageIcon(previewImages[previewIndex])));
+        //nameLabel.setText(previewNames[previewIndex]);
+        //previewLabel.setIcon((new ImageIcon(previewImages[previewIndex])));
         uiGrid.revalidate();
     }
 
-    private void importPreviews() throws IOException{
-        int maxWidth = 0;
-        float previewScale = 1.0f;
-        for (int i = 0; i < images.size(); i++)  {
-            if(i==0) {
-                for (BufferedImage img : images.values()) {
+    public void changePreviewDisplay(String name){
+        previewName = name;
+        //Scale preview image
+        int previewX = (int) (images.get(previewName).getWidth() * previewScale);
+        int previewY = (int) (images.get(previewName).getHeight() * previewScale);
 
-                    if(img.getWidth()>maxWidth){
-                        maxWidth = img.getWidth();
-                        previewScale = ((float)(gameWidth-400))/((float)(maxWidth));
-                    }
-                }
-                int j = 0;
-                for(String key : images.keySet()){
-                    System.out.println("Key " + (j+1) + ": " + key);
-                    previewNames[j] = key;
-                    j++;
-                }
-            }
-            int previewX = (int)(images.get(previewNames[i]).getWidth() * previewScale);
-            int previewY = (int)(images.get(previewNames[i]).getHeight() * previewScale);
+        Image scaledPreviewImage = images.get(previewName).getScaledInstance(previewX, previewY, Image.SCALE_SMOOTH);
 
-            Image scaledPreviewImage = images.get(previewNames[i]).getScaledInstance(previewX, previewY, Image.SCALE_SMOOTH);
+        previewImage = new BufferedImage(previewX, previewY, BufferedImage.TYPE_INT_ARGB);
+        previewImage.getGraphics().drawImage(scaledPreviewImage, 0, 0, null);
 
-            previewImages[i] = new BufferedImage(previewX, previewY, BufferedImage.TYPE_INT_ARGB);
+        nameLabel.setText(previewName);
 
-            previewImages[i].getGraphics().drawImage(scaledPreviewImage, 0, 0, null);
-        }
+        previewLabel.setIcon(new ImageIcon(previewImage));
+
+        uiGrid.revalidate();
     }
 
     public void toTrack(Node head, ArrayList <Car> cars) {
+        game.removeAll();
+        //if(cars.size()<4){}
         track = new TrackPanel(head, cars);
         track.setBackground(backgroundColor);
         track.setPreferredSize(windowBounds);
