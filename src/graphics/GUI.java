@@ -15,44 +15,60 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class GUI extends JFrame implements MouseListener {
-    private int previewCount, previewIndex;
+    private int gameWidth, gameHeight, windowWidth, windowHeight, cardWidth, cardHeight, previewCount, previewIndex;
+    private final Dimension gameBounds;
+    private final Dimension windowBounds;
+    private String[] previewNames;
     private Color backgroundColor, foregroundColor;
     private final Font menuFontPLAIN = new Font("Calibri", Font.PLAIN, 18);
     private final Font menuFontBOLD = new Font("Calibri", Font.BOLD, 22);
-    private final Dimension defaultRes;
-    private String[] previewNames;
+
+
     private BufferedImage[] previewImages;
-    private ArrayList<JPanel> previewCards, previewSprites;
-    private JPanel game, menu, uiGrid, uiBox, previewWindow, previewBar, center, track;
+    private BufferedImage[] thumbImages;
+    private JLabel[] thumbLabels;
+    private ArrayList<JPanel> cards, thumbnails;
+    private JPanel game, menu, uiGrid, uiBox, previewWindow, previewCards, center, track;
     private JSlider speedSlider, accelerationSlider, handlingSlider;
     private JButton startButton, hurryButton, pauseButton, restartButton, lastPreviewButton, nextPreviewButton;
     private JLabel selectVehicle, allocateStatsLabel, speedLabel, accelerationLabel, handlingLabel, budgetLabel, budgetValue, nameLabel, previewLabel;
 
     public GUI(String title, Color foregroundColor, Color backgroundColor, JComponent[] inputs, int width, int height) throws IOException {
         super(title);
+
         this.foregroundColor = foregroundColor;
         this.backgroundColor = backgroundColor;
-        importPreviews();
-        initializeMenuComponents(inputs);
+
+        gameWidth = width;
+        gameHeight = height;
+        windowWidth = (int)(gameWidth*1.25);
+        windowHeight = gameHeight;
+        cardWidth = windowWidth-width;
+        cardHeight = gameHeight/4;
+        windowBounds = new Dimension(windowWidth, windowHeight);
+        gameBounds = new Dimension(gameWidth, gameHeight);
+
         menu = new JPanel(); //has uiGrid and ridePreviewPanel
         menu.setLayout(new BoxLayout(menu, BoxLayout.X_AXIS));
         menu.setBackground(backgroundColor);
+
         game = new JPanel();
-        defaultRes = new Dimension(width, height);
-
-
         game.setBackground(this.backgroundColor);
         game.setForeground(this.foregroundColor);
         game.setLayout(new BorderLayout());
 
-        previewCards = new ArrayList<JPanel>();
-        previewSprites = new ArrayList<JPanel>();
-        previewBar = new JPanel();
-        previewBar.setLayout(new BoxLayout(previewBar, BoxLayout.X_AXIS));
-        previewBar.setBackground(backgroundColor);
+        cards = new ArrayList<JPanel>();
+        thumbnails = new ArrayList<JPanel>();
+        previewCards = new JPanel();
+        previewCards.setLayout(new BoxLayout(previewCards, BoxLayout.Y_AXIS));
+        previewCards.setBackground(backgroundColor);
+
+        importPreviews();
+        initializeMenuComponents(inputs);
+
 
         center = new JPanel(); //everything but previewbar in game
-        center.setPreferredSize(defaultRes);
+        center.setPreferredSize(gameBounds);
         center.setBackground(backgroundColor);
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -132,7 +148,7 @@ public class GUI extends JFrame implements MouseListener {
         budgetValue.setFont(menuFontBOLD);
         budgetValue.setForeground(Color.GREEN);
 
-        previewLabel = new JLabel(new ImageIcon(previewImages[previewIndex]));
+        previewLabel = new JLabel(new ImageIcon(previewImages[previewIndex]), JLabel.LEFT);
         //JToolTips
         ToolTipManager.sharedInstance().setInitialDelay(0);
         ToolTipManager.sharedInstance().setDismissDelay(8000);
@@ -169,8 +185,8 @@ public class GUI extends JFrame implements MouseListener {
 
     public void playerMenu(int budget) {
         GridBagConstraints menuConstraints = new GridBagConstraints();
-        menu.setPreferredSize(defaultRes);
-        menu.setMinimumSize(defaultRes);
+        menu.setPreferredSize(windowBounds);
+        menu.setMinimumSize(windowBounds);
         int menuWidth = 320;
         if(System.getProperty("os.name").contains("Mac")){
             menuWidth = 400;
@@ -323,6 +339,7 @@ public class GUI extends JFrame implements MouseListener {
         previewWindow = new JPanel(new GridBagLayout());
         GridBagConstraints previewConstraints = new GridBagConstraints();
         previewConstraints.fill = GridBagConstraints.BOTH;
+        previewConstraints.anchor = GridBagConstraints.SOUTHWEST;
         previewWindow.add(previewLabel, previewConstraints);
         previewWindow.setBackground(backgroundColor);
         previewWindow.setMinimumSize(new Dimension(1700 ,830));
@@ -347,52 +364,69 @@ public class GUI extends JFrame implements MouseListener {
         //this.revalidate();
     }
 
-    public void createPreviewCard(int car) {
-        previewCards.add(car, new JPanel(new BorderLayout()));
-        previewCards.get(car).setPreferredSize(new Dimension(150, 150));
-        previewCards.get(car).setMinimumSize(new Dimension(150, 150));
-        previewCards.get(car).setMaximumSize(new Dimension(150, 150));
-        previewCards.get(car).setBackground(foregroundColor);
+    public void createPreviewCards(ArrayList <Car> cars) {
+        previewCards.setPreferredSize(new Dimension(cardWidth, windowHeight));
+        previewCards.setMinimumSize(new Dimension(cardWidth, windowHeight));
+        previewCards.setMaximumSize(new Dimension(cardWidth, windowHeight));
 
-        previewSprites.add(car, new JPanel());
-        previewSprites.get(car).setBackground(Color.WHITE);
-        previewSprites.get(car).add(new Sprite("bikenana", 1));
-        previewSprites.get(car).setPreferredSize(new Dimension(120, 80));
-        previewSprites.get(car).setMaximumSize(new Dimension(120, 80));
+        thumbLabels = new JLabel[cars.size()];
 
-        JPanel speedBar = new JPanel();
-        speedBar.setBackground(Color.MAGENTA);
+        GridBagConstraints thumbConstraints = new GridBagConstraints();
+        thumbConstraints.insets = new Insets(0,0,0,0);
+        thumbConstraints.anchor = GridBagConstraints.SOUTH;
+        thumbConstraints.weighty = 1.0;
 
-        JPanel accelerationBar = new JPanel();
-        accelerationBar.setBackground(Color.CYAN);
+        for(Car car : cars){
+            cards.add(cars.indexOf(car), new JPanel(new BorderLayout()));
 
-        JPanel handlingBar = new JPanel();
-        handlingBar.setBackground(Color.GREEN);
+            cards.get(cars.indexOf(car)).setPreferredSize(new Dimension(150, 150));
+            cards.get(cars.indexOf(car)).setMinimumSize(new Dimension(150, 150));
+            cards.get(cars.indexOf(car)).setMaximumSize(new Dimension(150, 150));
+            cards.get(cars.indexOf(car)).setBackground(foregroundColor);
 
-        JPanel statsDisplay = new JPanel();
-        statsDisplay.setLayout(new GridLayout(3, 1, 10, 10));
-        statsDisplay.setBackground(Color.lightGray);
-        statsDisplay.setPreferredSize(new Dimension(120, 34));
-        statsDisplay.setMinimumSize(new Dimension(120, 34));
-        statsDisplay.setMaximumSize(new Dimension(120, 34));
-        statsDisplay.add(speedBar);
-        statsDisplay.add(accelerationBar);
-        statsDisplay.add(handlingBar);
+            thumbLabels[cars.indexOf(car)] = new JLabel(new ImageIcon(thumbImages[cars.indexOf(car)]));
+
+            thumbnails.add(cars.indexOf(car), new JPanel());
+            thumbnails.get(cars.indexOf(car)).setLayout(new GridBagLayout());
+            thumbnails.get(cars.indexOf(car)).setBackground(Color.WHITE);
+            thumbnails.get(cars.indexOf(car)).add(thumbLabels[cars.indexOf(car)], new GridBagConstraints());
+            thumbnails.get(cars.indexOf(car)).setPreferredSize(new Dimension(300, 120));
+            thumbnails.get(cars.indexOf(car)).setMaximumSize(new Dimension(300, 120));
+
+            JLabel speedBar = new JLabel ();
+            speedBar.setBackground(Color.MAGENTA);
+
+            JPanel accelerationBar = new JPanel();
+            accelerationBar.setBackground(Color.CYAN);
+
+            JPanel handlingBar = new JPanel();
+            handlingBar.setBackground(Color.GREEN);
+
+            JPanel statsDisplay = new JPanel();
+            statsDisplay.setLayout(new GridLayout(3, 1, 10, 10));
+            statsDisplay.setBackground(Color.lightGray);
+            statsDisplay.setPreferredSize(new Dimension(120, 34));
+            statsDisplay.setMinimumSize(new Dimension(120, 34));
+            statsDisplay.setMaximumSize(new Dimension(120, 34));
+            statsDisplay.add(speedBar);
+            statsDisplay.add(accelerationBar);
+            statsDisplay.add(handlingBar);
 
 
-        JPanel previewCenter = new JPanel();
-        previewCenter.setBackground(Color.lightGray);
-        previewCenter.setLayout(new BoxLayout(previewCenter, BoxLayout.Y_AXIS));
-        previewCenter.add(previewSprites.get(car));
-        previewCenter.add(new Box.Filler((new Dimension(150, 15)), (new Dimension(150, 15)), (new Dimension(150, 15))));
-        previewCenter.add(statsDisplay);
+            JPanel previewCenter = new JPanel();
+            previewCenter.setBackground(Color.lightGray);
+            previewCenter.setLayout(new BoxLayout(previewCenter, BoxLayout.Y_AXIS));
+            previewCenter.add(thumbnails.get(cars.indexOf(car)));
+            previewCenter.add(new Box.Filler((new Dimension(150, 15)), (new Dimension(150, 15)), (new Dimension(150, 15))));
+            previewCenter.add(statsDisplay);
 
-        previewCards.get(car).add(new Box.Filler((new Dimension(120, 15)), (new Dimension(120, 15)), (new Dimension(120, 15))), BorderLayout.NORTH);
-        previewCards.get(car).add(previewCenter, BorderLayout.CENTER);
-        previewCards.get(car).add(new Box.Filler((new Dimension(15, 130)), (new Dimension(15, 130)), (new Dimension(15, 130))), BorderLayout.WEST);
-        previewCards.get(car).add(new Box.Filler((new Dimension(15, 130)), (new Dimension(15, 130)), (new Dimension(15, 130))), BorderLayout.EAST);
-        previewCards.get(car).add(new Box.Filler((new Dimension(150, 15)), (new Dimension(150, 15)), (new Dimension(150, 15))), BorderLayout.SOUTH);
-        previewBar.add(previewCards.get(car), car);
+            cards.get(cars.indexOf(car)).add(new Box.Filler((new Dimension(120, 15)), (new Dimension(120, 15)), (new Dimension(120, 15))), BorderLayout.NORTH);
+            cards.get(cars.indexOf(car)).add(previewCenter, BorderLayout.CENTER);
+            cards.get(cars.indexOf(car)).add(new Box.Filler((new Dimension(15, 130)), (new Dimension(15, 130)), (new Dimension(15, 130))), BorderLayout.WEST);
+            cards.get(cars.indexOf(car)).add(new Box.Filler((new Dimension(15, 130)), (new Dimension(15, 130)), (new Dimension(15, 130))), BorderLayout.EAST);
+            cards.get(cars.indexOf(car)).add(new Box.Filler((new Dimension(150, 15)), (new Dimension(150, 15)), (new Dimension(150, 15))), BorderLayout.SOUTH);
+            previewCards.add(cards.get(cars.indexOf(car)), car);
+        }
     }
 
     public int getPreviewIndex() {
@@ -416,25 +450,49 @@ public class GUI extends JFrame implements MouseListener {
         File[] previewFiles = (new File("assets/previews")).listFiles();
         previewNames = new String[previewFiles.length];
         previewImages = new BufferedImage[previewFiles.length];
+        thumbImages = new BufferedImage[previewFiles.length];
         previewCount = previewFiles.length;
         previewIndex = (int)(Math.random() * (previewCount) + 0);
-        for (int i = 0; i < previewFiles.length; i++)  {
-            previewNames[i] = previewFiles[i].getName().split("_")[1];
-            BufferedImage source = ImageIO.read(previewFiles[i]);
-            int scaleX = (int)(source.getWidth() * .50);
-            int scaleY = (int)(source.getHeight() * .50);
-            Image scaled = source.getScaledInstance(scaleX, scaleY, Image.SCALE_SMOOTH);
-            source = new BufferedImage(scaleX, scaleY, BufferedImage.TYPE_INT_ARGB);
-            source.getGraphics().drawImage(scaled, 0, 0, null);
-            previewImages[i] = source;
+        int maxWidth = 0;
+        float previewScale = 1.0f;
+        for (int i = 0; i < previewImages.length; i++)  {
+            if(i==0) {
+                for (int j = 0; j < previewFiles.length; j++) {
+                    previewImages[j] = ImageIO.read(previewFiles[j]);
+                    previewNames[j] = previewFiles[j].getName().split("_")[1];
+                    if(previewImages[j].getWidth()>maxWidth){
+                        maxWidth = previewImages[j].getWidth();
+                        previewScale = ((float)(gameWidth-400))/((float)(maxWidth));
+                    }
+                }
+            }
+            float thumbScale = ((float)(120))/((float)((previewImages[i]).getHeight()));
+            int previewX = (int)(previewImages[i].getWidth() * previewScale);
+            int previewY = (int)(previewImages[i].getHeight() * previewScale);
+            int thumbX = (int)(previewImages[i].getWidth() * thumbScale);
+            int thumbY = (int)(previewImages[i].getHeight() * thumbScale);
+
+            Image scaledPreviewImage = previewImages[i].getScaledInstance(previewX, previewY, Image.SCALE_SMOOTH);
+            Image scaledCardImage = previewImages[i].getScaledInstance(thumbX, thumbY, Image.SCALE_SMOOTH);
+
+            previewImages[i] = new BufferedImage(previewX, previewY, BufferedImage.TYPE_INT_ARGB);
+
+            thumbImages[i] = new BufferedImage(thumbX, thumbY, BufferedImage.TYPE_INT_ARGB);
+
+            previewImages[i].getGraphics().drawImage(scaledPreviewImage, 0, 0, null);
+
+            thumbImages[i].getGraphics().drawImage(scaledCardImage, 0, 0, null);
         }
     }
 
     public void toTrack(Node head, ArrayList <Car> cars) {
         track = new TrackPanel(head, cars);
         track.setBackground(backgroundColor);
-        track.setPreferredSize(defaultRes);
-        this.setContentPane(track);
+        track.setPreferredSize(windowBounds);
+        createPreviewCards(cars);
+        game.add(previewCards, BorderLayout.WEST);
+        game.add(track, BorderLayout.CENTER);
+        this.setContentPane(game);
         this.pack();
         this.revalidate();
         this.repaint();
