@@ -391,7 +391,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(GroceryGrandPrix::new);
+        new GroceryGrandPrix();
     }
 
 }
