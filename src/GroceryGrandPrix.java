@@ -7,13 +7,13 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class GroceryGrandPrix implements ActionListener, ChangeListener {
@@ -39,34 +39,42 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         roundBudget = 6;
         playerBudget = roundBudget;
         round = 1;
-        fileReader();
-        createButtons();
-        cars = new ArrayList<>();
-        playerStats = new CarStats(statStart, statStart, statStart);
-        initializeGUI();
-        gui.playerMenu(playerBudget);
-        showMenu();
-        gui.setVisible(true);
-    }
 
-    private void fileReader() {
-        File[] spriteFiles = (new File("assets/sprites")).listFiles();
-        assert spriteFiles != null;
-        carNames = new String[spriteFiles.length];
-        for (int i = 0; i < spriteFiles.length; i++) {
-            carNames[i] = spriteFiles[i].getName().split("_")[1];
-            //System.out.println("Name " + (i+1) + ": " + carNames[i] + "\n");
+            createButtons();
+            cars = new ArrayList<>();
+            playerStats = new CarStats(statStart, statStart, statStart);
+        try {
+            initializeGUI();
+            gui.playerMenu(playerBudget);
+            showMenu();
+            gui.setVisible(true);
+        } catch (IOException e) {
+            //TODO: Display error to user
         }
     }
 
+    private HashMap<String, BufferedImage> fileReader() throws IOException {
+        File[] spriteFiles = (new File("assets/previews")).listFiles();
+        assert spriteFiles != null;
+        carNames = new String[spriteFiles.length];
+        HashMap<String, BufferedImage> previewMap = new HashMap<String, BufferedImage>();
+        for (int i = 0; i < spriteFiles.length; i++) {
+            carNames[i] = spriteFiles[i].getName().split("_")[1];
+            previewMap.put(carNames[i], ImageIO.read(spriteFiles[i]));
+            //System.out.println("Name " + (i+1) + ": " + carNames[i] + "\n");
+        }
+        return previewMap;
+    }
 
 
-    private void initializeGUI(){
+
+    private void initializeGUI() throws IOException{
+        HashMap<String, BufferedImage> previewMap = fileReader();
         if (gui != null){
             gui.dispose();
         }
         try {
-            gui = new GUI("Grocery Grand Prix", new Color(222, 232, 243), new Color(115, 122, 148), userInputs, trackX, trackY);
+            gui = new GUI("Grocery Grand Prix", userInputs, previewMap, trackX, trackY);
         } catch (IOException e) {
             //TODO: Display error to user
         }
