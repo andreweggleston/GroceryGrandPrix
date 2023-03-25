@@ -19,8 +19,8 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private int roundBudget;
     private int playerBudget;
     private int round;
-    private final int trackX = 1440;
-    private final int trackY = 830;
+    private final int trackX = 1600;
+    private final int trackY = 900;
     private final int maxStat = 10;
     private final int statStart = 3;
     private double timeElapsed;
@@ -41,7 +41,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         cars = new ArrayList<>();
         playerStats = new CarStats(statStart, statStart, statStart);
         initializeGUI();
-        gui.playerMenu(carNames, playerBudget);
+        gui.playerMenu(playerBudget);
         gui.setVisible(true);
     }
 
@@ -266,7 +266,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
             case "redo" :
                 restart();
                 break;
-            case "prev" :
+            case "last" :
                 if(round==1){
                     gui.setPreviewIndex(gui.getPreviewIndex()-1);
                 }

@@ -4,64 +4,35 @@ import shared.Car;
 import shared.Node;
 import shared.Sprite;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class GUI extends JFrame implements MouseListener {
-    private int previewCount;
-    private int previewIndex;
-    private String[] previewNames;
-    private Color backgroundColor;
-    private Color foregroundColor;
+    private int previewCount, previewIndex;
+    private Color backgroundColor, foregroundColor;
     private final Font menuFontPLAIN = new Font("Calibri", Font.PLAIN, 18);
     private final Font menuFontBOLD = new Font("Calibri", Font.BOLD, 22);
     private final Dimension defaultRes;
-    private JSlider speedSlider;
-    private JSlider accelerationSlider;
-    private JSlider handlingSlider;
-    private JPanel c;
-    private JPanel game;
-    private JPanel menu;
-    private JPanel uiGrid;
-    private JPanel uiBox;
-    private JPanel previewWindow;
-    private JButton speedHelpButton;
-    private JButton accelerationHelpButton;
-    private JButton handlingHelpButton;
-    private JButton budgetHelpButton;
-    private JButton startButton;
-    private JButton hurryButton;
-    private JButton pauseButton;
-    private JButton restartButton;
-    private JButton previousPreviewButton;
-    private JButton nextPreviewButton;
-    private ArrayList<JPanel> previewCards;
-    private ArrayList<JPanel> previewSprites;
-    private JLabel selectVehicle;
-    private JLabel allocateStatsLabel;
-    private JLabel speedLabel;
-    private JLabel accelerationLabel;
-    private JLabel handlingLabel;
-    private JLabel budgetLabel;
-    private JLabel budgetValue;
-    private JLabel previewLabel;
-    private JPanel previewBar;
-    private JPanel center;
-    private JPanel track;
-    private JPanel southButtons;
-    private ArrayList<Line2D.Double> trackSegments;
-    private ArrayList<Ellipse2D.Double> trackJoints;
-    boolean draw;
+    private String[] previewNames;
+    private BufferedImage[] previewImages;
+    private ArrayList<JPanel> previewCards, previewSprites;
+    private JPanel game, menu, uiGrid, uiBox, previewWindow, previewBar, center, track;
+    private JSlider speedSlider, accelerationSlider, handlingSlider;
+    private JButton startButton, hurryButton, pauseButton, restartButton, lastPreviewButton, nextPreviewButton;
+    private JLabel selectVehicle, allocateStatsLabel, speedLabel, accelerationLabel, handlingLabel, budgetLabel, budgetValue, nameLabel, previewLabel;
 
     public GUI(String title, Color foregroundColor, Color backgroundColor, JComponent[] inputs, int width, int height) {
         super(title);
         this.foregroundColor = foregroundColor;
         this.backgroundColor = backgroundColor;
+        importPreviews();
         initializeMenuComponents(inputs);
         menu = new JPanel(); //has uiGrid and ridePreviewPanel
         menu.setLayout(new BoxLayout(menu, BoxLayout.X_AXIS));
@@ -110,8 +81,8 @@ public class GUI extends JFrame implements MouseListener {
                         restartButton.setText("Restart?");
                         break;
                     case "last":
-                        previousPreviewButton = button;
-                        previousPreviewButton.setText("<");
+                        lastPreviewButton = button;
+                        lastPreviewButton.setText("<");
                         break;
                     case "next":
                         nextPreviewButton = button;
@@ -164,6 +135,8 @@ public class GUI extends JFrame implements MouseListener {
         budgetValue = new JLabel ("00", JLabel.LEFT);
         budgetValue.setFont(menuFontBOLD);
         budgetValue.setForeground(Color.GREEN);
+
+        previewLabel = new JLabel(new ImageIcon(previewImages[previewIndex]));
         //JToolTips
         ToolTipManager.sharedInstance().setInitialDelay(0);
         ToolTipManager.sharedInstance().setDismissDelay(8000);
@@ -198,16 +171,8 @@ public class GUI extends JFrame implements MouseListener {
         this.revalidate();
     }
 
-    public void playerMenu(String[] carNames, int budget) {
-        previewNames = carNames;
-        previewCount = previewNames.length;
-        previewIndex = (int)(Math.random() * (previewCount) + 0);
-
-
-
-        GridBagLayout menuLayout;
+    public void playerMenu(int budget) {
         GridBagConstraints menuConstraints = new GridBagConstraints();
-        //(int gridx, int gridy, int gridwidth, int gridheight, double weightx, double weighty, int anchor, int fill, Insets insets, int ipadx, int ipady)
         menu.setPreferredSize(defaultRes);
         menu.setMinimumSize(defaultRes);
         int menuWidth = 320;
@@ -230,8 +195,7 @@ public class GUI extends JFrame implements MouseListener {
         uiGrid.setBackground(backgroundColor);
         uiGrid.setPreferredSize(gridBounds);
         uiGrid.setMaximumSize(gridBounds);
-        uiGrid.setLayout(menuLayout = new GridBagLayout());
-        menuLayout.setConstraints(uiGrid, menuConstraints);
+        uiGrid.setLayout(new GridBagLayout());
 
         Insets zero = new Insets(0,0,0,0);
         Insets vertical5_10 = new Insets(5,0,10,0);
@@ -252,19 +216,18 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridx = 0;
         menuConstraints.gridy = 1;
         menuConstraints.gridwidth = 1;
-        uiGrid.add(previousPreviewButton, menuConstraints);
+        uiGrid.add(lastPreviewButton, menuConstraints);
 
-        previewLabel = new JLabel(previewNames[previewIndex], JLabel.CENTER);
-        previewLabel.setFont(menuFontBOLD);
-        previewLabel.setForeground(foregroundColor);
-        //System.out.println(previewIndex);
+        nameLabel = new JLabel(previewNames[previewIndex], JLabel.CENTER);
+        nameLabel.setFont(menuFontBOLD);
+        nameLabel.setForeground(foregroundColor);
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.insets = vertical5_10;
         menuConstraints.weightx = 1;
         menuConstraints.gridx = 1;
         menuConstraints.gridy = 1;
         menuConstraints.gridwidth = 6;
-        uiGrid.add(previewLabel, menuConstraints);
+        uiGrid.add(nameLabel, menuConstraints);
 
         menuConstraints.fill = GridBagConstraints.NONE;
         menuConstraints.insets = zero;
@@ -291,12 +254,6 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridwidth = 6;
         uiGrid.add(speedLabel, menuConstraints);
 
-        /*menuConstraints.anchor = GridBagConstraints.SOUTHEAST;
-        menuConstraints.fill = GridBagConstraints.NONE;
-        menuConstraints.gridx = 7; // (7,3)
-        menuConstraints.gridwidth = 1;
-        uiGrid.add(speedHelpButton, menuConstraints);*/
-
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.anchor = GridBagConstraints.NORTH;
         menuConstraints.insets = zero;
@@ -313,13 +270,6 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridy = 5;// (0,5)
         menuConstraints.gridwidth = 6;
         uiGrid.add(accelerationLabel, menuConstraints);
-
-        /*menuConstraints.anchor = GridBagConstraints.SOUTHEAST;
-        menuConstraints.fill = GridBagConstraints.NONE;
-        menuConstraints.weightx = 0;
-        menuConstraints.gridx = 7;  // (7,5)
-        menuConstraints.gridwidth = 1;
-        uiGrid.add(accelerationHelpButton, menuConstraints);*/
 
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.anchor = GridBagConstraints.NORTH;
@@ -339,13 +289,6 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridwidth = 6;
         uiGrid.add(handlingLabel, menuConstraints);
 
-        /*menuConstraints.anchor = GridBagConstraints.SOUTHEAST;
-        menuConstraints.fill = GridBagConstraints.NONE;
-        menuConstraints.weightx = 0;
-        menuConstraints.gridx = 7;  // (7,7)
-        menuConstraints.gridwidth = 1;
-        uiGrid.add(handlingHelpButton, menuConstraints);*/
-
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.anchor = GridBagConstraints.NORTH;
         menuConstraints.insets = zero;
@@ -354,8 +297,6 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridy = 8;
         menuConstraints.gridwidth = 6;
         uiGrid.add(handlingSlider, menuConstraints);
-
-
 
         menuConstraints.fill = GridBagConstraints.NONE;
         menuConstraints.anchor = GridBagConstraints.CENTER;
@@ -373,12 +314,6 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridy = 9;
         uiGrid.add(budgetValue, menuConstraints);
 
-        /*menuConstraints.anchor = GridBagConstraints.EAST;
-        menuConstraints.weightx = 0;
-        menuConstraints.gridx = 7;  // (7,7)
-        menuConstraints.gridwidth = 1;
-        uiGrid.add(budgetHelpButton, menuConstraints);*/
-
         menuConstraints.anchor = GridBagConstraints.NORTHEAST;
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.insets = vertical50_20;
@@ -389,7 +324,10 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridwidth = 6;
         uiGrid.add(startButton, menuConstraints);
 
-        previewWindow = new JPanel();
+        previewWindow = new JPanel(new GridBagLayout());
+        GridBagConstraints previewConstraints = new GridBagConstraints();
+        previewConstraints.fill = GridBagConstraints.BOTH;
+        previewWindow.add(previewLabel, previewConstraints);
         previewWindow.setBackground(backgroundColor);
         previewWindow.setMinimumSize(new Dimension(1700 ,830));
 
@@ -426,7 +364,6 @@ public class GUI extends JFrame implements MouseListener {
         previewSprites.add(car, new JPanel());
         previewSprites.get(car).setBackground(Color.WHITE);
         previewSprites.get(car).add(new Sprite("bikenana", 1));
-        //System.out.println("Max: " + previewSprites.get(car).getMaximumSize() + "\nPref: " + previewSprites.get(car).getPreferredSize()/* + "\nW: " + image.getWidth() + "\nH: " + image.getHeight()*/);
         previewSprites.get(car).setPreferredSize(new Dimension(120, 80));
         previewSprites.get(car).setMaximumSize(new Dimension(120, 80));
 
@@ -477,8 +414,31 @@ public class GUI extends JFrame implements MouseListener {
         }else{
             this.previewIndex = newIndex;
         }
-        previewLabel.setText(previewNames[previewIndex]);
+        nameLabel.setText(previewNames[previewIndex]);
+        previewLabel.setIcon((new ImageIcon(previewImages[previewIndex])));
         uiGrid.revalidate();
+    }
+
+    private void importPreviews() {
+        File[] previewFiles = (new File("assets/previews")).listFiles();
+        previewNames = new String[previewFiles.length];
+        previewImages = new BufferedImage[previewFiles.length];
+        previewCount = previewFiles.length;
+        previewIndex = (int)(Math.random() * (previewCount) + 0);
+        for (int i = 0; i < previewFiles.length; i++)  {
+            try {
+                previewNames[i]=previewFiles[i].getName().split("_")[1];
+                BufferedImage source = ImageIO.read(previewFiles[i]);
+                int scaleX = (int)(source.getWidth()*.50);
+                int scaleY = (int)(source.getHeight()*.50);
+                Image scaled = source.getScaledInstance(scaleX, scaleY, Image.SCALE_SMOOTH);
+                source = new BufferedImage(scaleX, scaleY, BufferedImage.TYPE_INT_ARGB);
+                source.getGraphics().drawImage(scaled, 0, 0, null);
+                previewImages[i] = source;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void toTrack(Node head, ArrayList <Car> cars) {
