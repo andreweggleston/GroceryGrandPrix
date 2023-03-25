@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GUI extends JFrame implements MouseListener {
     private int gameWidth, gameHeight, windowWidth, windowHeight, cardWidth, cardHeight, previewCount, previewIndex;
@@ -23,7 +24,7 @@ public class GUI extends JFrame implements MouseListener {
     private final Font menuFontPLAIN = new Font("Calibri", Font.PLAIN, 18);
     private final Font menuFontBOLD = new Font("Calibri", Font.BOLD, 22);
 
-
+    private HashMap<String, BufferedImage> images;
     private BufferedImage[] previewImages;
     private BufferedImage[] thumbImages;
     private JLabel[] thumbLabels;
@@ -33,11 +34,17 @@ public class GUI extends JFrame implements MouseListener {
     private JButton startButton, hurryButton, pauseButton, restartButton, lastPreviewButton, nextPreviewButton;
     private JLabel selectVehicle, allocateStatsLabel, speedLabel, accelerationLabel, handlingLabel, budgetLabel, budgetValue, nameLabel, previewLabel;
 
-    public GUI(String title, Color foregroundColor, Color backgroundColor, JComponent[] inputs, int width, int height) throws IOException {
+    public GUI(String title, JComponent[] inputs, HashMap<String, BufferedImage> images, int width, int height) throws IOException {
         super(title);
 
-        this.foregroundColor = foregroundColor;
-        this.backgroundColor = backgroundColor;
+        this.images = images;
+        previewNames = new String[images.size()];
+        previewIndex = (int)(Math.random() * (previewCount) + 0);
+        previewImages = new BufferedImage[images.size()];
+        thumbImages = new BufferedImage[images.size()];
+
+        this.foregroundColor = new Color(222, 232, 243);
+        this.backgroundColor = new Color(115, 122, 148);
 
         gameWidth = width;
         gameHeight = height;
@@ -63,7 +70,6 @@ public class GUI extends JFrame implements MouseListener {
         previewCards.setLayout(new BoxLayout(previewCards, BoxLayout.Y_AXIS));
         previewCards.setBackground(backgroundColor);
 
-        importPreviews();
         initializeMenuComponents(inputs);
 
 
@@ -147,7 +153,34 @@ public class GUI extends JFrame implements MouseListener {
         budgetValue = new JLabel ("00", JLabel.LEFT);
         budgetValue.setFont(menuFontBOLD);
         budgetValue.setForeground(Color.GREEN);
+        //Scale preview images
+        int maxWidth = 0;
+        float previewScale = 1.0f;
+        for (int i = 0; i < images.size(); i++) {
+            if (i == 0) {
+                for (BufferedImage img : images.values()) {
 
+                    if (img.getWidth() > maxWidth) {
+                        maxWidth = img.getWidth();
+                        previewScale = ((float) (gameWidth - 400)) / ((float) (maxWidth));
+                    }
+                }
+                int j = 0;
+                for (String key : images.keySet()) {
+                    System.out.println("Key " + (j + 1) + ": " + key);
+                    previewNames[j] = key;
+                    j++;
+                }
+            }
+            int previewX = (int) (images.get(previewNames[i]).getWidth() * previewScale);
+            int previewY = (int) (images.get(previewNames[i]).getHeight() * previewScale);
+
+            Image scaledPreviewImage = images.get(previewNames[i]).getScaledInstance(previewX, previewY, Image.SCALE_SMOOTH);
+
+            previewImages[i] = new BufferedImage(previewX, previewY, BufferedImage.TYPE_INT_ARGB);
+
+            previewImages[i].getGraphics().drawImage(scaledPreviewImage, 0, 0, null);
+        }
         previewLabel = new JLabel(new ImageIcon(previewImages[previewIndex]), JLabel.LEFT);
         //JToolTips
         ToolTipManager.sharedInstance().setInitialDelay(0);
@@ -230,7 +263,7 @@ public class GUI extends JFrame implements MouseListener {
         menuConstraints.gridwidth = 1;
         uiGrid.add(lastPreviewButton, menuConstraints);
 
-        nameLabel = new JLabel(previewNames[previewIndex], JLabel.CENTER);
+        nameLabel = new JLabel("", JLabel.CENTER);
         nameLabel.setFont(menuFontBOLD);
         nameLabel.setForeground(foregroundColor);
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -375,14 +408,23 @@ public class GUI extends JFrame implements MouseListener {
         thumbConstraints.insets = new Insets(0,0,0,0);
         thumbConstraints.anchor = GridBagConstraints.SOUTH;
         thumbConstraints.weighty = 1.0;
-
         for(Car car : cars){
+            String img = car.getImageName();
             cards.add(cars.indexOf(car), new JPanel(new BorderLayout()));
 
             cards.get(cars.indexOf(car)).setPreferredSize(new Dimension(150, 150));
             cards.get(cars.indexOf(car)).setMinimumSize(new Dimension(150, 150));
             cards.get(cars.indexOf(car)).setMaximumSize(new Dimension(150, 150));
             cards.get(cars.indexOf(car)).setBackground(foregroundColor);
+
+            //Process thumbnail from image
+            float thumbScale = ((float)(120))/((float)((images.get(img).getHeight())));
+            int thumbX = (int)(images.get(img).getWidth() * thumbScale);
+            int thumbY = (int)(images.get(img).getHeight() * thumbScale);
+            Image scaledCardImage = images.get(img).getScaledInstance(thumbX, thumbY, Image.SCALE_SMOOTH);
+
+            thumbImages[cars.indexOf(car)] = new BufferedImage(thumbX, thumbY, BufferedImage.TYPE_INT_ARGB);
+            thumbImages[cars.indexOf(car)].getGraphics().drawImage(scaledCardImage, 0, 0, null);
 
             thumbLabels[cars.indexOf(car)] = new JLabel(new ImageIcon(thumbImages[cars.indexOf(car)]));
 
@@ -447,41 +489,32 @@ public class GUI extends JFrame implements MouseListener {
     }
 
     private void importPreviews() throws IOException{
-        File[] previewFiles = (new File("assets/previews")).listFiles();
-        previewNames = new String[previewFiles.length];
-        previewImages = new BufferedImage[previewFiles.length];
-        thumbImages = new BufferedImage[previewFiles.length];
-        previewCount = previewFiles.length;
-        previewIndex = (int)(Math.random() * (previewCount) + 0);
         int maxWidth = 0;
         float previewScale = 1.0f;
-        for (int i = 0; i < previewImages.length; i++)  {
+        for (int i = 0; i < images.size(); i++)  {
             if(i==0) {
-                for (int j = 0; j < previewFiles.length; j++) {
-                    previewImages[j] = ImageIO.read(previewFiles[j]);
-                    previewNames[j] = previewFiles[j].getName().split("_")[1];
-                    if(previewImages[j].getWidth()>maxWidth){
-                        maxWidth = previewImages[j].getWidth();
+                for (BufferedImage img : images.values()) {
+
+                    if(img.getWidth()>maxWidth){
+                        maxWidth = img.getWidth();
                         previewScale = ((float)(gameWidth-400))/((float)(maxWidth));
                     }
                 }
+                int j = 0;
+                for(String key : images.keySet()){
+                    System.out.println("Key " + (j+1) + ": " + key);
+                    previewNames[j] = key;
+                    j++;
+                }
             }
-            float thumbScale = ((float)(120))/((float)((previewImages[i]).getHeight()));
-            int previewX = (int)(previewImages[i].getWidth() * previewScale);
-            int previewY = (int)(previewImages[i].getHeight() * previewScale);
-            int thumbX = (int)(previewImages[i].getWidth() * thumbScale);
-            int thumbY = (int)(previewImages[i].getHeight() * thumbScale);
+            int previewX = (int)(images.get(previewNames[i]).getWidth() * previewScale);
+            int previewY = (int)(images.get(previewNames[i]).getHeight() * previewScale);
 
-            Image scaledPreviewImage = previewImages[i].getScaledInstance(previewX, previewY, Image.SCALE_SMOOTH);
-            Image scaledCardImage = previewImages[i].getScaledInstance(thumbX, thumbY, Image.SCALE_SMOOTH);
+            Image scaledPreviewImage = images.get(previewNames[i]).getScaledInstance(previewX, previewY, Image.SCALE_SMOOTH);
 
             previewImages[i] = new BufferedImage(previewX, previewY, BufferedImage.TYPE_INT_ARGB);
 
-            thumbImages[i] = new BufferedImage(thumbX, thumbY, BufferedImage.TYPE_INT_ARGB);
-
             previewImages[i].getGraphics().drawImage(scaledPreviewImage, 0, 0, null);
-
-            thumbImages[i].getGraphics().drawImage(scaledCardImage, 0, 0, null);
         }
     }
 
