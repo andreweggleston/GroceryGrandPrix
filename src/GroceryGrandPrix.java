@@ -51,7 +51,8 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
             showMenu();
             gui.setVisible(true);
         } catch (IOException e) {
-            //TODO: Display error to user
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 
