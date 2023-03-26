@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class GUI extends JFrame implements MouseListener {
     private int gameWidth, gameHeight, windowWidth, windowHeight, cardWidth, cardHeight;
@@ -22,7 +23,8 @@ public class GUI extends JFrame implements MouseListener {
     private Color backgroundColor, foregroundColor;
     private final Font menuFontPLAIN = new Font("Calibri", Font.PLAIN, 18);
     private final Font menuFontBOLD = new Font("Calibri", Font.BOLD, 22);
-
+    private final Font menuFontMED = new Font("Calibri", Font.BOLD, 18);
+    private final Font menuFontBEEG = new Font("Calibri", Font.BOLD, 36);
     private HashMap<String, BufferedImage> images;
     private JLabel[] thumbLabels;
     private ArrayList<JPanel> cards, thumbnails;
@@ -232,7 +234,7 @@ public class GUI extends JFrame implements MouseListener {
         uiGrid.add(lastPreviewButton, menuConstraints);
 
         nameLabel = new JLabel("", JLabel.CENTER);
-        nameLabel.setFont(menuFontBOLD);
+        nameLabel.setFont(menuFontBEEG);
         nameLabel.setForeground(foregroundColor);
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.insets = vertical5_10;
@@ -366,7 +368,10 @@ public class GUI extends JFrame implements MouseListener {
     }
 
     public void createPreviewCards(ArrayList <Car> cars) {
+
         Color cardColor = new Color(190, 198, 211);
+        Color[] statColors = new Color[]{new Color(255, 0, 255), new Color(255, 68, 0), new Color(251, 95, 28), new Color(224, 114, 40), new Color(201, 141, 51), new Color(206, 166, 51), new Color(167, 176, 62), new Color(133, 183, 80), new Color(104, 197, 98), new Color(28, 251, 135), new Color(0, 255, 183)};
+        int unitWidth = (cardWidth-40)/10;
         cards = new ArrayList<JPanel>();
         thumbnails = new ArrayList<JPanel>();
         previewCards = new JPanel();
@@ -379,10 +384,7 @@ public class GUI extends JFrame implements MouseListener {
 
         thumbLabels = new JLabel[cars.size()];
 
-        GridBagConstraints thumbConstraints = new GridBagConstraints();
-        thumbConstraints.insets = new Insets(0,0,0,0);
-        thumbConstraints.anchor = GridBagConstraints.SOUTH;
-        thumbConstraints.weighty = 1.0;
+        GridBagConstraints cardConstraints = new GridBagConstraints();
         for(Car car : cars){
             String img = car.getImageName();
             cards.add(cars.indexOf(car), new JPanel(new BorderLayout()));
@@ -394,70 +396,125 @@ public class GUI extends JFrame implements MouseListener {
 
             //Process thumbnail from image
             float thumbScale = ((float)(120))/((float)((images.get(img).getHeight())));
-
             thumbLabels[cars.indexOf(car)] = new JLabel(getScaledIcon(car.getImageName(), thumbScale));
 
             thumbnails.add(cars.indexOf(car), new JPanel());
             thumbnails.get(cars.indexOf(car)).setLayout(new GridBagLayout());
             thumbnails.get(cars.indexOf(car)).setBackground(foregroundColor);//leave as foreground
-            thumbnails.get(cars.indexOf(car)).add(thumbLabels[cars.indexOf(car)], new GridBagConstraints());
+            cardConstraints.insets = new Insets(0,0,0,0);
+            cardConstraints.anchor = GridBagConstraints.SOUTH;
+            cardConstraints.weightx = 0;
+            cardConstraints.weighty = 1.0;
+            thumbnails.get(cars.indexOf(car)).add(thumbLabels[cars.indexOf(car)], cardConstraints);
             thumbnails.get(cars.indexOf(car)).setPreferredSize(new Dimension(300, 120));
             thumbnails.get(cars.indexOf(car)).setMaximumSize(new Dimension(300, 120));
 
             JPanel licensePlate = new JPanel();
             licensePlate.setBackground(cardColor);
-            JLabel plateName = new JLabel(car.getImageName());
-            plateName.setFont(menuFontPLAIN);
+            JLabel plateName = new JLabel(car.getImageName().toUpperCase());
+            plateName.setFont(menuFontMED);
             licensePlate.add(plateName);
 
             JPanel speedBar = new JPanel();
-            speedBar.setBackground(Color.MAGENTA);
+            Dimension speedLength = new Dimension((unitWidth*car.getTopSpeed()), 3);
+            Box.Filler speedFiller = new Box.Filler(speedLength, speedLength, speedLength);
+            speedBar.add(speedFiller);
+            speedBar.setMaximumSize(speedLength);
+            speedBar.setBackground(statColors[car.getTopSpeed()]);
+            speedBar.setToolTipText(car.getTopSpeed() + " TOP SPEED");
+
+            Dimension speedSpacerLength = new Dimension((unitWidth*(10-car.getTopSpeed())), 3);
+            Box.Filler speedSpacer = new Box.Filler(speedSpacerLength, speedSpacerLength, speedSpacerLength);
+            JPanel speedBarSpacer = new JPanel();
+            speedBarSpacer.add(speedSpacer);
+            speedBarSpacer.setMaximumSize(speedSpacerLength);
+            speedBarSpacer.setBackground(cardColor);
 
             JPanel accelerationBar = new JPanel();
-            accelerationBar.setBackground(Color.CYAN);
+            Dimension accelerationLength = new Dimension((unitWidth*car.getAcceleration()), 3);
+            Box.Filler accelerationFiller = new Box.Filler(accelerationLength, accelerationLength, accelerationLength);
+            accelerationBar.add(accelerationFiller);
+            accelerationBar.setMaximumSize(accelerationLength);
+            accelerationBar.setBackground(statColors[car.getAcceleration()]);
+            accelerationBar.setToolTipText(car.getAcceleration() + " ACCELERATION");
+
+            Dimension accelerationSpacerLength = new Dimension((unitWidth*(10-car.getAcceleration())), 3);
+            Box.Filler accelerationSpacer = new Box.Filler(accelerationSpacerLength, accelerationSpacerLength, accelerationSpacerLength);
+            JPanel accelerationBarSpacer = new JPanel();
+            accelerationBarSpacer.add(accelerationSpacer);
+            accelerationBarSpacer.setMaximumSize(accelerationSpacerLength);
+            accelerationBarSpacer.setBackground(cardColor);
 
             JPanel handlingBar = new JPanel();
-            handlingBar.setBackground(Color.GREEN);
+            Dimension handlingLength = new Dimension((unitWidth*car.getHandling()), 3);
+            Box.Filler handlingFiller = new Box.Filler(handlingLength, handlingLength, handlingLength);
+            handlingBar.add(handlingFiller);
+            handlingBar.setMaximumSize(handlingLength);
+            handlingBar.setBackground(statColors[car.getHandling()]);
+            handlingBar.setToolTipText(car.getHandling() + " HANDLING");
 
-            JPanel spacerBar = new JPanel();
-            spacerBar.setBackground(cardColor);
+            Dimension handlingSpacerLength = new Dimension ((unitWidth*(10-car.getHandling())), 3);
+            Box.Filler handlingSpacer = new Box.Filler(handlingSpacerLength, handlingSpacerLength, handlingSpacerLength);
+            JPanel handlingBarSpacer = new JPanel();
+            handlingBarSpacer.add(handlingSpacer);
+            handlingBarSpacer.setMaximumSize(handlingSpacerLength);
+            handlingBarSpacer.setBackground(cardColor);
 
             JPanel statsDisplay = new JPanel();
-            statsDisplay.setLayout(new GridLayout(3, 10, 2, 7));
+            statsDisplay.setLayout(new GridBagLayout());
             statsDisplay.setBackground(cardColor);
 
-            int spd = car.getTopSpeed();
-            for(int i = 0; i<10; i++){
-                if((spd-i)>0){
-                    statsDisplay.add(speedBar);
-                }else{
-                    statsDisplay.add(spacerBar);
-                }
-            }
-
-            int acc = car.getAcceleration();
-            for(int i = 0; i<10; i++){
-                if((acc-i)>0){
-                    statsDisplay.add(accelerationBar);
-                }else{
-                    statsDisplay.add(spacerBar);
-                }
-            }
-
-            int han = car.getHandling();
-            for(int i = 0; i<10; i++){
-                if((han-i)>0){
-                    statsDisplay.add(handlingBar);
-                }else{
-                    statsDisplay.add(spacerBar);
-                }
-            }
+            cardConstraints.insets = new Insets(0,0,3,0);
+            cardConstraints.anchor = GridBagConstraints.WEST;
+            cardConstraints.fill = GridBagConstraints.HORIZONTAL;
+            //speed fill
+            cardConstraints.gridx = 0;
+            cardConstraints.gridy = 0;
+            cardConstraints.gridwidth = car.getTopSpeed();
+            cardConstraints.weightx = 1*(1/car.getTopSpeed());
+            cardConstraints.weighty = 0;
+            statsDisplay.add(speedBar, cardConstraints);
+            //speed spacer
+            cardConstraints.gridx = car.getTopSpeed();
+            cardConstraints.gridy = 0;
+            cardConstraints.gridwidth = 10-(car.getTopSpeed());
+            cardConstraints.weightx = 10-(1*(1/car.getTopSpeed()));
+            cardConstraints.weighty = 0;
+            statsDisplay.add(speedBarSpacer, cardConstraints);
+            //acceleration fill
+            cardConstraints.gridx = 0;
+            cardConstraints.gridy = 1;
+            cardConstraints.gridwidth = car.getAcceleration();
+            cardConstraints.weightx = 1*(1/car.getAcceleration());
+            cardConstraints.weighty = 0;
+            statsDisplay.add(accelerationBar, cardConstraints);
+            //acceleration spacer
+            cardConstraints.gridx = car.getAcceleration();
+            cardConstraints.gridy = 1;
+            cardConstraints.gridwidth = 10-(car.getAcceleration());
+            cardConstraints.weightx = 10-(1*(1/car.getAcceleration()));
+            cardConstraints.weighty = 0;
+            statsDisplay.add(accelerationBarSpacer, cardConstraints);
+            //handling fill
+            cardConstraints.gridx = 0;
+            cardConstraints.gridy = 2;
+            cardConstraints.gridwidth = car.getHandling();
+            cardConstraints.weightx = 1*(1/car.getHandling());
+            cardConstraints.weighty = 0;
+            statsDisplay.add(handlingBar, cardConstraints);
+            //handling spacer
+            cardConstraints.gridx = car.getHandling();
+            cardConstraints.gridy = 2;
+            cardConstraints.gridwidth = 10-(car.getHandling());
+            cardConstraints.weightx = 10-(1*(1/car.getHandling()));
+            cardConstraints.weighty = 0;
+            statsDisplay.add(handlingBarSpacer, cardConstraints);
 
             JPanel previewCenter = new JPanel();
             previewCenter.setLayout(new BoxLayout(previewCenter, BoxLayout.Y_AXIS));
             previewCenter.add(thumbnails.get(cars.indexOf(car)));
             previewCenter.setBackground(cardColor);
-            previewCenter.add(licensePlate);//(new Box.Filler((new Dimension(cardWidth, 20)), (new Dimension(cardWidth, 20)), (new Dimension(cardWidth, 20))));
+            previewCenter.add(licensePlate);
             previewCenter.add(statsDisplay);
 
             cards.get(cars.indexOf(car)).add(new Box.Filler((new Dimension(cardWidth, 20)), (new Dimension(cardWidth, 20)), (new Dimension(cardWidth, 20))), BorderLayout.NORTH);
@@ -471,7 +528,7 @@ public class GUI extends JFrame implements MouseListener {
 
     public void changePreviewDisplay(String name){
         previewName = name;
-        nameLabel.setText(previewName);
+        nameLabel.setText(previewName.toUpperCase());
         previewLabel.setIcon(getScaledIcon(previewName, previewScale));
         uiGrid.revalidate();
     }
