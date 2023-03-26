@@ -44,7 +44,7 @@ public class Car {
             //do the handling "spin out" logic
             //1 handling is 50% spin out, 10 handling is 2% spin out
             double turnAngle = Math.toDegrees(Math.abs(lastNode.next().getAngle() - lastNode.getAngle())); //probably correct
-            if (turnAngle > 180.0) turnAngle = 360.0-turnAngle;
+            if (turnAngle > 180.0) turnAngle = 360.0 - turnAngle;
             double angleScale = turnAngle / 120.0;
             double spinout = stats.handling() * angleScale;
 
@@ -65,15 +65,14 @@ public class Car {
     }
 
     public void setAllStats(int[] statsArray) {
-        stats.topSpeed = Stat.fromInt(statsArray[0]);
-        stats.acceleration = Stat.fromInt(statsArray[1]);
-        stats.handling = Stat.fromInt(statsArray[2]);
+
+        setAllStats(statsArray[0], statsArray[1], statsArray[2]);
     }
 
     public void setAllStats(int topSpeed, int acceleration, int handling) {
-        stats.topSpeed = Stat.fromInt(topSpeed);
-        stats.acceleration = Stat.fromInt(acceleration);
-        stats.handling = Stat.fromInt(handling);
+        stats.setTopSpeedStat(Stat.fromInt(topSpeed));
+        stats.setAccelerationStat(Stat.fromInt(acceleration));
+        stats.setHandlingStat(Stat.fromInt(handling));
     }
 
     public void incrementTopSpeed() {
@@ -101,15 +100,15 @@ public class Car {
     }
 
     public int getTopSpeed() {
-        return stats.topSpeed.getStatNumeral();
+        return stats.getTopSpeedNumeral();
     }
 
     public int getAcceleration() {
-        return stats.acceleration.getStatNumeral();
+        return stats.getAccelerationNumeral();
     }
 
     public int getHandling() {
-        return stats.handling.getStatNumeral();
+        return stats.getHandlingNumeral();
     }
 
     //following accessors added by Naomi

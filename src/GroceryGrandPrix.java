@@ -79,8 +79,8 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     }
 
     public void showMenu() {
-        gui.updateStatLabels(playerStats.topSpeed.getStatNumeral(), playerStats.acceleration.getStatNumeral(),
-                playerStats.handling.getStatNumeral(), playerBudget, true);
+        gui.updateStatLabels(playerStats.getTopSpeedNumeral(), playerStats.getAccelerationNumeral(),
+                playerStats.getHandlingNumeral(), playerBudget, true);
         gui.switchToPlayerMenu();
 
         /* existing startGame code
@@ -319,47 +319,47 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     public void stateChanged(ChangeEvent e) {
         JSlider slider = (JSlider) e.getSource();
         final int sliderValue = slider.getValue();
-        final int playerTopSpeed = playerStats.topSpeed.getStatNumeral();
-        final int playerAcceleration = playerStats.acceleration.getStatNumeral();
-        final int playerHandling = playerStats.handling.getStatNumeral();
+        final int playerTopSpeed = playerStats.getTopSpeedNumeral();
+        final int playerAcceleration = playerStats.getAccelerationNumeral();
+        final int playerHandling = playerStats.getHandlingNumeral();
 
         switch (slider.getName()) {
             case "spd":
                 if (playerBudget >= (sliderValue - playerTopSpeed)) {
-                    playerStats.topSpeed = Stat.fromInt(sliderValue);
+                    playerStats.setTopSpeedStat(Stat.fromInt(sliderValue));
                     playerBudget -= sliderValue - playerTopSpeed;
                 }
                 else {
-                    playerStats.topSpeed = Stat.fromInt(playerTopSpeed + playerBudget);
+                    playerStats.setTopSpeedStat(Stat.fromInt(playerTopSpeed + playerBudget));
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.topSpeed.getStatNumeral() + "spd, slider" + slider.getValue());
                 break;
             case "acc":
                 if (playerBudget >= (sliderValue - playerAcceleration)) {
-                    playerStats.acceleration = Stat.fromInt(sliderValue);
+                    playerStats.setAccelerationStat(Stat.fromInt(sliderValue));
                     playerBudget -= sliderValue - playerAcceleration;
                 }
                 else {
-                    playerStats.acceleration = Stat.fromInt(playerAcceleration + playerBudget);
+                    playerStats.setAccelerationStat(Stat.fromInt(playerAcceleration + playerBudget));
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.acceleration.getStatNumeral() + "acc, slider" + slider.getValue());
                 break;
             case "han":
                 if (playerBudget >= (sliderValue - playerHandling)) {
-                    playerStats.handling = Stat.fromInt(sliderValue);
+                    playerStats.setHandlingStat(Stat.fromInt(sliderValue));
                     playerBudget -= sliderValue - playerHandling;
                 }
                 else {
-                    playerStats.handling = Stat.fromInt(playerHandling + playerBudget);
+                    playerStats.setHandlingStat(Stat.fromInt(playerHandling + playerBudget));
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.handling.getStatNumeral() + "han, slider" + slider.getValue());
         }
         //System.out.println(sliderValue);
-        gui.updateStatLabels(playerStats.topSpeed.getStatNumeral(), playerStats.acceleration.getStatNumeral(),
-                playerStats.handling.getStatNumeral(), playerBudget, !slider.getValueIsAdjusting());
+        gui.updateStatLabels(playerStats.getTopSpeedNumeral(), playerStats.getAccelerationNumeral(),
+                playerStats.getHandlingNumeral(), playerBudget, !slider.getValueIsAdjusting());
     }
 
     private void createButtons() {

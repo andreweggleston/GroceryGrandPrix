@@ -3,6 +3,8 @@ package shared;
 /**
  * CarStats class used by Car and GroceryGrandPrix that encapsulates the translation from integer stats (1 through 10)
  * to double values used by car to calculate things like momentum and handling.
+ * CarStats encapsulates all code related to balancing the game -- it makes it easy to, as a developer, tune the game
+ * to behave as we want it to.
  */
 public class CarStats {
 
@@ -10,9 +12,9 @@ public class CarStats {
     private static final double ACCELERATION_SCALE_FACTOR = .025;
     private static final double HANDLING_SCALE_FACTOR = 0.53;
     private static final double MIN_HANDLING_FACTOR = 0.02;
-    public Stat topSpeed;
-    public Stat acceleration;
-    public Stat handling;
+    private Stat topSpeed;
+    private Stat acceleration;
+    private Stat handling;
 
     public CarStats(int topSpeed, int acceleration, int handling) {
         assert (topSpeed > 0 && topSpeed <= 10) && (acceleration > 0 && acceleration <= 10) && (handling > 0 && handling <= 10);
@@ -88,14 +90,27 @@ public class CarStats {
         return (10 - handling.getStatNumeral()) / 10.0 * HANDLING_SCALE_FACTOR + MIN_HANDLING_FACTOR;
     }
 
-    /**
-     * Stat enumerates the integer values [1,10]. We use an enumerator because we want the rigorous type
-     * definition provided by an enum. This guarantees that a Stat won't exist with values outside the range
-     * provided by the enum.
-     * We use an enum--instead of a class, even if we want methods--because a class with an integer field would not
-     * guarantee the int was between 1 and 10.  With an enum those integer values are set once when the program is
-     * compiled and then cannot be touched during runtime.
-     */
+    public int getTopSpeedNumeral(){
+        return topSpeed.getStatNumeral();
+    }
 
+    public int getAccelerationNumeral() {
+        return acceleration.getStatNumeral();
+    }
 
+    public int getHandlingNumeral() {
+        return handling.getStatNumeral();
+    }
+
+    public void setTopSpeedStat(Stat topSpeedStat) {
+        this.topSpeed = topSpeedStat;
+    }
+
+    public void setAccelerationStat(Stat accelerationStat) {
+        this.acceleration = accelerationStat;
+    }
+
+    public void setHandlingStat(Stat handlingStat) {
+        this.handling = handlingStat;
+    }
 }
