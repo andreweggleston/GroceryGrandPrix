@@ -124,7 +124,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                     }
                 }
                 timeElapsed += inGameTimePassed;
-                gui.revalidate(); //VERY IMPORTANT LINE
+                //gui.revalidate(); //VERY IMPORTANT LINE
                 gui.repaint();
             } else {
                 gameLoop.stop();
@@ -160,7 +160,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         cars.clear();
         Node carStartNode = trackHead;
         int imageNameIndex;
-        int statPoints = roundBudget + (statStart * 3);
+        int statPoints = roundBudget + ((statStart - 1) * 3);
         int[] stats;
         List<String> availableCarNames = new ArrayList<String>(Arrays.asList(carNames));
 
@@ -196,7 +196,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
             } else if (((statPicker < (2.0/underMaxStatsCount) && stat1 != maxStat) || (statPicker < 1.0/underMaxStatsCount)) && stat2 != maxStat) {
                 stat2++;
                 underMaxStatsCount -= (stat2 == maxStat) ? 1 : 0;
-            } else if (stat3 != maxStat){
+            } else if (stat3 != maxStat) {
                 stat3++;
                 underMaxStatsCount -= (stat3 == maxStat) ? 1 : 0;
             }
@@ -207,21 +207,20 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
 
     private void generateNodes(int number) {
 
-        //TODO make starting positions first
 
         Random rand = new Random();
         double x = rand.nextDouble()*400 + 50;
         double y = rand.nextDouble()*200 + 250;
         trackHead = new Node(x, y);
-        trackHead.setNext(new Node(x+125, y));
-        trackHead.next().setNext(new Node(x+250, y));
-        trackHead.next().next().setNext(new Node(x+375, y));
+        trackHead.setNext(new Node(x+100, y));
+        trackHead.next().setNext(new Node(x+200, y));
+        trackHead.next().next().setNext(new Node(x+300, y));
         System.out.println(trackHead);
         System.out.println(trackHead.next());
         System.out.println(trackHead.next().next());
         System.out.println(trackHead.next().next().next());
         int quad = 1; // 1 = top left, 2 = top right, 3 = bottom right, 4 = bottom left
-        Node temp = trackHead;
+        Node temp = trackHead.next().next().next();
         for (int i = 0; i < number-1; i++) {
             switch (quad) {
                 case 1:
@@ -264,7 +263,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
             temp = temp.next();
         }*/
         temp = trackHead;
-        do{
+        do {
             System.out.println(temp);
             temp = temp.next();
         } while (temp != trackHead);
