@@ -210,24 +210,31 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         double x = rand.nextDouble()*400 + 50;
         double y = rand.nextDouble()*200 + 250;
         trackHead = new Node(x, y);
+        trackHead.setNext(new Node(x+125, y));
+        trackHead.next().setNext(new Node(x+250, y));
+        trackHead.next().next().setNext(new Node(x+375, y));
+        System.out.println(trackHead);
+        System.out.println(trackHead.next());
+        System.out.println(trackHead.next().next());
+        System.out.println(trackHead.next().next().next());
         int quad = 1; // 1 = top left, 2 = top right, 3 = bottom right, 4 = bottom left
         Node temp = trackHead;
         for (int i = 0; i < number-1; i++) {
             switch (quad) {
                 case 1:
                     x = rand.nextDouble() * (trackX - temp.getCoord().getX()-50) + (temp.getCoord().getX()); //Goes right
-                    y = rand.nextDouble() * (trackY - 50) + 50;
+                    y = rand.nextDouble() * (trackY/2 - 50) + 50; //Stays top
                     break;
                 case 2:
-                    x = rand.nextDouble() * (trackX - 50) + 50;
+                    x = rand.nextDouble() * (trackX/2 - 50) + trackX/2 + 50; //Stays right
                     y = rand.nextDouble() * (temp.getCoord().getY() - 50) + 50; //Goes down
                     break;
                 case 3:
                     x = rand.nextDouble() * (temp.getCoord().getX() - 50) + 50; //Goes left
-                    y = rand.nextDouble() * (trackY - 50) + 50;
+                    y = rand.nextDouble() * (trackY/2 - 50) + trackY/2 + 50; //Stays down
                     break;
                 case 4:
-                    x = rand.nextDouble() * (trackX - 50) + 50;
+                    x = rand.nextDouble() * (trackX/2 - 50) + 50;
                     y = rand.nextDouble() * (trackY - temp.getCoord().getY()-50) + (temp.getCoord().getY()); //Goes down
             }
             //Checks new quadrant below:
@@ -255,7 +262,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         }*/
         temp = trackHead;
         do{
-            //System.out.println(temp);
+            System.out.println(temp);
             temp = temp.next();
         } while (temp != trackHead);
     }
