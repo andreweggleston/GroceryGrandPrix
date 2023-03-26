@@ -28,7 +28,7 @@ public class Car {
 
     public boolean drive(double ms) {
         boolean aboutToFinish = lastNode.next().equals(goalNode);
-        momentum = Math.min(stats.topSpeed(), momentum + stats.acceleration());
+        momentum = Math.min(stats.topSpeed(), momentum + stats.acceleration()) + 0.25;
         distanceFromLast += momentum * (ms / 10.0);
 
         //if the car has passed a turn
@@ -49,7 +49,7 @@ public class Car {
             double spinout = stats.handling() * angleScale;
 
             if (Math.random() < spinout) {
-                momentum = 0.0;
+                momentum = 0.1;
             } else {
                 momentum -= stats.handling() * stats.topSpeed();
             }
