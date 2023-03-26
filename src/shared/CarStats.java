@@ -6,8 +6,8 @@ package shared;
  */
 public class CarStats {
 
-    private static final double TOP_SPEED_SCALE_FACTOR = 45.0;
-    private static final double ACCELERATION_SCALE_FACTOR = 1.5;
+    private static final double TOP_SPEED_SCALE_FACTOR = 4.5;
+    private static final double ACCELERATION_SCALE_FACTOR = .025;
     private static final double HANDLING_SCALE_FACTOR = 0.53;
     private static final double MIN_HANDLING_FACTOR = 0.02;
     public Stat topSpeed;
@@ -30,9 +30,9 @@ public class CarStats {
     public String toString() {
         return String.format(
                 "Top Speed: %d, Acceleration %d, Handling %d",
-                topSpeed.statNumeral,
-                acceleration.statNumeral,
-                handling.statNumeral
+                topSpeed.getStatNumeral(),
+                acceleration.getStatNumeral(),
+                handling.getStatNumeral()
         );
     }
 
@@ -62,29 +62,30 @@ public class CarStats {
 
     /**
      * Calculates double value for top speed used by Car
-     *
+     * log_10(stat*4.5)
+     * Should be between ~.65 and 1.65
      * @return top speed double
      */
     public double topSpeed() {
-        return topSpeed.statNumeral * TOP_SPEED_SCALE_FACTOR;
+        return Math.log10(topSpeed.getStatNumeral() * TOP_SPEED_SCALE_FACTOR);
     }
 
     /**
      * Calculates double value for acceleration used by Car
-     *
+     * Should be between .015 and .15
      * @return acceleration double
      */
     public double acceleration() {
-        return acceleration.statNumeral * ACCELERATION_SCALE_FACTOR;
+        return Math.pow(acceleration.getStatNumeral() * ACCELERATION_SCALE_FACTOR, 2);
     }
 
     /**
      * Calculates double value for handling used by Car
-     *
+     * Should be between ~0.02 and ~0.5
      * @return handling double
      */
     public double handling() {
-        return (10 - handling.statNumeral) / 10.0 * HANDLING_SCALE_FACTOR + MIN_HANDLING_FACTOR;
+        return (10 - handling.getStatNumeral()) / 10.0 * HANDLING_SCALE_FACTOR + MIN_HANDLING_FACTOR;
     }
 
     /**
@@ -95,40 +96,6 @@ public class CarStats {
      * guarantee the int was between 1 and 10.  With an enum those integer values are set once when the program is
      * compiled and then cannot be touched during runtime.
      */
-    public enum Stat {
-        ONE(1) {
-            @Override
-            public Stat decrement() {
-                return ONE;
-            }
-        }, TWO(2), THREE(3), FOUR(4), FIVE(5), SIX(6), SEVEN(7), EIGHT(8), NINE(9), TEN(10) {
-            @Override
-            public Stat increment() {
-                return TEN;
-            }
-        };
 
-        private final int statNumeral;
-
-        Stat(int i) {
-            statNumeral = i;
-        }
-
-        public static Stat fromInt(int i) {
-            return Stat.values()[i - 1];
-        }
-
-        public int getStatNumeral() {
-            return statNumeral;
-        }
-
-        public Stat increment() {
-            return values()[ordinal() + 1];
-        }
-
-        public Stat decrement() {
-            return values()[ordinal() - 1];
-        }
-    }
 
 }

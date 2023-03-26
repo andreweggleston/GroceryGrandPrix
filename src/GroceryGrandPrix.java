@@ -2,6 +2,8 @@ import graphics.GUI;
 import shared.Car;
 import shared.CarStats;
 import shared.Node;
+import shared.Stat;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -25,7 +27,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private final int trackY = 900;
     private final int maxStat = 10;
     private final int statStart = 3;
-    private double timeElapsed;
+    private int timeElapsed;
     private GUI gui;
     private Node trackHead;
     private String[] carNames;
@@ -49,7 +51,8 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
             showMenu();
             gui.setVisible(true);
         } catch (IOException e) {
-            //TODO: Display error to user
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -87,7 +90,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     }
 
     private void startNextRace() {
-        timeElapsed = 0.0;
+        timeElapsed = 0;
         generateNodes(round+3);
 
         if (round == 1) {
@@ -112,7 +115,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         final int timerDelayMs = 1000 / framerate;
 
         gameLoop = new Timer(timerDelayMs, e -> {
-            double inGameTimePassed = (timerDelayMs/100.0) * ((hurry) ? 2.0 : 1.0);
+            int inGameTimePassed = (timerDelayMs) * ((hurry) ? 2 : 1);
             if (carPlacements.size() < 5 - round) {
                 for (Car car : cars) {
                     if (!carPlacements.contains(car)) {
@@ -125,7 +128,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                 gui.repaint();
             } else {
                 gameLoop.stop();
-                boolean continueGame = gui.showResults(carPlacements, (int) timeElapsed);
+                boolean continueGame = gui.showResults(carPlacements,  (timeElapsed/1000.0));
                 Car lastCar = carPlacements.get(carPlacements.size() - 1);
 
                 if (continueGame) {
@@ -323,33 +326,33 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         switch (slider.getName()) {
             case "spd":
                 if (playerBudget >= (sliderValue - playerTopSpeed)) {
-                    playerStats.topSpeed = CarStats.Stat.fromInt(sliderValue);
+                    playerStats.topSpeed = Stat.fromInt(sliderValue);
                     playerBudget -= sliderValue - playerTopSpeed;
                 }
                 else {
-                    playerStats.topSpeed = CarStats.Stat.fromInt(playerTopSpeed + playerBudget);
+                    playerStats.topSpeed = Stat.fromInt(playerTopSpeed + playerBudget);
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.topSpeed.getStatNumeral() + "spd, slider" + slider.getValue());
                 break;
             case "acc":
                 if (playerBudget >= (sliderValue - playerAcceleration)) {
-                    playerStats.acceleration = CarStats.Stat.fromInt(sliderValue);
+                    playerStats.acceleration = Stat.fromInt(sliderValue);
                     playerBudget -= sliderValue - playerAcceleration;
                 }
                 else {
-                    playerStats.acceleration = CarStats.Stat.fromInt(playerAcceleration + playerBudget);
+                    playerStats.acceleration = Stat.fromInt(playerAcceleration + playerBudget);
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.acceleration.getStatNumeral() + "acc, slider" + slider.getValue());
                 break;
             case "han":
                 if (playerBudget >= (sliderValue - playerHandling)) {
-                    playerStats.handling = CarStats.Stat.fromInt(sliderValue);
+                    playerStats.handling = Stat.fromInt(sliderValue);
                     playerBudget -= sliderValue - playerHandling;
                 }
                 else {
-                    playerStats.handling = CarStats.Stat.fromInt(playerHandling + playerBudget);
+                    playerStats.handling = Stat.fromInt(playerHandling + playerBudget);
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.handling.getStatNumeral() + "han, slider" + slider.getValue());
@@ -398,7 +401,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(GroceryGrandPrix::new);
+        new GroceryGrandPrix();
     }
 
 }
