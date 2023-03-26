@@ -1,3 +1,5 @@
+//Andrew Eggleston a_eggleston1
+
 package shared;
 
 /**
@@ -12,15 +14,15 @@ public class CarStats {
     private static final double ACCELERATION_SCALE_FACTOR = .025;
     private static final double HANDLING_SCALE_FACTOR = 0.53;
     private static final double MIN_HANDLING_FACTOR = 0.02;
-    private Stat topSpeed;
-    private Stat acceleration;
-    private Stat handling;
+    private int topSpeed;
+    private int acceleration;
+    private int handling;
 
     public CarStats(int topSpeed, int acceleration, int handling) {
         assert (topSpeed > 0 && topSpeed <= 10) && (acceleration > 0 && acceleration <= 10) && (handling > 0 && handling <= 10);
-        this.topSpeed = Stat.fromInt(topSpeed);
-        this.acceleration = Stat.fromInt(acceleration);
-        this.handling = Stat.fromInt(handling);
+        this.topSpeed = topSpeed;
+        this.acceleration = acceleration;
+        this.handling = handling;
     }
 
     public CarStats(int[] stats){
@@ -32,34 +34,10 @@ public class CarStats {
     public String toString() {
         return String.format(
                 "Top Speed: %d, Acceleration %d, Handling %d",
-                topSpeed.getStatNumeral(),
-                acceleration.getStatNumeral(),
-                handling.getStatNumeral()
+                topSpeed,
+                acceleration,
+                handling
         );
-    }
-
-    public void incrementTopSpeed() {
-        topSpeed = topSpeed.increment();
-    }
-
-    public void decrementTopSpeed() {
-        topSpeed = topSpeed.decrement();
-    }
-
-    public void incrementAcceleration() {
-        acceleration = acceleration.increment();
-    }
-
-    public void decrementAcceleration() {
-        acceleration = acceleration.decrement();
-    }
-
-    public void incrementHandling() {
-        handling = handling.increment();
-    }
-
-    public void decrementHandling() {
-        handling = handling.decrement();
     }
 
     /**
@@ -69,7 +47,7 @@ public class CarStats {
      * @return top speed double
      */
     public double topSpeed() {
-        return Math.log10(topSpeed.getStatNumeral() * TOP_SPEED_SCALE_FACTOR);
+        return Math.log10(topSpeed * TOP_SPEED_SCALE_FACTOR);
     }
 
     /**
@@ -78,7 +56,7 @@ public class CarStats {
      * @return acceleration double
      */
     public double acceleration() {
-        return Math.pow(acceleration.getStatNumeral() * ACCELERATION_SCALE_FACTOR, 2);
+        return Math.pow(acceleration * ACCELERATION_SCALE_FACTOR, 2);
     }
 
     /**
@@ -87,30 +65,30 @@ public class CarStats {
      * @return handling double
      */
     public double handling() {
-        return (10 - handling.getStatNumeral()) / 10.0 * HANDLING_SCALE_FACTOR + MIN_HANDLING_FACTOR;
+        return (10 - handling) / 10.0 * HANDLING_SCALE_FACTOR + MIN_HANDLING_FACTOR;
     }
 
     public int getTopSpeedNumeral(){
-        return topSpeed.getStatNumeral();
+        return topSpeed;
     }
 
     public int getAccelerationNumeral() {
-        return acceleration.getStatNumeral();
+        return acceleration;
     }
 
     public int getHandlingNumeral() {
-        return handling.getStatNumeral();
+        return handling;
     }
 
-    public void setTopSpeedStat(Stat topSpeedStat) {
+    public void setTopSpeedStat(int topSpeedStat) {
         this.topSpeed = topSpeedStat;
     }
 
-    public void setAccelerationStat(Stat accelerationStat) {
+    public void setAccelerationStat(int accelerationStat) {
         this.acceleration = accelerationStat;
     }
 
-    public void setHandlingStat(Stat handlingStat) {
+    public void setHandlingStat(int handlingStat) {
         this.handling = handlingStat;
     }
 }
