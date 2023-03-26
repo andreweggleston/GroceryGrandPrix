@@ -150,4 +150,17 @@ public class Car {
         return lastNode;
     }
 
+    @Override
+    public String toString() {
+        return String.format("Car{\n" +
+                "\timageName='%s'\n" +
+                "\tstats=%s\n" +
+                "\tisPlayer=%b\n" +
+                "\tmomentum=%f\n" +
+                "\tdistanceFromLast=%f\n" +
+                "\tlastNode=%s\n" +
+                "\tgoalNode=%s\n" +
+                '}',
+                imageName,  stats, isPlayer, momentum, distanceFromLast, lastNode, goalNode);
+    }
 }
