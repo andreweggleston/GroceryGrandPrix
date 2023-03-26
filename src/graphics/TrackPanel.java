@@ -18,16 +18,16 @@ import java.util.List;
 
 public class TrackPanel extends JPanel {
 
-    List<Line2D.Double> trackSegments;
-    Car[] cars;
-    BufferedImage[] carImages;
-    BasicStroke roadStroke;
+    private List<Line2D.Double> trackSegments;
+    private Car[] cars;
+    private BufferedImage[] carImages;
+    private BasicStroke roadStroke;
+    private final int carOffset = 8;
 
 
     public TrackPanel(Node head, List<Car> cars) {
         super(true);
         trackSegments = new ArrayList<>();
-        this.setVisible(true);
         Node temp = head;
         do {
             Point2D p1 = temp.getCoord();
@@ -76,7 +76,7 @@ public class TrackPanel extends JPanel {
         for (Line2D.Double segment : trackSegments) {
             g2.draw(segment);
         }
-        for (int i = 0; i < cars.length; i++) {
+        for (int i = cars.length-1; i >= 0; i--) {
             Car car = cars[i];
             int carOffsetModifier = 0;
             switch (cars.length) {
@@ -103,7 +103,8 @@ public class TrackPanel extends JPanel {
             at.translate(-image.getWidth() / 2, -image.getHeight() / 2);
             final AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
             rotateOp.filter(image, rotatedImage);
-            g2.drawImage(rotatedImage, Math.round((float)((carCoord.getX()-(width/2))+((carOffsetModifier)*7*cosine))), Math.round((float) ((carCoord.getY()-(height/2))+((carOffsetModifier)*7*sine))), null);
+            g2.drawImage(rotatedImage, Math.round((float)((carCoord.getX()-(width/2))+((carOffsetModifier)*carOffset*cosine))),
+                    Math.round((float) ((carCoord.getY()-(height/2))+((carOffsetModifier)*carOffset*sine))), null);
         }
 
     }
