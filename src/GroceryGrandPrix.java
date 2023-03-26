@@ -91,7 +91,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
 
     private void startNextRace() {
         timeElapsedMs = 0;
-        generateNodes(round+3);
+        generateNodes(round+6);
 
         if (round == 1) {
             generateCars();
@@ -211,50 +211,49 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
 
         Random rand = new Random();
         double x = rand.nextDouble()*400 + 50;
-        double y = rand.nextDouble()*200 + 250;
+        double y = rand.nextDouble()*200 + 50;
         trackHead = new Node(x, y);
         trackHead.setNext(new Node(x+125, y));
         trackHead.next().setNext(new Node(x+250, y));
         trackHead.next().next().setNext(new Node(x+375, y));
-        System.out.println(trackHead);
-        System.out.println(trackHead.next());
-        System.out.println(trackHead.next().next());
-        System.out.println(trackHead.next().next().next());
         int quad = 1; // 1 = top left, 2 = top right, 3 = bottom right, 4 = bottom left
-        Node temp = trackHead;
+        Node temp = trackHead.next().next().next();
         for (int i = 0; i < number-1; i++) {
-            switch (quad) {
-                case 1:
-                    x = rand.nextDouble() * (trackX - temp.getCoord().getX()-50) + (temp.getCoord().getX()); //Goes right
-                    y = rand.nextDouble() * (trackY/2 - 50) + 50; //Stays top
-                    break;
-                case 2:
-                    x = rand.nextDouble() * (trackX/2 - 50) + trackX/2 + 50; //Stays right
-                    y = rand.nextDouble() * (temp.getCoord().getY() - 50) + 50; //Goes down
-                    break;
-                case 3:
-                    x = rand.nextDouble() * (temp.getCoord().getX() - 50) + 50; //Goes left
-                    y = rand.nextDouble() * (trackY/2 - 50) + trackY/2 + 50; //Stays down
-                    break;
-                case 4:
-                    x = rand.nextDouble() * (trackX/2 - 50) + 50;
-                    y = rand.nextDouble() * (trackY - temp.getCoord().getY()-50) + (temp.getCoord().getY()); //Goes down
-            }
-            //Checks new quadrant below:
-            if (temp.getCoord().getX() >= trackX / 2) {
-                if (temp.getCoord().getY() >= trackY / 2) {
-                    quad = 2;
-                }else {
-                    quad = 3;
+            do {
+                switch (quad) {
+                    case 1:
+                        x = rand.nextDouble() * (trackX - temp.getCoord().getX() - 50) + temp.getCoord().getX(); //Goes right
+                        y = rand.nextDouble() * (trackY / 2 - 50) + 50; //Stays top
+                        break;
+                    case 2:
+                        x = rand.nextDouble() * (trackX / 2 - 50) + trackX / 2 + 50; //Stays right
+                        y = rand.nextDouble() * (temp.getCoord().getY() - 50) + temp.getCoord().getY(); //Goes down
+                        break;
+                    case 3:
+                        x = rand.nextDouble() * (temp.getCoord().getX() - 50) + 50; //Goes left
+                        y = rand.nextDouble() * (trackY / 2 - 100) + trackY / 2 + 50; //Stays down
+                        break;
+                    case 4:
+                        x = rand.nextDouble() * (trackX / 2 - 50) + 50;
+                        y = rand.nextDouble() * (trackY - temp.getCoord().getY() - 50) + 50; //Goes up
                 }
-            } else{
-                if(temp.getCoord().getY() >= trackY / 2){
-                    quad = 1;
-                }else {
-                    quad = 4;
+                System.out.print("Quad: " + quad + " ");
+                //Checks new quadrant below:
+                if (temp.getCoord().getX() >= trackX / 2) {
+                    if (temp.getCoord().getY() >= trackY / 2) {
+                        quad = 3;
+                    } else {
+                        quad = 2;
+                    }
+                } else {
+                    if (temp.getCoord().getY() >= trackY / 2) {
+                        quad = 4;
+                    } else {
+                        quad = 1;
+                    }
                 }
-            }
-            temp.setNext(new Node(x, y, trackHead));
+                temp.setNext(new Node(x, y, trackHead));
+            }while (temp.distanceToNext() < 240 && Math.abs(temp.getAngle()) > 2);
             temp = temp.next();
         }
         /*for (int i = 0; i < number-1; i++) {
@@ -267,7 +266,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         do{
             System.out.println(temp);
             temp = temp.next();
-        } while (temp != trackHead);
+        } while (temp != trackHead );
     }
 
     @Override
