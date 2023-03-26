@@ -27,7 +27,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private final int trackY = 900;
     private final int maxStat = 10;
     private final int statStart = 3;
-    private int timeElapsed;
+    private int timeElapsedMs;
     private GUI gui;
     private Node trackHead;
     private String[] carNames;
@@ -90,7 +90,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     }
 
     private void startNextRace() {
-        timeElapsed = 0;
+        timeElapsedMs = 0;
         generateNodes(round+3);
 
         if (round == 1) {
@@ -123,12 +123,12 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                         if (car.drive(inGameTimePassed)) carPlacements.add(car);
                     }
                 }
-                timeElapsed += inGameTimePassed;
+                timeElapsedMs += inGameTimePassed;
                 gui.revalidate(); //VERY IMPORTANT LINE
                 gui.repaint();
             } else {
                 gameLoop.stop();
-                boolean continueGame = gui.showResults(carPlacements,  (timeElapsed/1000.0));
+                boolean continueGame = gui.showResults(carPlacements,  (timeElapsedMs /1000.0));
                 Car lastCar = carPlacements.get(carPlacements.size() - 1);
 
                 if (continueGame) {
