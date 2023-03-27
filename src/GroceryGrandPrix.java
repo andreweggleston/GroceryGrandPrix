@@ -28,23 +28,23 @@ import java.util.*;
  */
 public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private final int framerate = 30;
-    private boolean hurry;
-    private int playerBudget;
-    private int playerNameIndex;
+    private boolean hurry;// Whether or not the game is in hurry mode.
+    private int chosenCarNameIndex; // The index corresponding to the name of the player's car name in carNames.
     private int round;
-    private final int startBudget;
+    private int playerBudget; // Keeps track of the current budget of points the user has.
+    private final int startBudget; // Holds the number of points the player will get to spend in the first menu.
+    private final int postRaceBudget; // Holds the number of points the player will get to spend in menus after the first.
     private final int trackX = 1280;
-    private final int trackY = 900;
+    private final int trackY = 780;
     private final int maxStat = 10;
-    private final int statStart;
-    private final int postRaceBudget;
+    private final int statStart; // Where each of the players stats will start.
     private int timeElapsedMs;
     private GUI gui;
-    private Node trackHead;
-    private String[] carNames;
+    private Node trackHead; // The first node created in the linked list of nodes that make up the track.
+    private String[] carNames; // Holds the names of all of the car types read from files.
     private ArrayList <Car> cars;
     private CarStats playerStats;
-    private Timer gameLoop;
+    private Timer gameLoop; // The Timer that has the race simulation as a listener.
 
     public GroceryGrandPrix() {
         this(6, 3, 3);
@@ -57,7 +57,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
      * @param statStart Starting part for all three stats.
      */
     public GroceryGrandPrix(int startBudget, int postRaceBudget, int statStart) {
-        playerNameIndex = 0;
+        chosenCarNameIndex = 0;
         this.postRaceBudget = postRaceBudget;
         this.statStart = statStart;
         this.startBudget = startBudget;
@@ -93,14 +93,14 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
      * @throws IOException if the contents of the files cannot be read as an image.
      */
     private HashMap<String, BufferedImage> fileReader() throws IOException {
-        File[] spriteFiles = (new File("assets/previews")).listFiles();
-        assert spriteFiles != null;
+        File[] previewFiles = (new File("assets/previews")).listFiles();
+        assert previewFiles != null;
 
-        carNames = new String[spriteFiles.length];
+        carNames = new String[previewFiles.length];
         HashMap<String, BufferedImage> previewMap = new HashMap<String, BufferedImage>();
-        for (int i = 0; i < spriteFiles.length; i++) {
-            carNames[i] = spriteFiles[i].getName().split("_")[1];
-            previewMap.put(carNames[i], ImageIO.read(spriteFiles[i]));
+        for (int i = 0; i < previewFiles.length; i++) {
+            carNames[i] = previewFiles[i].getName().split("_")[1];
+            previewMap.put(carNames[i], ImageIO.read(previewFiles[i]));
             //System.out.println("Name " + (i+1) + ": " + carNames[i] + "\n");
         }
         return previewMap;
@@ -186,7 +186,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
      */
     private void restart() {
         playerBudget = startBudget;
-        playerNameIndex = 0;
+        chosenCarNameIndex = 0;
         round = 1;
         playerStats = new CarStats(statStart, statStart, statStart);
         showMenu();
@@ -198,7 +198,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private void generateCars() {
         cars.clear();
         Node carStartNode = trackHead;
-        int nameIndex = playerNameIndex;
+        int nameIndex = chosenCarNameIndex;
         // 1 is subtracted from statStart to compensate for the bots starting at 1 in each stat.
         int statPoints = startBudget + ((statStart - 1) * 3);
         int[] stats;
@@ -328,22 +328,22 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                 break;
             case "last" :
                 if(round == 1) {
-                    if (playerNameIndex > 0) {
-                        playerNameIndex--;
+                    if (chosenCarNameIndex > 0) {
+                        chosenCarNameIndex--;
                     } else {
-                        playerNameIndex = carNames.length - 1;
+                        chosenCarNameIndex = carNames.length - 1;
                     }
-                    gui.changePreviewDisplay(carNames[playerNameIndex]);
+                    gui.changePreviewDisplay(carNames[chosenCarNameIndex]);
                 }
                 break;
             case "next" :
                 if(round == 1) {
-                    if (playerNameIndex < carNames.length - 1) {
-                        playerNameIndex++;
+                    if (chosenCarNameIndex < carNames.length - 1) {
+                        chosenCarNameIndex++;
                     } else {
-                        playerNameIndex = 0;
+                        chosenCarNameIndex = 0;
                     }
-                    gui.changePreviewDisplay(carNames[playerNameIndex]);
+                    gui.changePreviewDisplay(carNames[chosenCarNameIndex]);
                 }
         }
     }
