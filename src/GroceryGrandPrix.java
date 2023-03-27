@@ -1,3 +1,4 @@
+//Lee Snyer
 import graphics.GUI;
 import shared.Car;
 import shared.CarStats;
@@ -254,7 +255,6 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
 
         return new int[]{stat1, stat2, stat3};
     }
-
     private void generateNodes(int number) {
         Random rand = new Random();
         double x = rand.nextDouble()*400 + 50;
