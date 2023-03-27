@@ -90,7 +90,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
 
     private void startNextRace() {
         timeElapsedMs = 0;
-        generateNodes(round+6);
+        generateNodes(round+5);
 
         if (round == 1) {
             generateCars();
@@ -216,14 +216,15 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         trackHead.next().next().setNext(new Node(x+375, y));
         Node temp = trackHead.next().next().next();
         for (int i = 0; i < number-1; i++) {
+            int failsafe = 1000;
             do {
                 switch (temp.getQuad()) {
                     case 1:
-                        x = rand.nextDouble() * (trackX - temp.getCoord().getX() - 50) + temp.getCoord().getX(); //Goes right
+                        x = rand.nextDouble() * (trackX - temp.getCoord().getX() - 100) + temp.getCoord().getX(); //Goes right
                         y = rand.nextDouble() * (trackY / 2 - 50) + 50; //Stays top
                         break;
                     case 2:
-                        x = rand.nextDouble() * (trackX / 2 - 50) + trackX / 2 + 50; //Stays right
+                        x = rand.nextDouble() * (trackX / 2 - 100) + trackX / 2 + 50; //Stays right
                         y = rand.nextDouble() * (temp.getCoord().getY() - 50) + temp.getCoord().getY(); //Goes down
                         break;
                     case 3:
@@ -234,9 +235,10 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                         x = rand.nextDouble() * (trackX / 2 - 50) + 50;
                         y = rand.nextDouble() * (trackY - temp.getCoord().getY() - 50) + 50; //Goes up
                 }
+                failsafe -= 1;
                 //Checks new quadrant below:
-                temp.setNext(new Node(x, y, trackHead, trackX, trackY));
-            }while (temp.distanceToNext() < 100 || Math.abs(temp.getAngle()) > 2.5);
+                temp.setNext(new Node(x, y, trackHead, temp, trackX, trackY));
+            }while (((temp.distanceToNext() < 250 && failsafe > 995)|| temp.turn() > 2) && failsafe>0); //Puts a cap on how sharp the turns can be
             temp = temp.next();
         }
         /*for (int i = 0; i < number-1; i++) {

@@ -77,7 +77,7 @@ public class Car {
 
             //do the handling "spin out" logic
             //1 handling is 50% spin out, 10 handling is 2% spin out
-            double turnAngle = Math.toDegrees(Math.abs(lastNode.next().getAngle() - lastNode.getAngle())); //probably correct
+            double turnAngle = Math.toDegrees(lastNode.next().turn()); //probably correct
             if (turnAngle > 180.0) turnAngle = 360.0 - turnAngle;
             double angleScale = turnAngle / 120.0;
             double spinout = stats.handling() * angleScale;

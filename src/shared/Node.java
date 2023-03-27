@@ -7,16 +7,19 @@ public class Node {
     private double angle;
     private double distance;
     private Node next;
+    private Node last;
 
     public Node(double x, double y){
         this.coord.x = x;
         this.coord.y = y;
         setNext(this);
+        last = this;
     }
-    public Node(double x, double y, Node n, int trackX, int trackY){
+    public Node(double x, double y, Node n, Node l, int trackX, int trackY){
         this.coord.x = x;
         this.coord.y = y;
         setNext(n);
+        last = l;
     }
     public Node next(){
         return next;
@@ -38,7 +41,11 @@ public class Node {
         }
         return quad;
     }
+    public void setLast(Node l){
+        last = l;
+    }
     public void setNext(Node n){
+        n.setLast(this);
         next = n;
         distance = coord.distance(n.getCoord());
         angle = Math.atan2(n.getCoord().getY() - this.getCoord().getY(), n.getCoord().getX() - this.getCoord().getX());
@@ -46,6 +53,9 @@ public class Node {
     }
     public double getAngle(){
         return angle;
+    }
+    public double turn(){
+        return Math.abs(last.getAngle() - this.getAngle());
     }
     public double distanceToNext(){
         return distance;
