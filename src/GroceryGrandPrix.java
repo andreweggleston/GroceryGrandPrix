@@ -15,33 +15,54 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * GroceryGrandPrix Creates and manages the components required for a grocery themed racing simulation game.
+ * The loop of the game involves going through this series of events:
+ *                      Assign Points -> Watch Race -> See Results -> Assign Points etc.
+ * Depending on the result of the race the game may continue or be reset.
+ *
+ * A series of sliders utilizing GroceryGrandPrix are used to assign a set of allotted points to a users stats.
+ * CarStats objects are passed to Cars to hold the three stats. The Cars drive on the track after being initialized.
+ * A linked list of Nodes is used to procedurally generate a circular track.
+ * GUI is used to render all elements of the game.
+ */
 public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private final int framerate = 30;
     private boolean hurry;
-    private int roundBudget;
     private int playerBudget;
     private int playerNameIndex;
     private int round;
+    private final int startBudget;
     private final int trackX = 1280;
     private final int trackY = 900;
     private final int maxStat = 10;
-    private final int statStart = 3;
+    private final int statStart;
+    private final int postRaceBudget;
     private int timeElapsedMs;
     private GUI gui;
     private Node trackHead;
     private String[] carNames;
     private ArrayList <Car> cars;
     private CarStats playerStats;
-    private JComponent[] userInputs;
     private Timer gameLoop;
 
-
     public GroceryGrandPrix() {
+        this(6, 3, 3);
+    }
+
+    /**
+     * A parameter constructor in case the default balance is not preferred.
+     * @param startBudget Stat points the user will get to spend at the start of the game.
+     * @param postRaceBudget Stat points the user will get to spend on the rounds after round one.
+     * @param statStart Starting part for all three stats.
+     */
+    public GroceryGrandPrix(int startBudget, int postRaceBudget, int statStart) {
         playerNameIndex = 0;
-        roundBudget = 6;
-        playerBudget = roundBudget;
+        this.postRaceBudget = postRaceBudget;
+        this.statStart = statStart;
+        this.startBudget = startBudget;
+        playerBudget = this.startBudget;
         round = 1;
-        createButtons();
         cars = new ArrayList<>();
         playerStats = new CarStats(statStart, statStart, statStart);
         try {
@@ -55,6 +76,22 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         }
     }
 
+    /**
+     * Creates the GUI object used to display the game.
+     * @throws IOException if the file reading of the required images goes wrong.
+     */
+    private void initializeGUI() throws IOException {
+        if (gui != null){
+            gui.dispose();
+        }
+        gui = new GUI("Grocery Grand Prix", createInputs(), fileReader(), trackX, trackY);
+    }
+
+    /**
+     * Reads a group of image files from a preset relative directory.
+     * @return A HashMap of the names of the image files to their images.
+     * @throws IOException if the contents of the files cannot be read as an image.
+     */
     private HashMap<String, BufferedImage> fileReader() throws IOException {
         File[] spriteFiles = (new File("assets/previews")).listFiles();
         assert spriteFiles != null;
@@ -69,75 +106,73 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         return previewMap;
     }
 
-
-    private void initializeGUI() throws IOException {
-        if (gui != null){
-            gui.dispose();
-        }
-        gui = new GUI("Grocery Grand Prix", userInputs, fileReader(), trackX, trackY);
-    }
-
+    /**
+     * Simple method that transitions the game to the menu. Ensures that any changes to stats are represented in the GUI.
+     */
     public void showMenu() {
         gui.updateStatLabels(playerStats.getTopSpeedNumeral(), playerStats.getAccelerationNumeral(),
                 playerStats.getHandlingNumeral(), playerBudget, true);
         gui.switchToPlayerMenu();
-
-        /* existing startGame code
-           for (int i = 0; i < cars.size(); i++) {
-            gui.createPreviewCard(i);
-        }*/
     }
 
+    /**
+     * Guides the transition from the menu to the track.
+     * Readies the cars depending on the round, and creates a new track.
+     */
     private void startNextRace() {
         timeElapsedMs = 0;
         generateNodes(round+5);
 
         if (round == 1) {
             generateCars();
-        }
-        else {
+        } else {
             Node carStartNode = trackHead;
             for (Car car : cars) {
                 if (!car.isPlayer()) {
-                    car.setAllStats(distributeCarStats(car.getTopSpeed(), car.getAcceleration(), car.getHandling(), roundBudget));
+                    car.setAllStats(distributeCarStats(car.getTopSpeed(), car.getAcceleration(), car.getHandling(), postRaceBudget));
                 }
                 car.setGoalNode(carStartNode);
                 carStartNode = carStartNode.next();
             }
         }
-
         gui.toTrack(trackHead, cars);
     }
 
+    /**
+     * Used to start the race.
+     * Creates and starts a Timer object that will control the Car objects owned by the game.
+     * After the simulation has finished the simulator will restart the game if the player has lost and wishes to try again,
+     * go to the next round if the player has not lost and wishes to continue or close the game if the player is done.
+     */
     private void startSimulation() {
         ArrayList<Car> carPlacements = new ArrayList<Car>();
         final int timerDelayMs = 1000 / framerate;
 
+        // Timer is given a lambda expression to control the full simulation of the Cars driving around the track.
         gameLoop = new Timer(timerDelayMs, e -> {
             int inGameTimePassed = (timerDelayMs) * ((hurry) ? 2 : 1);
-            if (carPlacements.size() < 5 - round) {
+            if (carPlacements.size() < 5 - round) { // Check if all the Cars have finished the race.
                 for (Car car : cars) {
-                    if (!carPlacements.contains(car)) {
-                        // save the cars in finishing order
+                    if (!carPlacements.contains(car)) { // Stop the Cars after they finish the race.
+                        // Save the cars in finishing order.
                         if (car.drive(inGameTimePassed)) carPlacements.add(car);
                     }
                 }
                 timeElapsedMs += inGameTimePassed;
-                //gui.revalidate(); //VERY IMPORTANT LINE
                 gui.repaint();
             } else {
                 gameLoop.stop();
                 boolean continueGame = gui.showResults(carPlacements,  (int)(timeElapsedMs /1000.0));
                 Car lastCar = carPlacements.get(carPlacements.size() - 1);
 
+                // Determines how the game will continue based on user input and the user's placement.
                 if (continueGame) {
                     if (lastCar.isPlayer()) {
                         restart();
                     } else {
                         cars.remove(lastCar);
                         round++;
-                        roundBudget = 2;
-                        playerBudget = roundBudget;
+                        playerBudget = postRaceBudget;
                         showMenu();
                     }
                 } else gui.dispose();
@@ -146,52 +181,64 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         gameLoop.start();
     }
 
+    /**
+     * Restarts the game back to a state where it can be played again.
+     */
     private void restart() {
-        roundBudget = 6;
-        playerBudget = roundBudget;
+        playerBudget = startBudget;
         playerNameIndex = 0;
         round = 1;
         playerStats = new CarStats(statStart, statStart, statStart);
         showMenu();
     }
 
+    /**
+     * Generates four Car objects and adds them to the cars ArrayList.
+     */
     private void generateCars() {
         cars.clear();
         Node carStartNode = trackHead;
-        int imageNameIndex;
-        int statPoints = roundBudget + ((statStart - 1) * 3);
+        int nameIndex = playerNameIndex;
+        // 1 is subtracted from statStart to compensate for the bots starting at 1 in each stat.
+        int statPoints = startBudget + ((statStart - 1) * 3);
         int[] stats;
         List<String> availableCarNames = new ArrayList<String>(Arrays.asList(carNames));
 
-        //System.out.println(statPoints);
+        // Creates 4 cars; 3 bots and 1 player.
         for (int i = 0; i < 4; i++) {
             if (i > 0) {
-                imageNameIndex = (int) (Math.random() * availableCarNames.size());
-                //System.out.println(imageNameIndex);
+                nameIndex = (int) (Math.random() * availableCarNames.size());
                 stats = distributeCarStats(1, 1, 1, statPoints);
-                cars.add(i, new Car(availableCarNames.get(imageNameIndex), new CarStats(stats), carStartNode, false));
-                availableCarNames.remove(imageNameIndex);
+                cars.add(new Car(availableCarNames.get(nameIndex), new CarStats(stats), carStartNode, false));
             } else {
-                cars.add(i, new Car(availableCarNames.get(playerNameIndex), playerStats, carStartNode, true));
-                availableCarNames.remove(playerNameIndex);
+                cars.add(new Car(availableCarNames.get(nameIndex), playerStats, carStartNode, true));
             }
-            //System.out.println("Car " + (i+1) + ": " + cars.get(i).getTopSpeed() + " " + cars.get(i).getAcceleration() + " " + cars.get(i).getHandling() + "\n");
+            availableCarNames.remove(nameIndex);
             carStartNode = carStartNode.next();
         }
     }
 
+    /**
+     * Distributes a given number of stat points evenly among three stats using a loop.
+     * Stat parameters are to allow for starting values.
+     * @param stat1 Represents the first stat given.
+     * @param stat2 Represents the second stat given.
+     * @param stat3 Represents the third stat given.
+     * @param statPoints Determines the number of stats that will be distributed.
+     * @return An array of integers holding the stat values after points have been distributed.
+     */
     private int[] distributeCarStats(int stat1, int stat2, int stat3, int statPoints) {
         double statPicker;
+        // Keeps track of how many stats have less than the maximum.
         int underMaxStatsCount = ((stat1 != maxStat) ?  1 : 0) + ((stat2 != maxStat) ?  1 : 0) + ((stat3 != maxStat) ?  1 : 0);
         // Distribute all stat points randomly one at a time.
         for (int s = 0; s < statPoints; s++) {
-            //System.out.println(underMaxStatsCount);
-            //System.out.println(s);
             statPicker = Math.random();
             // Add one to any stat under the maximum. Odds adjust if any stat reaches the maximum.
             if (statPicker < (1.0/underMaxStatsCount) && stat1 != maxStat) {
                 stat1++;
                 underMaxStatsCount -= (stat1 == maxStat) ? 1 : 0;
+            // Long conditional to ensure that stat2 has a 33% to start, and a 50% chance when either stat has been maxed.
             } else if (((statPicker < (2.0/underMaxStatsCount) && stat1 != maxStat) || (statPicker < 1.0/underMaxStatsCount)) && stat2 != maxStat) {
                 stat2++;
                 underMaxStatsCount -= (stat2 == maxStat) ? 1 : 0;
@@ -259,8 +306,10 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         JButton pressedButton = (JButton) event.getSource();
         switch (pressedButton.getActionCommand().substring(0,4)) {
             case "race" :
-                startNextRace();
-                startSimulation();
+                if (playerBudget == 0) {
+                    startNextRace();
+                    startSimulation();
+                }
                 break;
             case "fast" :
                 hurry = !hurry;
@@ -312,23 +361,19 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                 if (playerBudget >= (sliderValue - playerTopSpeed)) {
                     playerStats.setTopSpeedStat(sliderValue);
                     playerBudget -= sliderValue - playerTopSpeed;
-                }
-                else {
+                } else {
                     playerStats.setTopSpeedStat(playerTopSpeed + playerBudget);
                     playerBudget = 0;
                 }
-                //System.out.println(playerStats.topSpeed.getStatNumeral() + "spd, slider" + slider.getValue());
                 break;
             case "acc":
                 if (playerBudget >= (sliderValue - playerAcceleration)) {
                     playerStats.setAccelerationStat(sliderValue);
                     playerBudget -= sliderValue - playerAcceleration;
-                }
-                else {
+                } else {
                     playerStats.setAccelerationStat(playerAcceleration + playerBudget);
                     playerBudget = 0;
                 }
-                //System.out.println(playerStats.acceleration.getStatNumeral() + "acc, slider" + slider.getValue());
                 break;
             case "han":
                 if (playerBudget >= (sliderValue - playerHandling)) {
@@ -339,14 +384,16 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                     playerStats.setHandlingStat(playerHandling + playerBudget);
                     playerBudget = 0;
                 }
-                //System.out.println(playerStats.handling.getStatNumeral() + "han, slider" + slider.getValue());
         }
-        //System.out.println(sliderValue);
+        // Only forces the sliders to match the corresponding stat value if the player has stopped adjusting the slider.
         gui.updateStatLabels(playerStats.getTopSpeedNumeral(), playerStats.getAccelerationNumeral(),
                 playerStats.getHandlingNumeral(), playerBudget, !slider.getValueIsAdjusting());
     }
 
-    private void createButtons() {
+    /**
+     * Gives all the JButtons and JSliders the requisite game functionality.
+     */
+    private JComponent[] createInputs() {
         JButton startRace = new JButton();
         startRace.setActionCommand("race");
         startRace.addActionListener(this);
@@ -365,23 +412,17 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
 
         JSlider speed = new JSlider(1, maxStat, statStart);
         speed.setSnapToTicks(true);
-        speed.setPaintTicks(true);
-        speed.setMajorTickSpacing(1);
         speed.addChangeListener(this);
         speed.setName("spd");
         JSlider acceleration = new JSlider(1, maxStat, statStart);
         acceleration.setSnapToTicks(true);
-        acceleration.setPaintTicks(true);
-        acceleration.setMajorTickSpacing(1);
         acceleration.addChangeListener(this);
         acceleration.setName("acc");
         JSlider handling = new JSlider(1, maxStat, statStart);
         handling.setSnapToTicks(true);
-        handling.setMajorTickSpacing(1);
-        handling.setPaintTicks(true);
         handling.addChangeListener(this);
         handling.setName("han");
-        userInputs = new JComponent[]{startRace, hurry, pause, previousCar, nextCar, speed, acceleration, handling};
+        return new JComponent[]{startRace, hurry, pause, previousCar, nextCar, speed, acceleration, handling};
     }
 
     public static void main(String[] args) {

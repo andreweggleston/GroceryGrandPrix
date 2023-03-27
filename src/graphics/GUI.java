@@ -102,16 +102,22 @@ public class GUI extends JFrame implements MouseListener {
                 switch (slider.getName()) {
                     case "spd" :
                         speedSlider = slider;
+                        speedSlider.setPaintTicks(true);
+                        speedSlider.setMajorTickSpacing(1);
                         speedSlider.setBackground(backgroundColor);
-                    break;
+                        break;
                     case "acc" :
                         accelerationSlider = slider;
+                        accelerationSlider.setPaintTicks(true);
+                        accelerationSlider.setMajorTickSpacing(1);
                         accelerationSlider.setBackground(backgroundColor);
-                    break;
+                        break;
                     case "han":
                         handlingSlider = slider;
+                        handlingSlider.setPaintTicks(true);
+                        handlingSlider.setMajorTickSpacing(1);
                         handlingSlider.setBackground(backgroundColor);
-                    break;
+                        break;
                 }
             }
         }
@@ -386,6 +392,7 @@ public class GUI extends JFrame implements MouseListener {
 
         GridBagConstraints cardConstraints = new GridBagConstraints();
         for(Car car : cars){
+            System.out.println("spd: " + car.getTopSpeed() + " acc: " + car.getAcceleration() + " han: " + car.getHandling());
             String img = car.getImageName();
             cards.add(cars.indexOf(car), new JPanel(new BorderLayout()));
 
@@ -417,14 +424,16 @@ public class GUI extends JFrame implements MouseListener {
 
             JPanel speedBar = new JPanel();
             Dimension speedLength = new Dimension((unitWidth*car.getTopSpeed()), 3);
-            Box.Filler speedFiller = new Box.Filler(speedLength, speedLength, speedLength);
+            //Box.Filler speedFiller = new Box.Filler(speedLength, speedLength, speedLength);
+            Component speedFiller = Box.createHorizontalStrut(unitWidth*car.getTopSpeed());
             speedBar.add(speedFiller);
             speedBar.setMaximumSize(speedLength);
             speedBar.setBackground(statColors[car.getTopSpeed()]);
             speedBar.setToolTipText(car.getTopSpeed() + " TOP SPEED");
 
             Dimension speedSpacerLength = new Dimension((unitWidth*(10-car.getTopSpeed())), 3);
-            Box.Filler speedSpacer = new Box.Filler(speedSpacerLength, speedSpacerLength, speedSpacerLength);
+            //Box.Filler speedSpacer = new Box.Filler(speedSpacerLength, speedSpacerLength, speedSpacerLength);
+            Component speedSpacer = Box.createHorizontalStrut(unitWidth*(10-car.getTopSpeed()));
             JPanel speedBarSpacer = new JPanel();
             speedBarSpacer.add(speedSpacer);
             speedBarSpacer.setMaximumSize(speedSpacerLength);
@@ -432,14 +441,16 @@ public class GUI extends JFrame implements MouseListener {
 
             JPanel accelerationBar = new JPanel();
             Dimension accelerationLength = new Dimension((unitWidth*car.getAcceleration()), 3);
-            Box.Filler accelerationFiller = new Box.Filler(accelerationLength, accelerationLength, accelerationLength);
+            //Box.Filler accelerationFiller = new Box.Filler(accelerationLength, accelerationLength, accelerationLength);
+            Component accelerationFiller = Box.createHorizontalStrut(unitWidth*car.getAcceleration());
             accelerationBar.add(accelerationFiller);
             accelerationBar.setMaximumSize(accelerationLength);
             accelerationBar.setBackground(statColors[car.getAcceleration()]);
             accelerationBar.setToolTipText(car.getAcceleration() + " ACCELERATION");
 
             Dimension accelerationSpacerLength = new Dimension((unitWidth*(10-car.getAcceleration())), 3);
-            Box.Filler accelerationSpacer = new Box.Filler(accelerationSpacerLength, accelerationSpacerLength, accelerationSpacerLength);
+            //Box.Filler accelerationSpacer = new Box.Filler(accelerationSpacerLength, accelerationSpacerLength, accelerationSpacerLength);
+            Component accelerationSpacer = Box.createHorizontalStrut(unitWidth*(10-car.getAcceleration()));
             JPanel accelerationBarSpacer = new JPanel();
             accelerationBarSpacer.add(accelerationSpacer);
             accelerationBarSpacer.setMaximumSize(accelerationSpacerLength);
@@ -447,14 +458,16 @@ public class GUI extends JFrame implements MouseListener {
 
             JPanel handlingBar = new JPanel();
             Dimension handlingLength = new Dimension((unitWidth*car.getHandling()), 3);
-            Box.Filler handlingFiller = new Box.Filler(handlingLength, handlingLength, handlingLength);
+            //Box.Filler handlingFiller = new Box.Filler(handlingLength, handlingLength, handlingLength);
+            Component handlingFiller = Box.createHorizontalStrut(unitWidth*car.getHandling());
             handlingBar.add(handlingFiller);
             handlingBar.setMaximumSize(handlingLength);
             handlingBar.setBackground(statColors[car.getHandling()]);
             handlingBar.setToolTipText(car.getHandling() + " HANDLING");
 
             Dimension handlingSpacerLength = new Dimension ((unitWidth*(10-car.getHandling())), 3);
-            Box.Filler handlingSpacer = new Box.Filler(handlingSpacerLength, handlingSpacerLength, handlingSpacerLength);
+            //Box.Filler handlingSpacer = new Box.Filler(handlingSpacerLength, handlingSpacerLength, handlingSpacerLength);
+            Component handlingSpacer = Box.createHorizontalStrut(unitWidth*(10-car.getHandling()));
             JPanel handlingBarSpacer = new JPanel();
             handlingBarSpacer.add(handlingSpacer);
             handlingBarSpacer.setMaximumSize(handlingSpacerLength);
@@ -471,42 +484,41 @@ public class GUI extends JFrame implements MouseListener {
             cardConstraints.gridx = 0;
             cardConstraints.gridy = 0;
             cardConstraints.gridwidth = car.getTopSpeed();
-            cardConstraints.weightx = 1*(1/car.getTopSpeed());
             cardConstraints.weighty = 0;
             statsDisplay.add(speedBar, cardConstraints);
-            //speed spacer
-            cardConstraints.gridx = car.getTopSpeed();
-            cardConstraints.gridy = 0;
-            cardConstraints.gridwidth = 10-(car.getTopSpeed());
-            cardConstraints.weightx = 10-(1*(1/car.getTopSpeed()));
-            cardConstraints.weighty = 0;
-            statsDisplay.add(speedBarSpacer, cardConstraints);
+
             //acceleration fill
             cardConstraints.gridx = 0;
             cardConstraints.gridy = 1;
             cardConstraints.gridwidth = car.getAcceleration();
-            cardConstraints.weightx = 1*(1/car.getAcceleration());
             cardConstraints.weighty = 0;
             statsDisplay.add(accelerationBar, cardConstraints);
-            //acceleration spacer
-            cardConstraints.gridx = car.getAcceleration();
-            cardConstraints.gridy = 1;
-            cardConstraints.gridwidth = 10-(car.getAcceleration());
-            cardConstraints.weightx = 10-(1*(1/car.getAcceleration()));
-            cardConstraints.weighty = 0;
-            statsDisplay.add(accelerationBarSpacer, cardConstraints);
+
             //handling fill
             cardConstraints.gridx = 0;
             cardConstraints.gridy = 2;
             cardConstraints.gridwidth = car.getHandling();
-            cardConstraints.weightx = 1*(1/car.getHandling());
             cardConstraints.weighty = 0;
             statsDisplay.add(handlingBar, cardConstraints);
+
+
+            //speed spacer
+            cardConstraints.gridx = car.getTopSpeed();
+            cardConstraints.gridy = 0;
+            cardConstraints.gridwidth = 10-car.getTopSpeed();
+            cardConstraints.weighty = 0;
+            statsDisplay.add(speedBarSpacer, cardConstraints);
+
+            //acceleration spacer
+            cardConstraints.gridx = car.getAcceleration();
+            cardConstraints.gridy = 1;
+            cardConstraints.gridwidth = 10-car.getAcceleration();
+            cardConstraints.weighty = 0;
+            statsDisplay.add(accelerationBarSpacer, cardConstraints);
             //handling spacer
             cardConstraints.gridx = car.getHandling();
             cardConstraints.gridy = 2;
-            cardConstraints.gridwidth = 10-(car.getHandling());
-            cardConstraints.weightx = 10-(1*(1/car.getHandling()));
+            cardConstraints.gridwidth = 10-car.getHandling();
             cardConstraints.weighty = 0;
             statsDisplay.add(handlingBarSpacer, cardConstraints);
 
@@ -671,7 +683,7 @@ public class GUI extends JFrame implements MouseListener {
 
             playerPositionLabel.setText("You placed " + playerPlacement + placementSuffix);
             raceTimeLabel.setText("The race lasted " + raceTime + " seconds.");
-            loserLabel.setText(((playerPlacement == placedCars.size()) ? "You lost. Your" : "Last place's") + " ending stats were: " +
+            loserLabel.setText(((playerPlacement == placedCars.size()) ? "You lost. Your" : lastCar.getImageName() + "'s") + " ending stats were: " +
                     "Spd-" + lastCar.getTopSpeed() + ", Acc-" + lastCar.getAcceleration() + ", Han-" + lastCar.getHandling());
             // Change the message shown in the prompt label to reflect if the player has lost.
             promptLabel.setText((playerPlacement == placedCars.size()) ? "Try again?" : "Do you want to continue to the next round?");
@@ -699,6 +711,7 @@ public class GUI extends JFrame implements MouseListener {
         results.add(playerPositionLabel);
         results.add(raceTimeLabel);
         results.add(placementPanel);
+        if (!gameWon) results.add(loserLabel);
         results.add(Box.createVerticalStrut(25));
         results.add(promptLabel);
 
@@ -709,7 +722,7 @@ public class GUI extends JFrame implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("X: " + e.getX() + " Y: " + e.getY());
+        System.out.println(Math.atan2(e.getY() - gameBounds.getHeight()/2, e.getX() - gameBounds.getWidth()/2));
     }
 
     @Override
