@@ -46,7 +46,7 @@ public class Car {
     public Car() {
         this.imageName = "Uninitialized";
         this.stats = new CarStats(0, 0, 0);
-        Node n = new Node(0, 0);
+        Node n = new Node(0, 0, 1280, 900);
         this.goalNode = n;
         this.lastNode = n;
         this.momentum = 0.0;
@@ -85,7 +85,7 @@ public class Car {
             if (Math.random() < spinout) { //spin out: set momentum to 0
                 momentum = 0.0;
             } else { //turns decrease momentum more when high top speed and low handling
-                momentum -= stats.handling() * stats.topSpeed();
+                momentum -= stats.handling() * momentum * Math.toRadians(turnAngle);
             }
 
             distanceFromLast -= lastNode.distanceToNext();
