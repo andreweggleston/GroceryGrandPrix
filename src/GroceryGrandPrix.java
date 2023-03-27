@@ -2,7 +2,6 @@ import graphics.GUI;
 import shared.Car;
 import shared.CarStats;
 import shared.Node;
-import shared.Stat;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -27,7 +26,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private final int trackY = 900;
     private final int maxStat = 10;
     private final int statStart = 3;
-    private int timeElapsed;
+    private int timeElapsedMs;
     private GUI gui;
     private Node trackHead;
     private String[] carNames;
@@ -79,8 +78,8 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     }
 
     public void showMenu() {
-        gui.updateStatLabels(playerStats.topSpeed.getStatNumeral(), playerStats.acceleration.getStatNumeral(),
-                playerStats.handling.getStatNumeral(), playerBudget, true);
+        gui.updateStatLabels(playerStats.getTopSpeedNumeral(), playerStats.getAccelerationNumeral(),
+                playerStats.getHandlingNumeral(), playerBudget, true);
         gui.switchToPlayerMenu();
 
         /* existing startGame code
@@ -90,8 +89,8 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     }
 
     private void startNextRace() {
-        timeElapsed = 0;
-        generateNodes(round+3);
+        timeElapsedMs = 0;
+        generateNodes(round+6);
 
         if (round == 1) {
             generateCars();
@@ -123,7 +122,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                         if (car.drive(inGameTimePassed)) carPlacements.add(car);
                     }
                 }
-                timeElapsed += inGameTimePassed;
+                timeElapsedMs += inGameTimePassed;
                 //gui.revalidate(); //VERY IMPORTANT LINE
                 gui.repaint();
             } else {
@@ -210,7 +209,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
 
         Random rand = new Random();
         double x = rand.nextDouble()*400 + 50;
-        double y = rand.nextDouble()*200 + 250;
+        double y = rand.nextDouble()*200 + 50;
         trackHead = new Node(x, y);
         trackHead.setNext(new Node(x+100, y));
         trackHead.next().setNext(new Node(x+200, y));
@@ -222,38 +221,41 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         int quad = 1; // 1 = top left, 2 = top right, 3 = bottom right, 4 = bottom left
         Node temp = trackHead.next().next().next();
         for (int i = 0; i < number-1; i++) {
-            switch (quad) {
-                case 1:
-                    x = rand.nextDouble() * (trackX - temp.getCoord().getX()-50) + (temp.getCoord().getX()); //Goes right
-                    y = rand.nextDouble() * (trackY/2 - 50) + 50; //Stays top
-                    break;
-                case 2:
-                    x = rand.nextDouble() * (trackX/2 - 50) + trackX/2 + 50; //Stays right
-                    y = rand.nextDouble() * (temp.getCoord().getY() - 50) + 50; //Goes down
-                    break;
-                case 3:
-                    x = rand.nextDouble() * (temp.getCoord().getX() - 50) + 50; //Goes left
-                    y = rand.nextDouble() * (trackY/2 - 50) + trackY/2 + 50; //Stays down
-                    break;
-                case 4:
-                    x = rand.nextDouble() * (trackX/2 - 50) + 50;
-                    y = rand.nextDouble() * (trackY - temp.getCoord().getY()-50) + (temp.getCoord().getY()); //Goes down
-            }
-            //Checks new quadrant below:
-            if (temp.getCoord().getX() >= trackX / 2) {
-                if (temp.getCoord().getY() >= trackY / 2) {
-                    quad = 2;
-                }else {
-                    quad = 3;
+            do {
+                switch (quad) {
+                    case 1:
+                        x = rand.nextDouble() * (trackX - temp.getCoord().getX() - 50) + temp.getCoord().getX(); //Goes right
+                        y = rand.nextDouble() * (trackY / 2 - 50) + 50; //Stays top
+                        break;
+                    case 2:
+                        x = rand.nextDouble() * (trackX / 2 - 50) + trackX / 2 + 50; //Stays right
+                        y = rand.nextDouble() * (temp.getCoord().getY() - 50) + temp.getCoord().getY(); //Goes down
+                        break;
+                    case 3:
+                        x = rand.nextDouble() * (temp.getCoord().getX() - 50) + 50; //Goes left
+                        y = rand.nextDouble() * (trackY / 2 - 100) + trackY / 2 + 50; //Stays down
+                        break;
+                    case 4:
+                        x = rand.nextDouble() * (trackX / 2 - 50) + 50;
+                        y = rand.nextDouble() * (trackY - temp.getCoord().getY() - 50) + 50; //Goes up
                 }
-            } else{
-                if(temp.getCoord().getY() >= trackY / 2){
-                    quad = 1;
-                }else {
-                    quad = 4;
+                System.out.print("Quad: " + quad + " ");
+                //Checks new quadrant below:
+                if (temp.getCoord().getX() >= trackX / 2) {
+                    if (temp.getCoord().getY() >= trackY / 2) {
+                        quad = 3;
+                    } else {
+                        quad = 2;
+                    }
+                } else {
+                    if (temp.getCoord().getY() >= trackY / 2) {
+                        quad = 4;
+                    } else {
+                        quad = 1;
+                    }
                 }
-            }
-            temp.setNext(new Node(x, y, trackHead));
+                temp.setNext(new Node(x, y, trackHead));
+            }while (temp.distanceToNext() < 240 && Math.abs(temp.getAngle()) > 2);
             temp = temp.next();
         }
         /*for (int i = 0; i < number-1; i++) {
@@ -266,7 +268,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         do {
             System.out.println(temp);
             temp = temp.next();
-        } while (temp != trackHead);
+        } while (temp != trackHead );
     }
 
     @Override
@@ -318,47 +320,47 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     public void stateChanged(ChangeEvent e) {
         JSlider slider = (JSlider) e.getSource();
         final int sliderValue = slider.getValue();
-        final int playerTopSpeed = playerStats.topSpeed.getStatNumeral();
-        final int playerAcceleration = playerStats.acceleration.getStatNumeral();
-        final int playerHandling = playerStats.handling.getStatNumeral();
+        final int playerTopSpeed = playerStats.getTopSpeedNumeral();
+        final int playerAcceleration = playerStats.getAccelerationNumeral();
+        final int playerHandling = playerStats.getHandlingNumeral();
 
         switch (slider.getName()) {
             case "spd":
                 if (playerBudget >= (sliderValue - playerTopSpeed)) {
-                    playerStats.topSpeed = Stat.fromInt(sliderValue);
+                    playerStats.setTopSpeedStat(sliderValue);
                     playerBudget -= sliderValue - playerTopSpeed;
                 }
                 else {
-                    playerStats.topSpeed = Stat.fromInt(playerTopSpeed + playerBudget);
+                    playerStats.setTopSpeedStat(playerTopSpeed + playerBudget);
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.topSpeed.getStatNumeral() + "spd, slider" + slider.getValue());
                 break;
             case "acc":
                 if (playerBudget >= (sliderValue - playerAcceleration)) {
-                    playerStats.acceleration = Stat.fromInt(sliderValue);
+                    playerStats.setAccelerationStat(sliderValue);
                     playerBudget -= sliderValue - playerAcceleration;
                 }
                 else {
-                    playerStats.acceleration = Stat.fromInt(playerAcceleration + playerBudget);
+                    playerStats.setAccelerationStat(playerAcceleration + playerBudget);
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.acceleration.getStatNumeral() + "acc, slider" + slider.getValue());
                 break;
             case "han":
                 if (playerBudget >= (sliderValue - playerHandling)) {
-                    playerStats.handling = Stat.fromInt(sliderValue);
+                    playerStats.setHandlingStat(sliderValue);
                     playerBudget -= sliderValue - playerHandling;
                 }
                 else {
-                    playerStats.handling = Stat.fromInt(playerHandling + playerBudget);
+                    playerStats.setHandlingStat(playerHandling + playerBudget);
                     playerBudget = 0;
                 }
                 //System.out.println(playerStats.handling.getStatNumeral() + "han, slider" + slider.getValue());
         }
         //System.out.println(sliderValue);
-        gui.updateStatLabels(playerStats.topSpeed.getStatNumeral(), playerStats.acceleration.getStatNumeral(),
-                playerStats.handling.getStatNumeral(), playerBudget, !slider.getValueIsAdjusting());
+        gui.updateStatLabels(playerStats.getTopSpeedNumeral(), playerStats.getAccelerationNumeral(),
+                playerStats.getHandlingNumeral(), playerBudget, !slider.getValueIsAdjusting());
     }
 
     private void createButtons() {
