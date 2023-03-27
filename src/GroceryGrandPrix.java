@@ -127,7 +127,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                 gui.repaint();
             } else {
                 gameLoop.stop();
-                boolean continueGame = gui.showResults(carPlacements,  (timeElapsed/1000.0));
+                boolean continueGame = gui.showResults(carPlacements,  (timeElapsedMs /1000.0));
                 Car lastCar = carPlacements.get(carPlacements.size() - 1);
 
                 if (continueGame) {
@@ -210,19 +210,14 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         Random rand = new Random();
         double x = rand.nextDouble()*400 + 50;
         double y = rand.nextDouble()*200 + 50;
-        trackHead = new Node(x, y);
-        trackHead.setNext(new Node(x+100, y));
-        trackHead.next().setNext(new Node(x+200, y));
-        trackHead.next().next().setNext(new Node(x+300, y));
-        System.out.println(trackHead);
-        System.out.println(trackHead.next());
-        System.out.println(trackHead.next().next());
-        System.out.println(trackHead.next().next().next());
-        int quad = 1; // 1 = top left, 2 = top right, 3 = bottom right, 4 = bottom left
+        trackHead = new Node(x, y, trackX, trackY);
+        trackHead.setNext(new Node(x+125, y, trackX, trackY));
+        trackHead.next().setNext(new Node(x+250, y, trackX, trackY));
+        trackHead.next().next().setNext(new Node(x+375, y, trackX, trackY));
         Node temp = trackHead.next().next().next();
         for (int i = 0; i < number-1; i++) {
             do {
-                switch (quad) {
+                switch (temp.getQuad()) {
                     case 1:
                         x = rand.nextDouble() * (trackX - temp.getCoord().getX() - 50) + temp.getCoord().getX(); //Goes right
                         y = rand.nextDouble() * (trackY / 2 - 50) + 50; //Stays top
@@ -239,23 +234,9 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                         x = rand.nextDouble() * (trackX / 2 - 50) + 50;
                         y = rand.nextDouble() * (trackY - temp.getCoord().getY() - 50) + 50; //Goes up
                 }
-                System.out.print("Quad: " + quad + " ");
                 //Checks new quadrant below:
-                if (temp.getCoord().getX() >= trackX / 2) {
-                    if (temp.getCoord().getY() >= trackY / 2) {
-                        quad = 3;
-                    } else {
-                        quad = 2;
-                    }
-                } else {
-                    if (temp.getCoord().getY() >= trackY / 2) {
-                        quad = 4;
-                    } else {
-                        quad = 1;
-                    }
-                }
-                temp.setNext(new Node(x, y, trackHead));
-            }while (temp.distanceToNext() < 240 && Math.abs(temp.getAngle()) > 2);
+                temp.setNext(new Node(x, y, trackHead, trackX, trackY));
+            }while (temp.distanceToNext() < 100 || Math.abs(temp.getAngle()) > 2.5);
             temp = temp.next();
         }
         /*for (int i = 0; i < number-1; i++) {

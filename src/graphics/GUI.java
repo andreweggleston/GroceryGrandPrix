@@ -552,6 +552,7 @@ public class GUI extends JFrame implements MouseListener {
         game.removeAll();
         game.add(previewCards, BorderLayout.WEST);
         game.add(track, BorderLayout.CENTER);
+        track.addMouseListener(this);
         this.setContentPane(game);
         this.pack();
         this.revalidate();
@@ -675,6 +676,7 @@ public class GUI extends JFrame implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        System.out.println("X: " + e.getX() + " Y: " + e.getY());
     }
 
     @Override
@@ -687,14 +689,14 @@ public class GUI extends JFrame implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        switch (((JButton) e.getSource()).getActionCommand()) {
+        /*switch (((JButton) e.getSource()).getActionCommand()) {
             case "Speed Help":
                 break;
             case "Acceleration Help":
                 break;
             case "Handling Help":
                 break;
-        }
+        }*/
     }
 
     @Override
