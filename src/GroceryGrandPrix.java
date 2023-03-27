@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-
 public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private final int framerate = 30;
     private boolean hurry;
@@ -124,11 +123,11 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                     }
                 }
                 timeElapsedMs += inGameTimePassed;
-                gui.revalidate(); //VERY IMPORTANT LINE
+                //gui.revalidate(); //VERY IMPORTANT LINE
                 gui.repaint();
             } else {
                 gameLoop.stop();
-                boolean continueGame = gui.showResults(carPlacements,  (timeElapsedMs /1000.0));
+                boolean continueGame = gui.showResults(carPlacements,  (int)(timeElapsedMs /1000.0));
                 Car lastCar = carPlacements.get(carPlacements.size() - 1);
 
                 if (continueGame) {
@@ -160,7 +159,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         cars.clear();
         Node carStartNode = trackHead;
         int imageNameIndex;
-        int statPoints = roundBudget + (statStart * 3);
+        int statPoints = roundBudget + ((statStart - 1) * 3);
         int[] stats;
         List<String> availableCarNames = new ArrayList<String>(Arrays.asList(carNames));
 
@@ -196,7 +195,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
             } else if (((statPicker < (2.0/underMaxStatsCount) && stat1 != maxStat) || (statPicker < 1.0/underMaxStatsCount)) && stat2 != maxStat) {
                 stat2++;
                 underMaxStatsCount -= (stat2 == maxStat) ? 1 : 0;
-            } else if (stat3 != maxStat){
+            } else if (stat3 != maxStat) {
                 stat3++;
                 underMaxStatsCount -= (stat3 == maxStat) ? 1 : 0;
             }
@@ -207,7 +206,6 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
 
     private void generateNodes(int number) {
 
-        //TODO make starting positions first
 
         Random rand = new Random();
         double x = rand.nextDouble()*400 + 50;
@@ -248,7 +246,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
             temp = temp.next();
         }*/
         temp = trackHead;
-        do{
+        do {
             System.out.println(temp);
             temp = temp.next();
         } while (temp != trackHead );

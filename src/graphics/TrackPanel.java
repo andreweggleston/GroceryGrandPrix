@@ -25,10 +25,11 @@ import java.util.List;
  */
 public class TrackPanel extends JPanel {
 
-    List<Line2D.Double> trackSegments;
-    Car[] cars;
-    BufferedImage[] carImages;
-    BasicStroke roadStroke;
+    private List<Line2D.Double> trackSegments;
+    private Car[] cars;
+    private BufferedImage[] carImages;
+    private BasicStroke roadStroke;
+    private final int carOffset = 8;
 
     /**
      * Generates a new TrackPanel, reading each Car's imageName and reading the sprites with the corresponding name in
@@ -111,7 +112,7 @@ public class TrackPanel extends JPanel {
         }
 
         //draw cars, offset from the center of the track
-        for (int i = 0; i < cars.length; i++) {
+        for (int i = cars.length - 1; i >= 0; i--) {
             Car car = cars[i];
             int carOffsetModifier = 0;
             //cars.length indicates the round of the game
@@ -145,7 +146,8 @@ public class TrackPanel extends JPanel {
             rotateOp.filter(image, rotatedImage);
 
             //paint the rotated car, at the position on the track with the offset indicated
-            g2.drawImage(rotatedImage, Math.round((float)((carCoord.getX()-(width/2))+((carOffsetModifier)*7*cosine))), Math.round((float) ((carCoord.getY()-(height/2))+((carOffsetModifier)*7*sine))), null);
+            g2.drawImage(rotatedImage, Math.round((float)((carCoord.getX()-(width/2))+((carOffsetModifier)*carOffset*cosine))),
+                    Math.round((float) ((carCoord.getY()-(height/2))+((carOffsetModifier)*carOffset*sine))), null);
         }
 
     }
