@@ -7,10 +7,8 @@ public class Node {
     private double angle;
     private double distance;
     private Node next;
-    private int trackX;
-    private int trackY;
 
-    public Node(double x, double y, int trackX, int trackY){
+    public Node(double x, double y){
         this.coord.x = x;
         this.coord.y = y;
         setNext(this);
