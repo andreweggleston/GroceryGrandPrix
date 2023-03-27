@@ -46,7 +46,7 @@ public class Car {
     public Car() {
         this.imageName = "Uninitialized";
         this.stats = new CarStats(0, 0, 0);
-        Node n = new Node(0, 0, 1280, 900);
+        Node n = new Node(0, 0);
         this.goalNode = n;
         this.lastNode = n;
         this.momentum = 0.0;
