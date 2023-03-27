@@ -16,18 +16,34 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * TrackPanel is a JPanel responsible for painting the track and the Cars on the track.
+ * It keeps a reference to all of the {@link Car}s in the game as an array, and creates its own List of {@link Line2D}s
+ * which represent the sections of road between each node.
+ * TrackPanel also has an array of each Car's images,
+ * which are read from the filesystem using {@link Car#getImageName()}.
+ */
 public class TrackPanel extends JPanel {
 
-    List<Line2D.Double> trackSegments;
-    Car[] cars;
-    BufferedImage[] carImages;
-    BasicStroke roadStroke;
+    private List<Line2D.Double> trackSegments;
+    private Car[] cars;
+    private BufferedImage[] carImages;
+    private BasicStroke roadStroke;
+    private final int carOffset = 8;
 
-
+    /**
+     * Generates a new TrackPanel, reading each Car's imageName and reading the sprites with the corresponding name in
+     * as a {@link BufferedImage}.
+     * This constructor creates the trackSegments as well as loads the sprite images for each car.
+     * @param head the start of the track.
+     * @param cars list of cars to render in the panel
+     */
     public TrackPanel(Node head, List<Car> cars) {
         super(true);
         trackSegments = new ArrayList<>();
         this.setVisible(true);
+
+        //Create Track segments
         Node temp = head;
         do {
             Point2D p1 = temp.getCoord();
@@ -35,6 +51,8 @@ public class TrackPanel extends JPanel {
             Point2D p2 = temp.getCoord();
             trackSegments.add(new Line2D.Double(p1, p2));
         } while (temp != head);
+
+        //Load Car sprites
         this.cars = new Car[cars.size()];
         this.carImages = new BufferedImage[cars.size()];
         for (int i = 0; i < cars.size(); i++) {
@@ -56,9 +74,19 @@ public class TrackPanel extends JPanel {
                 throw new RuntimeException(e);
             }
         }
+
         roadStroke = new BasicStroke(80, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
     }
 
+    /**
+     * Calculates the Point2D at which Car is currently at.
+     * Uses the location of the Car's last node as well as the Car's distance from that node.
+     *
+     * THIS IS STATIC BECAUSE IT DOES NOT USE ANY STATE IN TRACKPANEL. IT COULD BE A PUBLIC METHOD IN A UTIL CLASS,
+     * BUT IT IS UNUSED ANYWHERE ELSE.
+     * @param car car to calculate position of
+     * @return Point2D representing the on-screen position of that car.
+     */
     private static Point2D calculateCoord(Car car) {
         Node lastNode = car.getLastNode();
         double xOffset = car.getDistanceFromLast() * Math.cos(lastNode.getAngle());
@@ -66,19 +94,28 @@ public class TrackPanel extends JPanel {
         return new Point2D.Double(lastNode.getCoord().x + xOffset, lastNode.getCoord().y + yOffset);
     }
 
+    /**
+     * Paint method
+     * @param g the <code>Graphics</code> object to protect
+     */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         RenderingHints antiAliasing = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHints(antiAliasing);
+
+        //Draw track segments
         g2.setStroke(roadStroke);
         for (Line2D.Double segment : trackSegments) {
             g2.draw(segment);
         }
-        for (int i = 0; i < cars.length; i++) {
+
+        //draw cars, offset from the center of the track
+        for (int i = cars.length - 1; i >= 0; i--) {
             Car car = cars[i];
             int carOffsetModifier = 0;
+            //cars.length indicates the round of the game
             switch (cars.length) {
                 case 4:
                     carOffsetModifier = (i >= 2) ? i - 1 : i - 2;
@@ -89,8 +126,12 @@ public class TrackPanel extends JPanel {
                 case 2:
                     carOffsetModifier = (i == 1) ? i + 1 : i - 2;
             }
+
+            //get the 2d position on-screen of the car
             Point2D carCoord = calculateCoord(car);
             BufferedImage image = carImages[i];
+
+            //rotate the car image
             final double radians = car.getLastNode().getAngle() + Math.PI/2;
             final double sine = Math.sin(radians);
             final double cosine = Math.cos(radians);
@@ -103,7 +144,10 @@ public class TrackPanel extends JPanel {
             at.translate(-image.getWidth() / 2, -image.getHeight() / 2);
             final AffineTransformOp rotateOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
             rotateOp.filter(image, rotatedImage);
-            g2.drawImage(rotatedImage, Math.round((float)((carCoord.getX()-(width/2))+((carOffsetModifier)*7*cosine))), Math.round((float) ((carCoord.getY()-(height/2))+((carOffsetModifier)*7*sine))), null);
+
+            //paint the rotated car, at the position on the track with the offset indicated
+            g2.drawImage(rotatedImage, Math.round((float)((carCoord.getX()-(width/2))+((carOffsetModifier)*carOffset*cosine))),
+                    Math.round((float) ((carCoord.getY()-(height/2))+((carOffsetModifier)*carOffset*sine))), null);
         }
 
     }

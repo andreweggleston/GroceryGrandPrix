@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class GUI extends JFrame implements MouseListener {
     private int gameWidth, gameHeight, windowWidth, windowHeight, cardWidth, cardHeight;
@@ -22,7 +23,8 @@ public class GUI extends JFrame implements MouseListener {
     private Color backgroundColor, foregroundColor;
     private final Font menuFontPLAIN = new Font("Calibri", Font.PLAIN, 18);
     private final Font menuFontBOLD = new Font("Calibri", Font.BOLD, 22);
-
+    private final Font menuFontMED = new Font("Calibri", Font.BOLD, 18);
+    private final Font menuFontBEEG = new Font("Calibri", Font.BOLD, 36);
     private HashMap<String, BufferedImage> images;
     private JLabel[] thumbLabels;
     private ArrayList<JPanel> cards, thumbnails;
@@ -100,16 +102,22 @@ public class GUI extends JFrame implements MouseListener {
                 switch (slider.getName()) {
                     case "spd" :
                         speedSlider = slider;
+                        speedSlider.setPaintTicks(true);
+                        speedSlider.setMajorTickSpacing(1);
                         speedSlider.setBackground(backgroundColor);
-                    break;
+                        break;
                     case "acc" :
                         accelerationSlider = slider;
+                        accelerationSlider.setPaintTicks(true);
+                        accelerationSlider.setMajorTickSpacing(1);
                         accelerationSlider.setBackground(backgroundColor);
-                    break;
+                        break;
                     case "han":
                         handlingSlider = slider;
+                        handlingSlider.setPaintTicks(true);
+                        handlingSlider.setMajorTickSpacing(1);
                         handlingSlider.setBackground(backgroundColor);
-                    break;
+                        break;
                 }
             }
         }
@@ -232,7 +240,7 @@ public class GUI extends JFrame implements MouseListener {
         uiGrid.add(lastPreviewButton, menuConstraints);
 
         nameLabel = new JLabel("", JLabel.CENTER);
-        nameLabel.setFont(menuFontBOLD);
+        nameLabel.setFont(menuFontBEEG);
         nameLabel.setForeground(foregroundColor);
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.insets = vertical5_10;
@@ -366,7 +374,10 @@ public class GUI extends JFrame implements MouseListener {
     }
 
     public void createPreviewCards(ArrayList <Car> cars) {
+
         Color cardColor = new Color(190, 198, 211);
+        Color[] statColors = new Color[]{new Color(255, 0, 255), new Color(255, 68, 0), new Color(251, 95, 28), new Color(224, 114, 40), new Color(201, 141, 51), new Color(206, 166, 51), new Color(167, 176, 62), new Color(133, 183, 80), new Color(104, 197, 98), new Color(28, 251, 135), new Color(0, 255, 183)};
+        int unitWidth = (cardWidth-40)/10;
         cards = new ArrayList<JPanel>();
         thumbnails = new ArrayList<JPanel>();
         previewCards = new JPanel();
@@ -379,11 +390,9 @@ public class GUI extends JFrame implements MouseListener {
 
         thumbLabels = new JLabel[cars.size()];
 
-        GridBagConstraints thumbConstraints = new GridBagConstraints();
-        thumbConstraints.insets = new Insets(0,0,0,0);
-        thumbConstraints.anchor = GridBagConstraints.SOUTH;
-        thumbConstraints.weighty = 1.0;
+        GridBagConstraints cardConstraints = new GridBagConstraints();
         for(Car car : cars){
+            System.out.println("spd: " + car.getTopSpeed() + " acc: " + car.getAcceleration() + " han: " + car.getHandling());
             String img = car.getImageName();
             cards.add(cars.indexOf(car), new JPanel(new BorderLayout()));
 
@@ -394,84 +403,144 @@ public class GUI extends JFrame implements MouseListener {
 
             //Process thumbnail from image
             float thumbScale = ((float)(120))/((float)((images.get(img).getHeight())));
-
             thumbLabels[cars.indexOf(car)] = new JLabel(getScaledIcon(car.getImageName(), thumbScale));
 
             thumbnails.add(cars.indexOf(car), new JPanel());
             thumbnails.get(cars.indexOf(car)).setLayout(new GridBagLayout());
             thumbnails.get(cars.indexOf(car)).setBackground(foregroundColor);//leave as foreground
-            thumbnails.get(cars.indexOf(car)).add(thumbLabels[cars.indexOf(car)], new GridBagConstraints());
+            cardConstraints.insets = new Insets(0,0,0,0);
+            cardConstraints.anchor = GridBagConstraints.SOUTH;
+            cardConstraints.weightx = 0;
+            cardConstraints.weighty = 1.0;
+            thumbnails.get(cars.indexOf(car)).add(thumbLabels[cars.indexOf(car)], cardConstraints);
             thumbnails.get(cars.indexOf(car)).setPreferredSize(new Dimension(300, 120));
             thumbnails.get(cars.indexOf(car)).setMaximumSize(new Dimension(300, 120));
 
             JPanel licensePlate = new JPanel();
             licensePlate.setBackground(cardColor);
-            JLabel plateName = new JLabel(car.getImageName());
-            plateName.setFont(menuFontPLAIN);
+            JLabel plateName = new JLabel(car.getImageName().toUpperCase());
+            plateName.setFont(menuFontMED);
             licensePlate.add(plateName);
 
             JPanel speedBar = new JPanel();
-            speedBar.setBackground(Color.MAGENTA);
+            Dimension speedLength = new Dimension((unitWidth*car.getTopSpeed()), 3);
+            //Box.Filler speedFiller = new Box.Filler(speedLength, speedLength, speedLength);
+            Component speedFiller = Box.createHorizontalStrut(unitWidth*car.getTopSpeed());
+            speedBar.add(speedFiller);
+            speedBar.setMaximumSize(speedLength);
+            speedBar.setBackground(statColors[car.getTopSpeed()]);
+            speedBar.setToolTipText(car.getTopSpeed() + " TOP SPEED");
+
+            Dimension speedSpacerLength = new Dimension((unitWidth*(10-car.getTopSpeed())), 3);
+            //Box.Filler speedSpacer = new Box.Filler(speedSpacerLength, speedSpacerLength, speedSpacerLength);
+            Component speedSpacer = Box.createHorizontalStrut(unitWidth*(10-car.getTopSpeed()));
+            JPanel speedBarSpacer = new JPanel();
+            speedBarSpacer.add(speedSpacer);
+            speedBarSpacer.setMaximumSize(speedSpacerLength);
+            speedBarSpacer.setBackground(cardColor);
 
             JPanel accelerationBar = new JPanel();
-            accelerationBar.setBackground(Color.CYAN);
+            Dimension accelerationLength = new Dimension((unitWidth*car.getAcceleration()), 3);
+            //Box.Filler accelerationFiller = new Box.Filler(accelerationLength, accelerationLength, accelerationLength);
+            Component accelerationFiller = Box.createHorizontalStrut(unitWidth*car.getAcceleration());
+            accelerationBar.add(accelerationFiller);
+            accelerationBar.setMaximumSize(accelerationLength);
+            accelerationBar.setBackground(statColors[car.getAcceleration()]);
+            accelerationBar.setToolTipText(car.getAcceleration() + " ACCELERATION");
+
+            Dimension accelerationSpacerLength = new Dimension((unitWidth*(10-car.getAcceleration())), 3);
+            //Box.Filler accelerationSpacer = new Box.Filler(accelerationSpacerLength, accelerationSpacerLength, accelerationSpacerLength);
+            Component accelerationSpacer = Box.createHorizontalStrut(unitWidth*(10-car.getAcceleration()));
+            JPanel accelerationBarSpacer = new JPanel();
+            accelerationBarSpacer.add(accelerationSpacer);
+            accelerationBarSpacer.setMaximumSize(accelerationSpacerLength);
+            accelerationBarSpacer.setBackground(cardColor);
 
             JPanel handlingBar = new JPanel();
-            handlingBar.setBackground(Color.GREEN);
+            Dimension handlingLength = new Dimension((unitWidth*car.getHandling()), 3);
+            //Box.Filler handlingFiller = new Box.Filler(handlingLength, handlingLength, handlingLength);
+            Component handlingFiller = Box.createHorizontalStrut(unitWidth*car.getHandling());
+            handlingBar.add(handlingFiller);
+            handlingBar.setMaximumSize(handlingLength);
+            handlingBar.setBackground(statColors[car.getHandling()]);
+            handlingBar.setToolTipText(car.getHandling() + " HANDLING");
 
-            JPanel spacerBar = new JPanel();
-            spacerBar.setBackground(cardColor);
+            Dimension handlingSpacerLength = new Dimension ((unitWidth*(10-car.getHandling())), 3);
+            //Box.Filler handlingSpacer = new Box.Filler(handlingSpacerLength, handlingSpacerLength, handlingSpacerLength);
+            Component handlingSpacer = Box.createHorizontalStrut(unitWidth*(10-car.getHandling()));
+            JPanel handlingBarSpacer = new JPanel();
+            handlingBarSpacer.add(handlingSpacer);
+            handlingBarSpacer.setMaximumSize(handlingSpacerLength);
+            handlingBarSpacer.setBackground(cardColor);
 
             JPanel statsDisplay = new JPanel();
-            statsDisplay.setLayout(new GridLayout(3, 10, 2, 7));
+            statsDisplay.setLayout(new GridBagLayout());
             statsDisplay.setBackground(cardColor);
 
-            int spd = car.getTopSpeed();
-            for(int i = 0; i<10; i++){
-                if((spd-i)>0){
-                    statsDisplay.add(speedBar);
-                }else{
-                    statsDisplay.add(spacerBar);
-                }
-            }
+            cardConstraints.insets = new Insets(0,0,3,0);
+            cardConstraints.anchor = GridBagConstraints.WEST;
+            cardConstraints.fill = GridBagConstraints.HORIZONTAL;
+            //speed fill
+            cardConstraints.gridx = 0;
+            cardConstraints.gridy = 0;
+            cardConstraints.gridwidth = car.getTopSpeed();
+            cardConstraints.weighty = 0;
+            statsDisplay.add(speedBar, cardConstraints);
 
-            int acc = car.getAcceleration();
-            for(int i = 0; i<10; i++){
-                if((acc-i)>0){
-                    statsDisplay.add(accelerationBar);
-                }else{
-                    statsDisplay.add(spacerBar);
-                }
-            }
+            //acceleration fill
+            cardConstraints.gridx = 0;
+            cardConstraints.gridy = 1;
+            cardConstraints.gridwidth = car.getAcceleration();
+            cardConstraints.weighty = 0;
+            statsDisplay.add(accelerationBar, cardConstraints);
 
-            int han = car.getHandling();
-            for(int i = 0; i<10; i++){
-                if((han-i)>0){
-                    statsDisplay.add(handlingBar);
-                }else{
-                    statsDisplay.add(spacerBar);
-                }
-            }
+            //handling fill
+            cardConstraints.gridx = 0;
+            cardConstraints.gridy = 2;
+            cardConstraints.gridwidth = car.getHandling();
+            cardConstraints.weighty = 0;
+            statsDisplay.add(handlingBar, cardConstraints);
+
+
+            //speed spacer
+            cardConstraints.gridx = car.getTopSpeed();
+            cardConstraints.gridy = 0;
+            cardConstraints.gridwidth = 10-car.getTopSpeed();
+            cardConstraints.weighty = 0;
+            statsDisplay.add(speedBarSpacer, cardConstraints);
+
+            //acceleration spacer
+            cardConstraints.gridx = car.getAcceleration();
+            cardConstraints.gridy = 1;
+            cardConstraints.gridwidth = 10-car.getAcceleration();
+            cardConstraints.weighty = 0;
+            statsDisplay.add(accelerationBarSpacer, cardConstraints);
+            //handling spacer
+            cardConstraints.gridx = car.getHandling();
+            cardConstraints.gridy = 2;
+            cardConstraints.gridwidth = 10-car.getHandling();
+            cardConstraints.weighty = 0;
+            statsDisplay.add(handlingBarSpacer, cardConstraints);
 
             JPanel previewCenter = new JPanel();
             previewCenter.setLayout(new BoxLayout(previewCenter, BoxLayout.Y_AXIS));
             previewCenter.add(thumbnails.get(cars.indexOf(car)));
             previewCenter.setBackground(cardColor);
-            previewCenter.add(licensePlate);//(new Box.Filler((new Dimension(cardWidth, 20)), (new Dimension(cardWidth, 20)), (new Dimension(cardWidth, 20))));
+            previewCenter.add(licensePlate);
             previewCenter.add(statsDisplay);
 
-            cards.get(cars.indexOf(car)).add(new Box.Filler((new Dimension(cardWidth, 20)), (new Dimension(cardWidth, 20)), (new Dimension(cardWidth, 20))), BorderLayout.NORTH);
+            cards.get(cars.indexOf(car)).add(Box.createHorizontalStrut(20), BorderLayout.NORTH);
             cards.get(cars.indexOf(car)).add(previewCenter, BorderLayout.CENTER);
-            cards.get(cars.indexOf(car)).add(new Box.Filler((new Dimension(20, cardHeight-40)), (new Dimension(20, cardHeight-40)), (new Dimension(20, cardHeight-40))), BorderLayout.WEST);
-            cards.get(cars.indexOf(car)).add(new Box.Filler((new Dimension(20, cardHeight-40)), (new Dimension(20, cardHeight-40)), (new Dimension(20, cardHeight-40))), BorderLayout.EAST);
-            cards.get(cars.indexOf(car)).add(new Box.Filler((new Dimension(cardWidth, 8)), (new Dimension(cardWidth, 8)), (new Dimension(cardWidth, 8))), BorderLayout.SOUTH);
+            cards.get(cars.indexOf(car)).add(Box.createVerticalStrut(20), BorderLayout.WEST);
+            cards.get(cars.indexOf(car)).add(Box.createVerticalStrut(20), BorderLayout.EAST);
+            cards.get(cars.indexOf(car)).add(Box.createHorizontalStrut(8), BorderLayout.SOUTH);
             previewCards.add(cards.get(cars.indexOf(car)), car);
         }
     }
 
     public void changePreviewDisplay(String name){
         previewName = name;
-        nameLabel.setText(previewName);
+        nameLabel.setText(previewName.toUpperCase());
         previewLabel.setIcon(getScaledIcon(previewName, previewScale));
         uiGrid.revalidate();
     }
@@ -495,6 +564,7 @@ public class GUI extends JFrame implements MouseListener {
         game.removeAll();
         game.add(previewCards, BorderLayout.WEST);
         game.add(track, BorderLayout.CENTER);
+        track.addMouseListener(this);
         this.setContentPane(game);
         this.pack();
         this.revalidate();
@@ -504,55 +574,95 @@ public class GUI extends JFrame implements MouseListener {
 
     /**
      * Shows the results of every race after it has been concluded and prompts the user to continue the game.
-     * @param placedCars The list of Cars in order from 1st to last.
-     * @param raceTime How much time the race took in seconds as a double.
+     * @param placedCars The list of Cars in order from 1st to last in the previous race.
+     * @param raceTime How much time the race took in seconds.
      * @return A boolean indicated whether the user would like to continue the game.
      */
-    public boolean showResults(ArrayList<Car> placedCars, double raceTime) {
+    public boolean showResults(ArrayList<Car> placedCars, int raceTime) {
         boolean userContinue;
+        int i;
         int playerPlacement = 0;
-        Car lastCar = placedCars.get(placedCars.size()-1);
+        float placementScale;
+        boolean gameWon;
+        GridLayout placementGrid = new GridLayout(2, placedCars.size());
+        String carName;
+        Car lastCar = placedCars.get(placedCars.size() - 1);
         JPanel results = new JPanel();
         results.setLayout(new BoxLayout(results, BoxLayout.Y_AXIS));
-        JPanel statsHeaderPanel = new JPanel();
-        JPanel headerPanel = new JPanel();
-        JPanel placementPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 75, 0));
-        JPanel imagePanel = new JPanel();
-        JPanel loserPanel = new JPanel();
-        JPanel promptPanel = new JPanel();
-        JTextArea header = new JTextArea();
+        results.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JPanel placementPanel = new JPanel(placementGrid);
+
+        JLabel playerPositionLabel = new JLabel();
+        playerPositionLabel.setMinimumSize(new Dimension(400, 0));
+        playerPositionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel raceTimeLabel = new JLabel();
+        raceTimeLabel.setMinimumSize(new Dimension(400, 0));
+        raceTimeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel playerWinLabel = new JLabel();
+        playerWinLabel.setMinimumSize(new Dimension(400, 0));
+        playerWinLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel loserLabel = new JLabel();
+        loserLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         JLabel promptLabel = new JLabel();
+        promptLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         Font messageFont = new Font(Font.SANS_SERIF, Font.BOLD, 24);
 
-        header.setTabSize(3);
-        header.setEditable(false);
-        header.setFont(messageFont);
-        header.setBackground(headerPanel.getBackground());
-
+        playerPositionLabel.setFont(messageFont);
+        raceTimeLabel.setFont(messageFont);
         loserLabel.setFont(messageFont);
         promptLabel.setFont(messageFont);
 
         // Find the position that the player finished the race.
-        for (int i = 0; i < placedCars.size(); i++) {
+        for (i = 0; i < placedCars.size(); i++) {
             if (placedCars.get(i).isPlayer()) playerPlacement = i + 1;
         }
 
-        // If player beat the game show their stats and wrap up run.
-        if (placedCars.size() == 2 && playerPlacement == 1) {
-            Car player = placedCars.get(0);
+        gameWon = placedCars.size() == 2 && playerPlacement == 1;
 
-            header.setText("\t\tYou win!\nThe final race lasted " + raceTime + " seconds.");
-            JLabel statsHeader = new JLabel("Your winning car is:");
-            statsHeader.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
-            JLabel stats = new JLabel("Spd-" + player.getTopSpeed() + " Acc-" + player.getAcceleration() + " Han-" + player.getHandling());
-            stats.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
-            Sprite playerSprite = new Sprite("bikenana", 1);
+        // If player beat the game show their stats and wrap up run.
+        if (gameWon) {
+            Car player = placedCars.get(0);
+            Car opponent = placedCars.get(1);
+            carName = player.getImageName();
+            placementPanel.setLayout(new BoxLayout(placementPanel, BoxLayout.Y_AXIS));
+            placementPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            playerPositionLabel.setText("You win!");
+            playerPositionLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 40));
+            raceTimeLabel.setText("The final race lasted " + raceTime + " seconds.");
+            playerWinLabel.setText("Your winning car is:");
+            playerWinLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 32));
+
+            JLabel playerStats = new JLabel("Spd-" + player.getTopSpeed() + " Acc-" + player.getAcceleration() + " Han-" + player.getHandling());
+            playerStats.setAlignmentX(Component.CENTER_ALIGNMENT);
+            playerStats.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 32));
+
+            placementScale = ((float)(80))/((float)((images.get(carName).getHeight())));
+            JLabel playerImageLabel = new JLabel();
+            playerImageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            playerImageLabel.setIcon(getScaledIcon(carName, placementScale));
+
+            carName = opponent.getImageName();
+            placementScale = ((float)(60))/((float)((images.get(carName).getHeight())));
+            JLabel opponentImageLabel = new JLabel();
+            opponentImageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            opponentImageLabel.setIcon(getScaledIcon(carName, placementScale));
+
+            JLabel loserStats = new JLabel("Spd-" + opponent.getTopSpeed() + " Acc-" + opponent.getAcceleration() + " Han-" + opponent.getHandling());
+            loserStats.setAlignmentX(Component.CENTER_ALIGNMENT);
+            loserStats.setFont(messageFont);
+
+            loserLabel.setText("The car you bested was:");
+
             promptLabel.setText("Would you like to try another run?");
 
-            statsHeaderPanel.add(statsHeader);
-            placementPanel.add(stats);
-            imagePanel.add(playerSprite);
+            placementPanel.add(playerWinLabel);
+            placementPanel.add(playerImageLabel);
+            placementPanel.add(playerStats);
+            placementPanel.add(Box.createVerticalStrut(50));
+            placementPanel.add(loserLabel);
+            placementPanel.add(opponentImageLabel);
+            placementPanel.add(loserStats);
         }
         else {
             String placementSuffix;
@@ -571,35 +681,39 @@ public class GUI extends JFrame implements MouseListener {
                     placementSuffix = "th";
             }
 
-            header.setText("\t You placed " + playerPlacement + placementSuffix + ".\nThe race lasted " + raceTime + " seconds.");
+            playerPositionLabel.setText("You placed " + playerPlacement + placementSuffix);
+            raceTimeLabel.setText("The race lasted " + raceTime + " seconds.");
+            loserLabel.setText(((playerPlacement == placedCars.size()) ? "You lost. Your" : lastCar.getImageName() + "'s") + " ending stats were: " +
+                    "Spd-" + lastCar.getTopSpeed() + ", Acc-" + lastCar.getAcceleration() + ", Han-" + lastCar.getHandling());
             // Change the message shown in the prompt label to reflect if the player has lost.
             promptLabel.setText((playerPlacement == placedCars.size()) ? "Try again?" : "Do you want to continue to the next round?");
 
-            // Add every car's sprite and the corresponding placement in the prior race to panels.
-            for (int i = 0; i < placedCars.size(); i++) {
-                JLabel nextRanking = new JLabel(Integer.toString(i + 1));
-                Sprite nextSprite = new Sprite("bikenana", 1);
-                nextRanking.setFont(new Font(Font.SANS_SERIF, Font.BOLD, (int) (nextSprite.getPreferredSize().getWidth() * 3) / 4));
 
-                placementPanel.add(nextRanking);
-                imagePanel.add(nextSprite);
+
+            // Add every Car's preview image and the corresponding placement in the prior race to panels.
+            for (i = 0; i < placedCars.size(); i++) {
+                // Getting Cars in opposing order from labels to accommodate GridLayouts format.
+                carName = placedCars.get((placedCars.size() - i) - 1).getImageName();
+                placementScale = ((float)(80))/((float)((images.get(carName).getHeight())));
+
+                JLabel nextImageLabel = new JLabel("", JLabel.CENTER);
+                nextImageLabel.setIcon(getScaledIcon(carName, placementScale));
+
+                JLabel rankingLabel = new JLabel("#" + (i + 1), JLabel.CENTER);
+                rankingLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, (int)(nextImageLabel.getPreferredSize().getHeight() * 3 / 4)));
+
+                placementPanel.add(nextImageLabel, 0, i);
+                placementPanel.add(rankingLabel, 1, i);
+
             }
         }
-        // Change the message shown in the loser label to reflect if the player has lost.
-        loserLabel.setText(((playerPlacement == placedCars.size()) ? "You lost. Your" : "Last place's") + " ending stats were: " +
-                "Spd-" + lastCar.getTopSpeed() + ", Acc-" + lastCar.getAcceleration() + ", Han-" + lastCar.getHandling());
 
-        headerPanel.add(header);
-        loserPanel.add(loserLabel);
-        promptPanel.add(promptLabel);
-
-        results.add(headerPanel);
-        // Adds an empty panel when the player did not win the tournament.
-        results.add(statsHeaderPanel);
+        results.add(playerPositionLabel);
+        results.add(raceTimeLabel);
         results.add(placementPanel);
-        results.add(imagePanel);
-        results.add(loserPanel);
-        results.add(promptPanel);
+        if (!gameWon) results.add(loserLabel);
+        results.add(Box.createVerticalStrut(25));
+        results.add(promptLabel);
 
         // Show all the components in the form of a ConfirmDialog. Save the user response as a boolean (false if no).
         userContinue = JOptionPane.showConfirmDialog(this, results, "Race Results", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE) != 1;
@@ -608,6 +722,7 @@ public class GUI extends JFrame implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        System.out.println(Math.atan2(e.getY() - gameBounds.getHeight()/2, e.getX() - gameBounds.getWidth()/2));
     }
 
     @Override
@@ -620,14 +735,14 @@ public class GUI extends JFrame implements MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        switch (((JButton) e.getSource()).getActionCommand()) {
+        /*switch (((JButton) e.getSource()).getActionCommand()) {
             case "Speed Help":
                 break;
             case "Acceleration Help":
                 break;
             case "Handling Help":
                 break;
-        }
+        }*/
     }
 
     @Override
