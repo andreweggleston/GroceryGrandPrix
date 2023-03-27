@@ -100,7 +100,11 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         HashMap<String, BufferedImage> previewMap = new HashMap<String, BufferedImage>();
         for (int i = 0; i < previewFiles.length; i++) {
             carNames[i] = previewFiles[i].getName().split("_")[1];
-            previewMap.put(carNames[i], ImageIO.read(previewFiles[i]));
+            BufferedImage readImage = ImageIO.read(previewFiles[i]);
+            if (readImage == null) {
+                throw new IOException(String.format("Image %s failed to read. Are you sure it is an image?", previewFiles[i]));
+            }
+            previewMap.put(carNames[i], readImage);
             //System.out.println("Name " + (i+1) + ": " + carNames[i] + "\n");
         }
         return previewMap;
