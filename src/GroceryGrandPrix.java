@@ -212,10 +212,10 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         Random rand = new Random();
         double x = rand.nextDouble()*400 + 50;
         double y = rand.nextDouble()*200 + 50;
-        trackHead = new Node(x, y, trackX, trackY);
-        trackHead.setNext(new Node(x+125, y, trackX, trackY));
-        trackHead.next().setNext(new Node(x+250, y, trackX, trackY));
-        trackHead.next().next().setNext(new Node(x+375, y, trackX, trackY));
+        trackHead = new Node(x, y);
+        trackHead.setNext(new Node(x+125, y));
+        trackHead.next().setNext(new Node(x+250, y));
+        trackHead.next().next().setNext(new Node(x+375, y));
         Node temp = trackHead.next().next().next();
         for (int i = 0; i < number-1; i++) {
             do {
