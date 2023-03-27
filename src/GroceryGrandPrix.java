@@ -127,7 +127,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                 gui.repaint();
             } else {
                 gameLoop.stop();
-                boolean continueGame = gui.showResults(carPlacements,  (timeElapsedMs /1000.0));
+                boolean continueGame = gui.showResults(carPlacements,  (int)(timeElapsedMs /1000.0));
                 Car lastCar = carPlacements.get(carPlacements.size() - 1);
 
                 if (continueGame) {
