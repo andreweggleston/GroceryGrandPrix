@@ -252,8 +252,6 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     }
 
     private void generateNodes(int number) {
-
-
         Random rand = new Random();
         double x = rand.nextDouble()*400 + 50;
         double y = rand.nextDouble()*200 + 50;
@@ -284,16 +282,10 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                 }
                 failsafe -= 1;
                 //Checks new quadrant below:
-                temp.setNext(new Node(x, y, trackHead, temp, trackX, trackY));
+                temp.setNext(new Node(x, y, trackHead, temp));
             }while (((temp.distanceToNext() < 250 && failsafe > 995)|| temp.turn() > 2) && failsafe>0); //Puts a cap on how sharp the turns can be
             temp = temp.next();
         }
-        /*for (int i = 0; i < number-1; i++) {
-            x = rand.nextDouble()*800 + 50;
-            y = rand.nextDouble()*400 + 50;
-            temp.setNext(new shared.Node(x, y, head));
-            temp = temp.next();
-        }*/
         temp = trackHead;
         do {
             System.out.println(temp);

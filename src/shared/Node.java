@@ -15,7 +15,7 @@ public class Node {
         setNext(this);
         last = this;
     }
-    public Node(double x, double y, Node n, Node l, int trackX, int trackY){
+    public Node(double x, double y, Node n, Node l){
         this.coord.x = x;
         this.coord.y = y;
         setNext(n);
