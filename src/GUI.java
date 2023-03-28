@@ -4,6 +4,16 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * GUI is a subclass of JFrame that is responsible for showing the game window.
+ * It keeps track of multiple JPanels, and places them in the frame in accordance to the requirements.
+ * <p>
+ * GUI also keeps track of any interactive components like buttons or sliders and sets up any extra settings on them
+ * (like text, tick marks for sliders, and tooltips).
+ * <p>
+ * GUI is called by and is a member of {@link GroceryGrandPrix}. All public methods of GUI are only called by
+ * GroceryGrandPrix
+ */
 public class GUI extends JFrame{
     private int gameWidth, gameHeight, frameWidth, frameHeight, cardWidth, cardHeight;
     private float previewScale;
