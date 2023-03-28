@@ -1,4 +1,4 @@
-//Phoenix Ganz-Ratzat, Lee Snyer
+//Phoenix Ganz-Ratzat
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -254,7 +254,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         return new int[]{stat1, stat2, stat3};
     }
 
-    /**
+    /**Lee Snyder
      * Procedurally generates a double linked-list of Node objects.
      * Each node moves clock-wise from one node to the next.
      * @param number The number of Nodes to be created.
