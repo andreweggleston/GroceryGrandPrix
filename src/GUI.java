@@ -28,7 +28,15 @@ public class GUI extends JFrame{
     public GUI(){
         this("Untitled Racing Game", new JComponent[]{}, new HashMap<String, BufferedImage>(), 800, 600);
     }
-    //constructor called by GroceryGrandPrix
+
+    /**
+     * GUI constructor called by Grand Prix
+     * @param title Title of the window
+     * @param inputs array of interactive components (buttons and sliders)
+     * @param images map from car names to loaded bufferedimages
+     * @param width width of the frame to create
+     * @param height height of the frame to create
+     */
     public GUI(String title, JComponent[] inputs, HashMap<String, BufferedImage> images, int width, int height){
         super(title);
 
@@ -68,6 +76,11 @@ public class GUI extends JFrame{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    /**
+     * sets up buttons and sliders to look correct and to have proper names
+     * also sets up tooltips on sliders and point budget
+     * @param inputs interactive components to set attributes on
+     */
     private void initializeMenuComponents(JComponent[] inputs) {
         GridBagConstraints buttonConstraints = new GridBagConstraints();
         buttonConstraints.insets = new Insets(0,20,0,20);
@@ -195,12 +208,19 @@ public class GUI extends JFrame{
                 + "</html>");
     }
 
+    /**
+     * Swaps out the current content pane with the stat picking menu JPanel
+     */
     public void switchToPlayerMenu() {
         setContentPane(menu);
         this.pack();
         this.revalidate();
     }
 
+    /**
+     * Initializes the player stat picking menu JPanel
+     * @param budget amount of points to start with
+     */
     public void playerMenu(int budget) {
         GridBagConstraints menuConstraints = new GridBagConstraints();
         menu.setPreferredSize(windowBounds);
@@ -368,6 +388,14 @@ public class GUI extends JFrame{
         menu.add(previewWindow, BorderLayout.CENTER);
     }
 
+    /**
+     * updates the tooltips for the stat sliders
+     * @param topSpeed new topspeed settings
+     * @param acceleration new acceleration setting
+     * @param handling new handling setting
+     * @param budget new budget
+     * @param updateSliders whether to update the sliders
+     */
     public void updateStatLabels(int topSpeed, int acceleration, int handling, int budget, boolean updateSliders) {
         speedLabel.setText("Top Speed: " + topSpeed);
         accelerationLabel.setText("Acceleration: " + acceleration);
@@ -381,6 +409,10 @@ public class GUI extends JFrame{
         }
     }
 
+    /**
+     * initializes the preview cars (on the left side of the track screen)
+     * @param cars list of cars to initialize preview cards with
+     */
     public void createPreviewCards(ArrayList<Car> cars) {
 
         Color cardColor = new Color(190, 198, 211);
@@ -540,6 +572,10 @@ public class GUI extends JFrame{
         }
     }
 
+    /**
+     * changes the selected car on the player stat picking menu
+     * @param name name of the car to change preview to
+     */
     public void changePreviewDisplay(String name) {
         previewName = name;
         nameLabel.setText(previewName.toUpperCase());
@@ -547,6 +583,12 @@ public class GUI extends JFrame{
         uiGrid.revalidate();
     }
 
+    /**
+     * scales the selected car image and returns it as an ImageIcon
+     * @param name name of the car preview image to scale
+     * @param scaleFactor factor to scale by
+     * @return ImageIcon of the scaled image
+     */
     private ImageIcon getScaledIcon(String name, float scaleFactor) {
         int iconX = (int) (images.get(name).getWidth() * scaleFactor);
         int iconY = (int) (images.get(name).getHeight() * scaleFactor);
@@ -559,6 +601,12 @@ public class GUI extends JFrame{
         return new ImageIcon(image);
     }
 
+    /**
+     * Initializes the TrackPanel and adds it to the race panel.
+     * This method is called when the Start Race button is pressed.
+     * @param head head node of the track
+     * @param cars list of cars to pass to track
+     */
     public void toTrack(Node head, ArrayList<Car> cars) {
         race = new JPanel(new BorderLayout());
         race.setPreferredSize(new Dimension(gameWidth, frameHeight));
