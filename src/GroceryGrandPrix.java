@@ -171,7 +171,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
 
                 // Determines how the game will continue based on user input and the user's placement.
                 if (continueGame) {
-                    if (lastCar.isPlayer()) {
+                    if (lastCar.isPlayer() || round == 3) {
                         restart();
                     } else {
                         cars.remove(lastCar);
@@ -254,6 +254,12 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
 
         return new int[]{stat1, stat2, stat3};
     }
+
+    /**
+     * Procedurally generates a double linked-list of Node objects.
+     * Each node moves clock-wise from one node to the next.
+     * @param number The number of Nodes to be created.
+     */
     private void generateNodes(int number) {
         Random rand = new Random();
         double x = rand.nextDouble()*400 + 50;
