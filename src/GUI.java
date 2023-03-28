@@ -630,7 +630,7 @@ public class GUI extends JFrame{
         track.repaint();
     }
 
-    /**
+    /**Phoenix Ganz-Ratzat
      * Shows the results of every race after it has been concluded and prompts the user to continue the game.
      *
      * @param placedCars The list of Cars in order from 1st to last in the previous race.
