@@ -152,7 +152,7 @@ public class TrackPanel extends JPanel {
             g2.drawImage(rotatedImage, Math.round((float)((carCoord.getX()-(width/2))+((carOffsetModifier)*carOffset*cosine))),
                     Math.round((float) ((carCoord.getY()-(height/2))+((carOffsetModifier)*carOffset*sine))), null);
             g2.setColor(Color.YELLOW);
-            g2.drawString(String.format("%s: %.2fmph", car.getImageName(), car.getMomentum()*60), 25,  getHeight()-25*i);
+            g2.drawString(String.format("%s: %.2fmph", car.getImageName(), car.getMomentum()*60), 25,  getHeight()-75+25*i);
         }
 
     }
