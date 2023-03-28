@@ -150,6 +150,10 @@ public class Car {
         return lastNode;
     }
 
+    public double getMomentum() {
+        return momentum;
+    }
+
     @Override
     public String toString() {
         return String.format("Car{\n" +

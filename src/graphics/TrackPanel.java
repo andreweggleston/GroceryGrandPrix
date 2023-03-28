@@ -26,10 +26,13 @@ import java.util.List;
 public class TrackPanel extends JPanel {
 
     private List<Line2D.Double> trackSegments;
+    private List<Point2D> nodePoints;
     private Car[] cars;
     private BufferedImage[] carImages;
     private BasicStroke roadStroke;
     private final int carOffset = 8;
+    private final Color textColor = new Color(197, 17, 188);
+    private final Font textFont = new Font(Font.MONOSPACED, Font.BOLD, 30);
 
     /**
      * Generates a new TrackPanel, reading each Car's imageName and reading the sprites with the corresponding name in
@@ -41,11 +44,13 @@ public class TrackPanel extends JPanel {
     public TrackPanel(Node head, List<Car> cars) {
         super(new BorderLayout(), true);
         trackSegments = new ArrayList<>();
+        nodePoints = new ArrayList<>();
         this.setVisible(true);
 
         //Create Track segments
         Node temp = head;
         do {
+            nodePoints.add(temp.getCoord());
             Point2D p1 = temp.getCoord();
             temp = temp.next();
             Point2D p2 = temp.getCoord();
@@ -100,10 +105,19 @@ public class TrackPanel extends JPanel {
         RenderingHints antiAliasing = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHints(antiAliasing);
 
+
+
         //Draw track segments
         g2.setStroke(roadStroke);
         for (Line2D.Double segment : trackSegments) {
             g2.draw(segment);
+        }
+
+        for (int i = 0; i < nodePoints.size(); i++) {
+            g2.setColor(textColor);
+            Point2D nodePoint = nodePoints.get(i);
+            g2.setFont(textFont);
+            g2.drawString(String.valueOf((char)(i+65)), (float)nodePoint.getX(), (float)nodePoint.getY());
         }
 
         //draw cars, offset from the center of the track
@@ -143,6 +157,8 @@ public class TrackPanel extends JPanel {
             //paint the rotated car, at the position on the track with the offset indicated
             g2.drawImage(rotatedImage, Math.round((float)((carCoord.getX()-(width/2))+((carOffsetModifier)*carOffset*cosine))),
                     Math.round((float) ((carCoord.getY()-(height/2))+((carOffsetModifier)*carOffset*sine))), null);
+            g2.setColor(Color.YELLOW);
+            g2.drawString(String.format("%s: %.2fmph", car.getImageName(), car.getMomentum()*60), 25,  getHeight()-25*i);
         }
 
     }
