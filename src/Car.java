@@ -1,9 +1,9 @@
 //Andrew Eggleston a_eggleston1, Lee Snyder
 
 /**
- * Car represents a car on the track
+ * Car represents a car on the track. <p>
  * Car has 3 final fields: a String representing the name of its sprite/preview image, a {@link CarStats} object holding
- * its stats, and a boolean representing whether it's a player.
+ * its stats, and a boolean representing whether it's a player. <p>
  * Car also has 4 mutable fields: momentum representing how fast the Car is traveling, a lastNode the last turn the Car
  * has passed, a distanceFromLast being the Car's distance from that last node, and a goalNode which also happens to be
  * the Car's starting node.

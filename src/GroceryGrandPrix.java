@@ -14,10 +14,13 @@ import java.util.*;
 
 /**
  * GroceryGrandPrix Creates and manages the components required for a grocery themed racing simulation game.
+ * <p>
  * The loop of the game involves going through this series of events:
- *                      Assign Points -> Watch Race -> See Results -> Assign Points etc.
+ * <p>
+ *                      Assign Points -&gt; Watch Race -&gt; See Results -&gt; Assign Points etc.
+ * <p>
  * Depending on the result of the race the game may continue or be reset.
- *
+ * <p>
  * A series of sliders utilizing GroceryGrandPrix are used to assign a set of allotted points to a users stats.
  * CarStats objects are passed to Cars to hold the three stats. The Cars drive on the track after being initialized.
  * A linked list of Nodes is used to procedurally generate a circular track.
