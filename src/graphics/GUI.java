@@ -1,39 +1,38 @@
 package graphics;
-
 import shared.Car;
 import shared.Node;
-import shared.Sprite;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
-public class GUI extends JFrame implements MouseListener {
-    private int gameWidth, gameHeight, windowWidth, windowHeight, cardWidth, cardHeight;
-    float previewScale;
+public class GUI extends JFrame{
+    private int gameWidth, gameHeight, frameWidth, frameHeight, cardWidth, cardHeight;
+    private float previewScale;
     private final Dimension gameBounds;
     private final Dimension windowBounds;
+    private final Dimension controlBounds;
     private String previewName;
     private Color backgroundColor, foregroundColor;
-    private final Font menuFontPLAIN = new Font("Calibri", Font.PLAIN, 18);
-    private final Font menuFontBOLD = new Font("Calibri", Font.BOLD, 22);
-    private final Font menuFontMED = new Font("Calibri", Font.BOLD, 18);
-    private final Font menuFontBEEG = new Font("Calibri", Font.BOLD, 36);
+    private final Font plain = new Font("Calibri", Font.PLAIN, 18);
+    private final Font bold = new Font("Calibri", Font.BOLD, 22);
+    private final Font boldSmall = new Font("Calibri", Font.BOLD, 18);
+    private final Font boldLarge = new Font("Calibri", Font.BOLD, 36);
     private HashMap<String, BufferedImage> images;
     private JLabel[] thumbLabels;
     private ArrayList<JPanel> cards, thumbnails;
-    private JPanel game, menu, uiGrid, uiBox, previewWindow, previewCards, center, track;
+    private JPanel menu, uiGrid, uiBox, previewWindow, game, previewCards, race, track, controls;
     private JSlider speedSlider, accelerationSlider, handlingSlider;
-    private JButton startButton, hurryButton, pauseButton, restartButton, lastPreviewButton, nextPreviewButton;
+    private JButton startButton, hurryButton, pauseButton, lastPreviewButton, nextPreviewButton;
     private JLabel selectVehicle, allocateStatsLabel, speedLabel, accelerationLabel, handlingLabel, budgetLabel, budgetValue, nameLabel, previewLabel;
 
-    public GUI(String title, JComponent[] inputs, HashMap<String, BufferedImage> images, int width, int height) throws IOException {
+    //default constructor
+    public GUI(){
+        this("Untitled Racing Game", new JComponent[]{}, new HashMap<String, BufferedImage>(), 800, 600);
+    }
+    //constructor called by GroceryGrandPrix
+    public GUI(String title, JComponent[] inputs, HashMap<String, BufferedImage> images, int width, int height){
         super(title);
 
         this.images = images;
@@ -43,37 +42,42 @@ public class GUI extends JFrame implements MouseListener {
 
         gameWidth = width;
         gameHeight = height;
-        windowWidth = (int)(gameWidth*1.25);
-        windowHeight = gameHeight;
-        cardWidth = windowWidth-width;
-        cardHeight = gameHeight/4;
-        windowBounds = new Dimension(windowWidth, windowHeight);
+        frameWidth = (int) (gameWidth * 1.25);//sets up frame to have 20% more horizontal width than game window for preview cards during races
+        frameHeight = (int) (frameWidth * 0.5625);//forces frame to 16:9 aspect ratio
+        if (gameHeight > frameHeight) frameHeight = (int) (gameHeight * 1.15);//failsafe for unexpected game dimensions
+        cardWidth = frameWidth - gameWidth;
+        cardHeight = frameHeight / 4;
         gameBounds = new Dimension(gameWidth, gameHeight);
+        windowBounds = new Dimension(frameWidth, frameHeight);
+        controlBounds = new Dimension(gameWidth, (frameHeight - gameHeight));
 
         menu = new JPanel(); //has uiGrid and ridePreviewPanel
         menu.setLayout(new BoxLayout(menu, BoxLayout.X_AXIS));
         menu.setBackground(backgroundColor);
 
-        game = new JPanel();
+        game = new JPanel(new BorderLayout());
         game.setBackground(this.backgroundColor);
         game.setForeground(this.foregroundColor);
-        game.setLayout(new BorderLayout());
+
+        controls = new JPanel(new GridBagLayout());
+        controls.setPreferredSize(controlBounds);
+        controls.setMaximumSize(controlBounds);
+        controls.setMinimumSize(controlBounds);
+        controls.setBackground(this.backgroundColor);
 
         initializeMenuComponents(inputs);
 
-        center = new JPanel(); //everything but previewCards in game
-        center.setPreferredSize(gameBounds);
-        center.setBackground(backgroundColor);
-
         //this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
     }
-    private void initializeMenuComponents(JComponent[] inputs){
+
+    private void initializeMenuComponents(JComponent[] inputs) {
+        GridBagConstraints buttonConstraints = new GridBagConstraints();
+        buttonConstraints.insets = new Insets(0,20,0,20);
         for (JComponent input : inputs) {
             if (input instanceof JButton) {
                 JButton button = (JButton) input;
-                button.setFont(menuFontBOLD);
+                button.setFont(bold);
                 switch (button.getActionCommand()) {
                     case "race":
                         startButton = button;
@@ -82,10 +86,19 @@ public class GUI extends JFrame implements MouseListener {
                     case "fast":
                         hurryButton = button;
                         hurryButton.setText("Hurry");
+                        buttonConstraints.gridx = 1;
+                        buttonConstraints.weightx = 0.5;
+                        buttonConstraints.anchor = GridBagConstraints.WEST;
+                        controls.add(hurryButton, buttonConstraints);
+
                         break;
                     case "stop":
                         pauseButton = button;
                         pauseButton.setText("Pause");
+                        buttonConstraints.gridx = 0;
+                        buttonConstraints.weightx = 0.5;
+                        buttonConstraints.anchor = GridBagConstraints.EAST;
+                        controls.add(pauseButton, buttonConstraints);
                         break;
                     case "last":
                         lastPreviewButton = button;
@@ -96,17 +109,16 @@ public class GUI extends JFrame implements MouseListener {
                         nextPreviewButton.setText(">");
                         break;
                 }
-            }
-            else if (input instanceof JSlider) {
+            } else if (input instanceof JSlider) {
                 JSlider slider = (JSlider) input;
                 switch (slider.getName()) {
-                    case "spd" :
+                    case "spd":
                         speedSlider = slider;
                         speedSlider.setPaintTicks(true);
                         speedSlider.setMajorTickSpacing(1);
                         speedSlider.setBackground(backgroundColor);
                         break;
-                    case "acc" :
+                    case "acc":
                         accelerationSlider = slider;
                         accelerationSlider.setPaintTicks(true);
                         accelerationSlider.setMajorTickSpacing(1);
@@ -133,41 +145,41 @@ public class GUI extends JFrame implements MouseListener {
         previewLabel = new JLabel(new ImageIcon(), JLabel.LEFT);
         //JLabels
         selectVehicle = new JLabel("SELECT VEHICLE:", JLabel.CENTER);
-        selectVehicle.setFont(menuFontBOLD);
+        selectVehicle.setFont(bold);
         selectVehicle.setForeground(foregroundColor);
         allocateStatsLabel = new JLabel("ALLOCATE STAT POINTS:", JLabel.CENTER);
-        allocateStatsLabel.setFont(menuFontBOLD);
+        allocateStatsLabel.setFont(bold);
         allocateStatsLabel.setForeground(foregroundColor);
         speedLabel = new JLabel("Top Speed", JLabel.CENTER);
-        speedLabel.setFont(menuFontBOLD);
+        speedLabel.setFont(bold);
         speedLabel.setForeground(foregroundColor);
 
         accelerationLabel = new JLabel("Acceleration", JLabel.CENTER);
-        accelerationLabel.setFont(menuFontBOLD);
+        accelerationLabel.setFont(bold);
         accelerationLabel.setForeground(foregroundColor);
 
         handlingLabel = new JLabel("Handling", JLabel.CENTER);
-        handlingLabel.setFont(menuFontBOLD);
+        handlingLabel.setFont(bold);
         handlingLabel.setForeground(foregroundColor);
 
-        budgetLabel = new JLabel ("POINTS AVAILABLE: ", JLabel.RIGHT);
-        budgetLabel.setFont(menuFontBOLD);
+        budgetLabel = new JLabel("POINTS AVAILABLE: ", JLabel.RIGHT);
+        budgetLabel.setFont(bold);
         budgetLabel.setForeground(foregroundColor);
 
-        budgetValue = new JLabel ("00", JLabel.LEFT);
-        budgetValue.setFont(menuFontBOLD);
+        budgetValue = new JLabel("00", JLabel.LEFT);
+        budgetValue.setFont(bold);
         budgetValue.setForeground(Color.GREEN);
 
         //JToolTips
         ToolTipManager.sharedInstance().setInitialDelay(0);
         ToolTipManager.sharedInstance().setDismissDelay(8000);
-        UIManager.put("ToolTip.font", menuFontPLAIN);
+        UIManager.put("ToolTip.font", plain);
         speedLabel.setToolTipText("Sets vehicle's top speed");
         accelerationLabel.setToolTipText("<html>"
-                                       + "Sets rate at which top speed is "
-                                       + "<br>"
-                                       + "reached from rest"
-                                       + "</html>");
+                + "Sets rate at which top speed is "
+                + "<br>"
+                + "reached from rest"
+                + "</html>");
         handlingLabel.setToolTipText("<html>"
                 + "Sets vehicle's chance to perform "
                 + "<br>"
@@ -176,14 +188,14 @@ public class GUI extends JFrame implements MouseListener {
                 + "control (stopping briefly)"
                 + "</html>");
         budgetLabel.setToolTipText("<html>"
-                                 + "Number of points to be allocated "
-                                 + "<br>"
-                                 + "to your vehicle's stats. You can't "
-                                 + "<br>"
-                                 + "start a race until there are zero "
-                                 + "<br>"
-                                 + "points available"
-                                 + "</html>");
+                + "Number of points to be allocated "
+                + "<br>"
+                + "to your vehicle's stats. You can't "
+                + "<br>"
+                + "start a race until there are zero "
+                + "<br>"
+                + "points available"
+                + "</html>");
     }
 
     public void switchToPlayerMenu() {
@@ -197,12 +209,11 @@ public class GUI extends JFrame implements MouseListener {
         menu.setPreferredSize(windowBounds);
         menu.setMinimumSize(windowBounds);
         int menuWidth = 320;
-        if(System.getProperty("os.name").contains("Mac")){
+        if (System.getProperty("os.name").contains("Mac")) {
             menuWidth = 400;
-            System.out.println(System.getProperty("os.name"));
         }
         int menuHeight = 1080;
-        Dimension boxBounds = new Dimension(menuWidth+40, menuHeight);
+        Dimension boxBounds = new Dimension(menuWidth + 40, menuHeight);
         Dimension gridBounds = new Dimension(menuWidth, menuHeight);
 
 
@@ -218,9 +229,9 @@ public class GUI extends JFrame implements MouseListener {
         uiGrid.setMaximumSize(gridBounds);
         uiGrid.setLayout(new GridBagLayout());
 
-        Insets zero = new Insets(0,0,0,0);
-        Insets vertical5_10 = new Insets(5,0,10,0);
-        Insets vertical50_20 = new Insets(50,0,20,0);
+        Insets zero = new Insets(0, 0, 0, 0);
+        Insets vertical5_10 = new Insets(5, 0, 10, 0);
+        Insets vertical50_20 = new Insets(50, 0, 20, 0);
 
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.insets = vertical50_20;
@@ -240,7 +251,7 @@ public class GUI extends JFrame implements MouseListener {
         uiGrid.add(lastPreviewButton, menuConstraints);
 
         nameLabel = new JLabel("", JLabel.CENTER);
-        nameLabel.setFont(menuFontBEEG);
+        nameLabel.setFont(boldLarge);
         nameLabel.setForeground(foregroundColor);
         menuConstraints.fill = GridBagConstraints.HORIZONTAL;
         menuConstraints.insets = vertical5_10;
@@ -353,7 +364,7 @@ public class GUI extends JFrame implements MouseListener {
         previewConstraints.anchor = GridBagConstraints.SOUTHWEST;
         previewWindow.add(previewLabel, previewConstraints);
         previewWindow.setBackground(backgroundColor);
-        previewWindow.setMinimumSize(new Dimension(1700 ,830));
+        previewWindow.setMinimumSize(new Dimension(1700, 830));
 
         uiBox.add(uiGrid, BorderLayout.EAST);
         menu.add(uiBox, BorderLayout.WEST);
@@ -373,26 +384,25 @@ public class GUI extends JFrame implements MouseListener {
         }
     }
 
-    public void createPreviewCards(ArrayList <Car> cars) {
+    public void createPreviewCards(ArrayList<Car> cars) {
 
         Color cardColor = new Color(190, 198, 211);
-        Color[] statColors = new Color[]{new Color(255, 0, 255), new Color(255, 68, 0), new Color(251, 95, 28), new Color(224, 114, 40), new Color(201, 141, 51), new Color(206, 166, 51), new Color(167, 176, 62), new Color(133, 183, 80), new Color(104, 197, 98), new Color(28, 251, 135), new Color(0, 255, 183)};
-        int unitWidth = (cardWidth-40)/10;
+        Color[] statColors = new Color[]{new Color(255, 0, 255), new Color(255, 0, 0), new Color(255, 100, 0), new Color(255, 145, 0), new Color(255, 199, 0), new Color(255, 251, 0), new Color(221, 255, 0), new Color(191, 255, 0), new Color(140, 255, 0), new Color(0, 255, 140), new Color(0, 255, 196)};
+        int unitWidth = (cardWidth - 40) / 10;
         cards = new ArrayList<JPanel>();
         thumbnails = new ArrayList<JPanel>();
         previewCards = new JPanel();
         previewCards.setLayout(new BoxLayout(previewCards, BoxLayout.Y_AXIS));
         previewCards.setBackground(cardColor);
 
-        previewCards.setPreferredSize(new Dimension(cardWidth, windowHeight));
-        previewCards.setMinimumSize(new Dimension(cardWidth, windowHeight));
-        previewCards.setMaximumSize(new Dimension(cardWidth, windowHeight));
+        previewCards.setPreferredSize(new Dimension(cardWidth, frameHeight));
+        previewCards.setMinimumSize(new Dimension(cardWidth, frameHeight));
+        previewCards.setMaximumSize(new Dimension(cardWidth, frameHeight));
 
         thumbLabels = new JLabel[cars.size()];
 
         GridBagConstraints cardConstraints = new GridBagConstraints();
-        for(Car car : cars){
-            System.out.println("spd: " + car.getTopSpeed() + " acc: " + car.getAcceleration() + " han: " + car.getHandling());
+        for (Car car : cars) {
             String img = car.getImageName();
             cards.add(cars.indexOf(car), new JPanel(new BorderLayout()));
 
@@ -402,72 +412,66 @@ public class GUI extends JFrame implements MouseListener {
             cards.get(cars.indexOf(car)).setBackground(cardColor);
 
             //Process thumbnail from image
-            float thumbScale = ((float)(120))/((float)((images.get(img).getHeight())));
+            float thumbScale = ((float) (((cardWidth-40)*0.4))) / ((float) ((images.get(img).getHeight())));
             thumbLabels[cars.indexOf(car)] = new JLabel(getScaledIcon(car.getImageName(), thumbScale));
 
             thumbnails.add(cars.indexOf(car), new JPanel());
             thumbnails.get(cars.indexOf(car)).setLayout(new GridBagLayout());
             thumbnails.get(cars.indexOf(car)).setBackground(foregroundColor);//leave as foreground
-            cardConstraints.insets = new Insets(0,0,0,0);
+            cardConstraints.insets = new Insets(0, 0, 0, 0);
             cardConstraints.anchor = GridBagConstraints.SOUTH;
             cardConstraints.weightx = 0;
             cardConstraints.weighty = 1.0;
             thumbnails.get(cars.indexOf(car)).add(thumbLabels[cars.indexOf(car)], cardConstraints);
-            thumbnails.get(cars.indexOf(car)).setPreferredSize(new Dimension(300, 120));
-            thumbnails.get(cars.indexOf(car)).setMaximumSize(new Dimension(300, 120));
+            thumbnails.get(cars.indexOf(car)).setPreferredSize(new Dimension(cardWidth-40, (int)((cardWidth-40)*0.4)));
+            thumbnails.get(cars.indexOf(car)).setMaximumSize(new Dimension(cardWidth-40, 120));
 
             JPanel licensePlate = new JPanel();
             licensePlate.setBackground(cardColor);
             JLabel plateName = new JLabel(car.getImageName().toUpperCase());
-            plateName.setFont(menuFontMED);
+            plateName.setFont(boldSmall);
             licensePlate.add(plateName);
 
             JPanel speedBar = new JPanel();
-            Dimension speedLength = new Dimension((unitWidth*car.getTopSpeed()), 3);
-            //Box.Filler speedFiller = new Box.Filler(speedLength, speedLength, speedLength);
-            Component speedFiller = Box.createHorizontalStrut(unitWidth*car.getTopSpeed());
+            Dimension speedLength = new Dimension((unitWidth * car.getTopSpeed()), 3);
+            Component speedFiller = Box.createHorizontalStrut(unitWidth * car.getTopSpeed());
             speedBar.add(speedFiller);
             speedBar.setMaximumSize(speedLength);
             speedBar.setBackground(statColors[car.getTopSpeed()]);
             speedBar.setToolTipText(car.getTopSpeed() + " TOP SPEED");
 
-            Dimension speedSpacerLength = new Dimension((unitWidth*(10-car.getTopSpeed())), 3);
-            //Box.Filler speedSpacer = new Box.Filler(speedSpacerLength, speedSpacerLength, speedSpacerLength);
-            Component speedSpacer = Box.createHorizontalStrut(unitWidth*(10-car.getTopSpeed()));
+            Dimension speedSpacerLength = new Dimension((unitWidth * (10 - car.getTopSpeed())), 3);
+            Component speedSpacer = Box.createHorizontalStrut(unitWidth * (10 - car.getTopSpeed()));
             JPanel speedBarSpacer = new JPanel();
             speedBarSpacer.add(speedSpacer);
             speedBarSpacer.setMaximumSize(speedSpacerLength);
             speedBarSpacer.setBackground(cardColor);
 
             JPanel accelerationBar = new JPanel();
-            Dimension accelerationLength = new Dimension((unitWidth*car.getAcceleration()), 3);
-            //Box.Filler accelerationFiller = new Box.Filler(accelerationLength, accelerationLength, accelerationLength);
-            Component accelerationFiller = Box.createHorizontalStrut(unitWidth*car.getAcceleration());
+            Dimension accelerationLength = new Dimension((unitWidth * car.getAcceleration()), 3);
+            Component accelerationFiller = Box.createHorizontalStrut(unitWidth * car.getAcceleration());
             accelerationBar.add(accelerationFiller);
             accelerationBar.setMaximumSize(accelerationLength);
             accelerationBar.setBackground(statColors[car.getAcceleration()]);
             accelerationBar.setToolTipText(car.getAcceleration() + " ACCELERATION");
 
-            Dimension accelerationSpacerLength = new Dimension((unitWidth*(10-car.getAcceleration())), 3);
-            //Box.Filler accelerationSpacer = new Box.Filler(accelerationSpacerLength, accelerationSpacerLength, accelerationSpacerLength);
-            Component accelerationSpacer = Box.createHorizontalStrut(unitWidth*(10-car.getAcceleration()));
+            Dimension accelerationSpacerLength = new Dimension((unitWidth * (10 - car.getAcceleration())), 3);
+            Component accelerationSpacer = Box.createHorizontalStrut(unitWidth * (10 - car.getAcceleration()));
             JPanel accelerationBarSpacer = new JPanel();
             accelerationBarSpacer.add(accelerationSpacer);
             accelerationBarSpacer.setMaximumSize(accelerationSpacerLength);
             accelerationBarSpacer.setBackground(cardColor);
 
             JPanel handlingBar = new JPanel();
-            Dimension handlingLength = new Dimension((unitWidth*car.getHandling()), 3);
-            //Box.Filler handlingFiller = new Box.Filler(handlingLength, handlingLength, handlingLength);
-            Component handlingFiller = Box.createHorizontalStrut(unitWidth*car.getHandling());
+            Dimension handlingLength = new Dimension((unitWidth * car.getHandling()), 3);
+            Component handlingFiller = Box.createHorizontalStrut(unitWidth * car.getHandling());
             handlingBar.add(handlingFiller);
             handlingBar.setMaximumSize(handlingLength);
             handlingBar.setBackground(statColors[car.getHandling()]);
             handlingBar.setToolTipText(car.getHandling() + " HANDLING");
 
-            Dimension handlingSpacerLength = new Dimension ((unitWidth*(10-car.getHandling())), 3);
-            //Box.Filler handlingSpacer = new Box.Filler(handlingSpacerLength, handlingSpacerLength, handlingSpacerLength);
-            Component handlingSpacer = Box.createHorizontalStrut(unitWidth*(10-car.getHandling()));
+            Dimension handlingSpacerLength = new Dimension((unitWidth * (10 - car.getHandling())), 3);
+            Component handlingSpacer = Box.createHorizontalStrut(unitWidth * (10 - car.getHandling()));
             JPanel handlingBarSpacer = new JPanel();
             handlingBarSpacer.add(handlingSpacer);
             handlingBarSpacer.setMaximumSize(handlingSpacerLength);
@@ -477,48 +481,49 @@ public class GUI extends JFrame implements MouseListener {
             statsDisplay.setLayout(new GridBagLayout());
             statsDisplay.setBackground(cardColor);
 
-            cardConstraints.insets = new Insets(0,0,3,0);
-            cardConstraints.anchor = GridBagConstraints.WEST;
-            cardConstraints.fill = GridBagConstraints.HORIZONTAL;
             //speed fill
-            cardConstraints.gridx = 0;
+            cardConstraints.anchor = GridBagConstraints.WEST;
+            cardConstraints.insets = new Insets(0, 0, 3, 0);
+            cardConstraints.gridx = 1;
             cardConstraints.gridy = 0;
             cardConstraints.gridwidth = car.getTopSpeed();
+            cardConstraints.gridheight = 1;
             cardConstraints.weighty = 0;
             statsDisplay.add(speedBar, cardConstraints);
 
+
             //acceleration fill
-            cardConstraints.gridx = 0;
+            cardConstraints.gridx = 1;
             cardConstraints.gridy = 1;
             cardConstraints.gridwidth = car.getAcceleration();
             cardConstraints.weighty = 0;
             statsDisplay.add(accelerationBar, cardConstraints);
 
             //handling fill
-            cardConstraints.gridx = 0;
+            cardConstraints.gridx = 1;
             cardConstraints.gridy = 2;
             cardConstraints.gridwidth = car.getHandling();
             cardConstraints.weighty = 0;
             statsDisplay.add(handlingBar, cardConstraints);
 
-
             //speed spacer
             cardConstraints.gridx = car.getTopSpeed();
             cardConstraints.gridy = 0;
-            cardConstraints.gridwidth = 10-car.getTopSpeed();
+            cardConstraints.gridwidth = 10 - car.getTopSpeed();
             cardConstraints.weighty = 0;
             statsDisplay.add(speedBarSpacer, cardConstraints);
 
             //acceleration spacer
             cardConstraints.gridx = car.getAcceleration();
             cardConstraints.gridy = 1;
-            cardConstraints.gridwidth = 10-car.getAcceleration();
+            cardConstraints.gridwidth = 10 - car.getAcceleration();
             cardConstraints.weighty = 0;
             statsDisplay.add(accelerationBarSpacer, cardConstraints);
+
             //handling spacer
             cardConstraints.gridx = car.getHandling();
             cardConstraints.gridy = 2;
-            cardConstraints.gridwidth = 10-car.getHandling();
+            cardConstraints.gridwidth = 10 - car.getHandling();
             cardConstraints.weighty = 0;
             statsDisplay.add(handlingBarSpacer, cardConstraints);
 
@@ -529,22 +534,23 @@ public class GUI extends JFrame implements MouseListener {
             previewCenter.add(licensePlate);
             previewCenter.add(statsDisplay);
 
-            cards.get(cars.indexOf(car)).add(Box.createHorizontalStrut(20), BorderLayout.NORTH);
+            cards.get(cars.indexOf(car)).add(Box.createVerticalStrut(20), BorderLayout.NORTH);
             cards.get(cars.indexOf(car)).add(previewCenter, BorderLayout.CENTER);
-            cards.get(cars.indexOf(car)).add(Box.createVerticalStrut(20), BorderLayout.WEST);
-            cards.get(cars.indexOf(car)).add(Box.createVerticalStrut(20), BorderLayout.EAST);
-            cards.get(cars.indexOf(car)).add(Box.createHorizontalStrut(8), BorderLayout.SOUTH);
+            cards.get(cars.indexOf(car)).add(Box.createHorizontalStrut(20), BorderLayout.WEST);
+            cards.get(cars.indexOf(car)).add(Box.createHorizontalStrut(20), BorderLayout.EAST);
+            cards.get(cars.indexOf(car)).add(Box.createVerticalStrut(20), BorderLayout.SOUTH);
             previewCards.add(cards.get(cars.indexOf(car)), car);
         }
     }
 
-    public void changePreviewDisplay(String name){
+    public void changePreviewDisplay(String name) {
         previewName = name;
         nameLabel.setText(previewName.toUpperCase());
         previewLabel.setIcon(getScaledIcon(previewName, previewScale));
         uiGrid.revalidate();
     }
-    private ImageIcon getScaledIcon(String name, float scaleFactor){
+
+    private ImageIcon getScaledIcon(String name, float scaleFactor) {
         int iconX = (int) (images.get(name).getWidth() * scaleFactor);
         int iconY = (int) (images.get(name).getHeight() * scaleFactor);
 
@@ -556,15 +562,22 @@ public class GUI extends JFrame implements MouseListener {
         return new ImageIcon(image);
     }
 
-    public void toTrack(Node head, ArrayList <Car> cars) {
+    public void toTrack(Node head, ArrayList<Car> cars) {
+        race = new JPanel(new BorderLayout());
+        race.setPreferredSize(new Dimension(gameWidth, frameHeight));
         track = new TrackPanel(head, cars);
         track.setBackground(backgroundColor);
         track.setPreferredSize(gameBounds);
+
+        race.add(track, BorderLayout.CENTER);
+        race.add(controls, BorderLayout.SOUTH);
+
         createPreviewCards(cars);
+
         game.removeAll();
         game.add(previewCards, BorderLayout.WEST);
-        game.add(track, BorderLayout.CENTER);
-        track.addMouseListener(this);
+        game.add(race, BorderLayout.CENTER);
+
         this.setContentPane(game);
         this.pack();
         this.revalidate();
@@ -574,8 +587,9 @@ public class GUI extends JFrame implements MouseListener {
 
     /**
      * Shows the results of every race after it has been concluded and prompts the user to continue the game.
+     *
      * @param placedCars The list of Cars in order from 1st to last in the previous race.
-     * @param raceTime How much time the race took in seconds.
+     * @param raceTime   How much time the race took in seconds.
      * @return A boolean indicated whether the user would like to continue the game.
      */
     public boolean showResults(ArrayList<Car> placedCars, int raceTime) {
@@ -637,13 +651,13 @@ public class GUI extends JFrame implements MouseListener {
             playerStats.setAlignmentX(Component.CENTER_ALIGNMENT);
             playerStats.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 32));
 
-            placementScale = ((float)(80))/((float)((images.get(carName).getHeight())));
+            placementScale = ((float) (80)) / ((float) ((images.get(carName).getHeight())));
             JLabel playerImageLabel = new JLabel();
             playerImageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             playerImageLabel.setIcon(getScaledIcon(carName, placementScale));
 
             carName = opponent.getImageName();
-            placementScale = ((float)(60))/((float)((images.get(carName).getHeight())));
+            placementScale = ((float) (60)) / ((float) ((images.get(carName).getHeight())));
             JLabel opponentImageLabel = new JLabel();
             opponentImageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             opponentImageLabel.setIcon(getScaledIcon(carName, placementScale));
@@ -663,21 +677,20 @@ public class GUI extends JFrame implements MouseListener {
             placementPanel.add(loserLabel);
             placementPanel.add(opponentImageLabel);
             placementPanel.add(loserStats);
-        }
-        else {
+        } else {
             String placementSuffix;
             // Find the proper suffix for player's placement.
             switch (playerPlacement) {
-                case 1 :
+                case 1:
                     placementSuffix = "st";
                     break;
-                case 2 :
+                case 2:
                     placementSuffix = "nd";
                     break;
-                case 3 :
+                case 3:
                     placementSuffix = "rd";
                     break;
-                default :
+                default:
                     placementSuffix = "th";
             }
 
@@ -689,18 +702,17 @@ public class GUI extends JFrame implements MouseListener {
             promptLabel.setText((playerPlacement == placedCars.size()) ? "Try again?" : "Do you want to continue to the next round?");
 
 
-
             // Add every Car's preview image and the corresponding placement in the prior race to panels.
             for (i = 0; i < placedCars.size(); i++) {
                 // Getting Cars in opposing order from labels to accommodate GridLayouts format.
                 carName = placedCars.get((placedCars.size() - i) - 1).getImageName();
-                placementScale = ((float)(80))/((float)((images.get(carName).getHeight())));
+                placementScale = ((float) (80)) / ((float) ((images.get(carName).getHeight())));
 
                 JLabel nextImageLabel = new JLabel("", JLabel.CENTER);
                 nextImageLabel.setIcon(getScaledIcon(carName, placementScale));
 
                 JLabel rankingLabel = new JLabel("#" + (i + 1), JLabel.CENTER);
-                rankingLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, (int)(nextImageLabel.getPreferredSize().getHeight() * 3 / 4)));
+                rankingLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, (int) (nextImageLabel.getPreferredSize().getHeight() * 3 / 4)));
 
                 placementPanel.add(nextImageLabel, 0, i);
                 placementPanel.add(rankingLabel, 1, i);
@@ -718,34 +730,5 @@ public class GUI extends JFrame implements MouseListener {
         // Show all the components in the form of a ConfirmDialog. Save the user response as a boolean (false if no).
         userContinue = JOptionPane.showConfirmDialog(this, results, "Race Results", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE) != 1;
         return userContinue;
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        System.out.println(Math.atan2(e.getY() - gameBounds.getHeight()/2, e.getX() - gameBounds.getWidth()/2));
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        /*switch (((JButton) e.getSource()).getActionCommand()) {
-            case "Speed Help":
-                break;
-            case "Acceleration Help":
-                break;
-            case "Handling Help":
-                break;
-        }*/
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
     }
 }

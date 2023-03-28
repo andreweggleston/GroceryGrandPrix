@@ -48,7 +48,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
     private Timer gameLoop; // The Timer that has the race simulation as a listener.
 
     public GroceryGrandPrix() {
-        this(6, 3, 3);
+        this(7, 3, 3);
     }
 
     /**
@@ -106,7 +106,6 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
                 throw new IOException(String.format("Image %s failed to read. Are you sure it is an image?", previewFiles[i]));
             }
             previewMap.put(carNames[i], readImage);
-            //System.out.println("Name " + (i+1) + ": " + carNames[i] + "\n");
         }
         return previewMap;
     }
@@ -290,11 +289,6 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
             }while (((temp.distanceToNext() < 250 && failsafe > 995)|| temp.turn() > 2) && failsafe>0); //Puts a cap on how sharp the turns can be
             temp = temp.next();
         }
-        temp = trackHead;
-        do {
-            System.out.println(temp);
-            temp = temp.next();
-        } while (temp != trackHead );
     }
 
     @Override

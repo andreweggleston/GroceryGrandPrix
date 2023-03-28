@@ -39,7 +39,7 @@ public class TrackPanel extends JPanel {
      * @param cars list of cars to render in the panel
      */
     public TrackPanel(Node head, List<Car> cars) {
-        super(true);
+        super(new BorderLayout(), true);
         trackSegments = new ArrayList<>();
         this.setVisible(true);
 
@@ -59,13 +59,8 @@ public class TrackPanel extends JPanel {
             this.cars[i] = cars.get(i);
             try {
                 BufferedImage image = ImageIO.read(new File("assets/sprites/sprite_" + this.cars[i].getImageName() + "_size_0.png"));
-                //System.out.println("Image " + (i+1) + ": assets/sprites/sprite_" + this.cars[i].getImageName() + "_size_0.png\n");
-                int scaleX = (int)(image.getWidth()*.10); // for use with size_0
-                int scaleY = (int)(image.getHeight()*.10); // for use with size_0
-                //int scaleX = (int)(image.getWidth()*.75); // for use with size_1
-                // int scaleY = (int)(image.getHeight()*.75); // for use with size_1
-                //int scaleX = (int)(image.getWidth()*.30); // for use with size_2
-                //int scaleY = (int)(image.getHeight()*.30); // for use with size_2
+                int scaleX = (int)(image.getWidth()*.10);
+                int scaleY = (int)(image.getHeight()*.10);
                 Image img = image.getScaledInstance(scaleX, scaleY, Image.SCALE_SMOOTH);
                 image = new BufferedImage(scaleX, scaleY, BufferedImage.TYPE_INT_ARGB);
                 image.getGraphics().drawImage(img, 0, 0, null);
