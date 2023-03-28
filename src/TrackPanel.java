@@ -1,3 +1,5 @@
+//a_eggleston1 Andrew Eggleston
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -114,6 +116,7 @@ public class TrackPanel extends JPanel {
             g2.drawString(String.valueOf((char)(i+65)), (float)nodePoint.getX(), (float)nodePoint.getY());
         }
 
+        //Car offsets done by Phoenix
         //draw cars, offset from the center of the track
         for (int i = cars.length - 1; i >= 0; i--) {
             Car car = cars[i];
@@ -130,6 +133,7 @@ public class TrackPanel extends JPanel {
                     carOffsetModifier = (i == 1) ? i + 1 : i - 2;
             }
 
+            //painting car done by Andrew
             //get the 2d position on-screen of the car
             Point2D carCoord = calculateCoord(car);
             BufferedImage image = carImages[i];

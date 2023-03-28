@@ -1,4 +1,4 @@
-//Andrew Eggleston a_eggleston1, Lee Snyder
+//Andrew Eggleston a_eggleston1
 
 /**
  * Car represents a car on the track. <p>
