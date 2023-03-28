@@ -1,8 +1,3 @@
-package graphics;
-
-import shared.Car;
-import shared.Node;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +41,6 @@ public class TrackPanel extends JPanel {
         trackSegments = new ArrayList<>();
         nodePoints = new ArrayList<>();
         this.setVisible(true);
-
         //Create Track segments
         Node temp = head;
         do {
@@ -63,7 +57,7 @@ public class TrackPanel extends JPanel {
         for (int i = 0; i < cars.size(); i++) {
             this.cars[i] = cars.get(i);
             try {
-                BufferedImage image = ImageIO.read(new File("assets/sprites/sprite_" + this.cars[i].getImageName() + "_size_0.png"));
+                BufferedImage image = ImageIO.read(new File("src" + File.separator + "sprites" + File.separator + "sprite_" + this.cars[i].getImageName() + "_size_0.png"));
                 int scaleX = (int)(image.getWidth()*.10);
                 int scaleY = (int)(image.getHeight()*.10);
                 Image img = image.getScaledInstance(scaleX, scaleY, Image.SCALE_SMOOTH);

@@ -1,5 +1,4 @@
 //Andrew Eggleston a_eggleston1, Lee Snyder
-package shared;
 
 /**
  * Car represents a car on the track

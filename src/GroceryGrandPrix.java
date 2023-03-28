@@ -1,8 +1,4 @@
-//Lee Snyer
-import graphics.GUI;
-import shared.Car;
-import shared.CarStats;
-import shared.Node;
+//Phoenix Ganz-Ratzat, Lee Snyer
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -94,7 +90,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
      * @throws IOException if the contents of the files cannot be read as an image.
      */
     private HashMap<String, BufferedImage> fileReader() throws IOException {
-        File[] previewFiles = (new File("assets/previews")).listFiles();
+        File[] previewFiles = (new File("src" + File.separator + "previews")).listFiles();
         assert previewFiles != null;
 
         carNames = new String[previewFiles.length];

@@ -1,6 +1,3 @@
-package graphics;
-import shared.Car;
-import shared.Node;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;

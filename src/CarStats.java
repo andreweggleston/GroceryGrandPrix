@@ -1,7 +1,5 @@
 //Andrew Eggleston a_eggleston1
 
-package shared;
-
 /**
  * CarStats class used by Car and GroceryGrandPrix that encapsulates the translation from integer stats (1 through 10)
  * to double values used by car to calculate things like momentum and handling.
