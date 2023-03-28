@@ -268,7 +268,7 @@ public class GroceryGrandPrix implements ActionListener, ChangeListener {
         for (int i = 0; i < number-1; i++) {
             int failsafe = 1000;
             do {
-                switch (temp.getQuad()) {
+                switch (temp.getQuad(trackX, trackY)) {
                     case 1:
                         x = rand.nextDouble() * (trackX - temp.getCoord().getX() - 100) + temp.getCoord().getX(); //Goes right
                         y = rand.nextDouble() * (trackY / 2 - 50) + 50; //Stays top

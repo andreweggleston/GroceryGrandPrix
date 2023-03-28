@@ -23,16 +23,16 @@ public class Node {
     public Node next(){
         return next;
     }
-    public int getQuad(){ // 1 = top left, 2 = top right, 3 = bottom right, 4 = bottom left
+    public int getQuad(int width, int height){ // 1 = top left, 2 = top right, 3 = bottom right, 4 = bottom left
         int quad;
-        if (this.getCoord().getX() >= 600) {
-            if (this.getCoord().getY() >= 450) {
+        if (this.getCoord().getX() >= width/2) {
+            if (this.getCoord().getY() >= height/2) {
                 quad = 3;
             } else {
                 quad = 2;
             }
         } else {
-            if (this.getCoord().getY() >= 450) {
+            if (this.getCoord().getY() >= height/2) {
                 quad = 4;
             } else {
                 quad = 1;
@@ -64,7 +64,7 @@ public class Node {
     }
 
     public String toString(){
-        return "X: " + this.coord.getX() + " Y: " + this.coord.getY() + " Distance: " + distance + " Angle: " + angle + " Quad: " + this.getQuad();
+        return "X: " + this.coord.getX() + " Y: " + this.coord.getY() + " Distance: " + distance + " Angle: " + angle;
     }
 
     @Override
